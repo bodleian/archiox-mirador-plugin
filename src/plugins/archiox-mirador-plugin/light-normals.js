@@ -6,7 +6,6 @@ import ThreeCanvas from './three-canvas';
 import {getImageData, getMinMaxProperty, parseImageURL} from "./helpers";
 
 function TorchButton(props) {
-
     return (
         <div>
             <button
@@ -183,7 +182,7 @@ class lightNormals extends Component {
     }
 
     // this keeps track of values stored in state and compares them to the current values, if any of them change it causes
-    // a re-render
+    // a rerender
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevState.zoom !== this.threeCanvasProps.zoom ||
             prevState.rendererInstructions.intersection.width !== this.threeCanvasProps.rendererInstructions.intersection.width ||
