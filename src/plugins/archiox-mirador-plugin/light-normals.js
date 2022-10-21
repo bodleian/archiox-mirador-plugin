@@ -57,9 +57,9 @@ function getTiles(tileData, tileLevel, albedoMap, normalMap) {
     const normalImageData = getImageData(normalMap, tileData, tileLevel);
     const length = albedoImageData.urls.length;
     let tiles = [];
+
     // for each url in the object yielded by getImageData we can use
     // parseURL to get all the things like x, y, and width, and height of each tile that we need
-
     for (let i = 0; i < length; i++) {
         const albedoImageProperties = parseImageURL(
             albedoImageData.urls[i],
@@ -146,11 +146,14 @@ class lightNormals extends Component {
             );
 
             overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+
             // uncomment code below to enable debug mode in OpenSeaDragon
             // for (var i = 0; i < this.props.viewer.world.getItemCount(); i++) {
             //     this.props.viewer.world.getItemAt(i).debugMode = true;
             // }
 
+            // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
+            // glitch and not re-render until we cause the viewport-change event to trigger
             this.props.viewer.forceRedraw();
 
             this.props.viewer.addHandler('viewport-change',  (event) => {
@@ -172,12 +175,15 @@ class lightNormals extends Component {
             })
         }
 
+        // this will need replacing because I think that ReacDOM.render has been depricated
         !this.state.active ? ReactDOM.render(
             Overlay(this.threeCanvasProps),
             this.threeCanvas
         ) : ReactDOM.unmountComponentAtNode(this.threeCanvas)
     }
 
+    // this keeps track of values stored in state and compares them to the current values, if any of them change it causes
+    // a re-render
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevState.zoom !== this.threeCanvasProps.zoom ||
             prevState.rendererInstructions.intersection.width !== this.threeCanvasProps.rendererInstructions.intersection.width ||
