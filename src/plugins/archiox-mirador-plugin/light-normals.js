@@ -49,7 +49,7 @@ function getMap(annotationBodies, mapType) {
             }
         }
     });
-    return map
+    return map;
 }
 
 function getTiles(tileData, tileLevel, albedoMap, normalMap) {
@@ -75,10 +75,10 @@ function getTiles(tileData, tileLevel, albedoMap, normalMap) {
                 width: albedoImageProperties.intersection.w,
                 height: albedoImageProperties.intersection.h
             }
-        )
+        );
     }
 
-    return tiles
+    return tiles;
 }
 
 function getRendererInstructions(props) {
@@ -166,20 +166,20 @@ class lightNormals extends Component {
                 this.setState({rendererInstructions: this.threeCanvasProps.rendererInstructions});
                 //this.setState({tileLevel: this.threeCanvasProps.tileLevel});
                 overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
-            })
+            });
 
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
                 // remove all handlers os viewport-change isn't activated!
                 this.props.viewer.removeAllHandlers();
-            })
+            });
         }
 
         // this will need replacing because I think that ReacDOM.render has been depricated
         !this.state.active ? ReactDOM.render(
             Overlay(this.threeCanvasProps),
             this.threeCanvas
-        ) : ReactDOM.unmountComponentAtNode(this.threeCanvas)
+        ) : ReactDOM.unmountComponentAtNode(this.threeCanvas);
     }
 
     // this keeps track of values stored in state and compares them to the current values, if any of them change it causes
@@ -195,7 +195,7 @@ class lightNormals extends Component {
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
                 this.threeCanvas
-            ) : null
+            ) : null;
         }
     }
 
