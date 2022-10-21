@@ -19,3 +19,5 @@ Then to run the dev server.
 ```bash
 npm start
 ```
+# Development
+All new features should be placed in feature branches and not pushed direct to `Qa` or `Master` as per our other repos.  That way we can test new features without breaking anything.
