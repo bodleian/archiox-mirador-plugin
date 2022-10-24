@@ -143,7 +143,7 @@ class ThreeCanvas extends React.Component{
                 map: this.diffuseMap,
                 normalMap: this.normalMap,
                 flatShading: true,
-                normalScale: new THREE.Vector3( 1, 1 )
+                normalScale: new THREE.Vector3(1, 1)
             });
 
             const x = this.state.tiles[i].x + this.state.tiles[i].width / 2
