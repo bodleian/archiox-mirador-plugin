@@ -1,5 +1,5 @@
 import lightNormals from './light-normals';
-import { getCurrentCanvas } from 'mirador/dist/es/src/state/selectors';
+import {getCurrentCanvas} from 'mirador/dist/es/src/state/selectors';
 
 export default {
    target: 'OpenSeadragonViewer',
