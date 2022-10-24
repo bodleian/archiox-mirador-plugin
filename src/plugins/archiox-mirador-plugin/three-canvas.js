@@ -158,8 +158,8 @@ class ThreeCanvas extends React.Component{
         // centre the group of planes in the centre of the scene
         new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
 
-        this.ambientLight = new THREE.AmbientLight( 0xffffff, 0.1);
-        this.directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         this.directionalLight.position.set(0, 0, 1);
         this.directionalLight.castShadow = true;
         this.scene.add(this.group);
