@@ -94,7 +94,7 @@ function getRendererInstructions(props) {
     }
 }
 
-class lightNormals extends Component {
+class LightNormals extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -212,4 +212,4 @@ class lightNormals extends Component {
     }
 }
 
-export default lightNormals;
+export default LightNormals;

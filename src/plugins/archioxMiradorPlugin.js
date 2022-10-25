@@ -1,4 +1,4 @@
-import lightNormals from './lightNormals';
+import LightNormals from './lightNormals';
 import {getCurrentCanvas} from 'mirador/dist/es/src/state/selectors';
 
 export default {
@@ -7,5 +7,5 @@ export default {
         canvas: getCurrentCanvas(state, { windowId })
     }),
     mode: 'add',
-    component: lightNormals,
+    component: LightNormals,
 }
