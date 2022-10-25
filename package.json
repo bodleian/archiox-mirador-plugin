@@ -18,6 +18,7 @@
   ],
   "author": "Richard Benjamin Allen",
   "license": "N/A",
+  "module": "src/index.js",
   "bugs": {
     "url": "https://gitlab.bodleian.ox.ac.uk/arch0396/archiox-mirador-plugin/-/issues"
   },
