@@ -1,1 +1,1 @@
-export archiox-mirador-plugin from './plugins/archiox-mirador-plugin';
+export archioxMiradorPlugin from './plugins/archioxMiradorPlugin';

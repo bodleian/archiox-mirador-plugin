@@ -1,4 +1,4 @@
-import lightNormals from './light-normals';
+import lightNormals from './lightNormals';
 import {getCurrentCanvas} from 'mirador/dist/es/src/state/selectors';
 
 export default {
