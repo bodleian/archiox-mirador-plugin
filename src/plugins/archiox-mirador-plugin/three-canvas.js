@@ -143,6 +143,7 @@ class ThreeCanvas extends React.Component{
                 map: this.diffuseMap,
                 normalMap: this.normalMap,
                 flatShading: true,
+                normalScale: new THREE.Vector3(1, 1)
             });
 
             const x = this.state.tiles[i].x + this.state.tiles[i].width / 2
@@ -157,12 +158,10 @@ class ThreeCanvas extends React.Component{
         // centre the group of planes in the centre of the scene
         new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
 
-        this.ambientLight = new THREE.AmbientLight( 0xffffff, 0.5);
-        this.directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         this.directionalLight.position.set(0, 0, 1);
         this.directionalLight.castShadow = true;
-        this.directionalLight.mapSizeWidth = this.width;
-        this.directionalLight.mapSizeHeight = this.height;
         this.scene.add(this.group);
         this.scene.add(this.camera);
         this.scene.add(this.directionalLight);
