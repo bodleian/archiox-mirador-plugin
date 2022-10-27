@@ -1,22 +1,5 @@
 import React from "react";
 
-const ACCEPTABLE_FORMATS = [
-    "jpg",
-    "tif",
-    "png",
-    "gif",
-    "jp2",
-    "pdf",
-    "webp",
-]
-
-const ACCEPTABLE_QUALITIES = [
-    "color",
-    "grey",
-    "bitonal",
-    "default",
-]
-
 /**
  *
  * @param canvas
@@ -46,8 +29,8 @@ export function resizeCanvas(canvas) {
  * @param scaleFactor
  * @returns {{}}
  */
-export function explode(id, width, height, tileSource, scaleFactor) {
-    let tiles =[];
+export function generateTiles(id, width, height, tileSource, scaleFactor) {
+    let tiles = [];
     let tileCount = 0;
     const tileWidth = tileSource.width;
     const tileHeight = tileSource.height || tileSource.width;
@@ -64,194 +47,41 @@ export function explode(id, width, height, tileSource, scaleFactor) {
         let x = 0;
         while(x < width){
             let region;
+            let rw;
+            let rh;
+
             if(scaleWidth <= tileWidth && scaleHeight <= tileHeight){
+                rw = tileWidth;
+                rh = tileHeight;
                 region = 'full';
             } else {
-                let rw = Math.min(regionWidth, width - x);
-                let rh = Math.min(regionHeight, height - y);
+                rw = Math.min(regionWidth, width - x);
+                rh = Math.min(regionHeight, height - y);
                 region = x + "," + y + "," + rw + "," + rh;
             }
             const scaledWidthRemaining = Math.ceil((width - x) / scale);
+            const scaledHeightRemaining = Math.ceil((height - y) / scale);
             const tw = Math.min(tileWidth, scaledWidthRemaining);
+            const th = Math.min(tileHeight, scaledHeightRemaining);
             const iiifArgs = "/" + region + "/" + tw + ",/0/default.jpg";
-            tiles.push(id + iiifArgs);
+            
+            tiles.push({
+                url: id + iiifArgs,
+                intersection: {
+                    w: parseInt(rw),
+                    h: parseInt(rh),
+                    x: parseInt(x),
+                    y: parseInt(y)
+                }
+            })
+            
             tileCount++;
             x += regionWidth;
         }
         y += regionHeight;
     }
+    
     return tiles;
-}
-
-/**
- *
- * @param uuid
- * @returns {boolean}
- * @private
- */
-function _validateUUID(uuid) {
-    const regex = /^[\da-f]{8}-[\da-f]{4}-[0-5][\da-f]{3}-[089ab][\da-f]{3}-[\da-f]{12}$/i;
-
-    return new RegExp(regex).test(uuid);
-}
-
-/**
- *
- * @param intersection
- * @param width
- * @param height
- * @returns {{}|null}
- * @private
- */
-function _mapIntersection(intersection, width, height) {
-    let intersectionProperties = {};
-
-
-    // we need to use size to calculate actual size of tile
-    if (intersection === "full") {
-        intersectionProperties.x = 0;
-        intersectionProperties.y = 0;
-        intersectionProperties.w = parseInt(width);
-        intersectionProperties.h = parseInt(height);
-
-        return intersectionProperties;
-    }
-
-    const intersectionComponents = intersection.split(',');
-    if ( intersectionComponents.length !== 4 ) {
-        return null;
-    }
-
-    intersectionProperties.x = parseInt(intersectionComponents[0]);
-    intersectionProperties.y = parseInt(intersectionComponents[1]);
-    intersectionProperties.w = parseInt(intersectionComponents[2]);
-    intersectionProperties.h = parseInt(intersectionComponents[3]);
-
-    return intersectionProperties;
-}
-
-/**
- *
- * @param size
- * @param aspectRatio
- * @returns {{}|null}
- * @private
- */
-function _mapSize(size, aspectRatio) {
-    let sizeProperties = {};
-    const sizeComponents = size.split(',');
-
-    if (!sizeComponents.length > 2) {
-        return null;
-    }
-
-    const width = parseInt(sizeComponents[0]);
-    const height = parseInt(sizeComponents[1]);
-
-    if (isNaN(width)) {
-        const width = height * aspectRatio;
-        sizeProperties.height = height;
-        sizeProperties.width = width;
-        return sizeProperties;
-    }
-
-    if (isNaN(height)) {
-        sizeProperties.height = width / aspectRatio;
-        sizeProperties.width = width;
-        return sizeProperties;
-    }
-
-    sizeProperties.height = height;
-    sizeProperties.width = width;
-    return sizeProperties;
-}
-
-/**
- *
- * @private
- */
-function _mapQualityAndFormat(qualityFormat) {
-
-    let qualityFormatProperties = {};
-    const components = qualityFormat.split('.');
-
-    if (!components.length > 1) {
-        return null;
-    }
-
-    if (!components[0] in ACCEPTABLE_QUALITIES) {
-        return null;
-    }
-
-    qualityFormatProperties.quality = components[0];
-
-    if (!components[1] in ACCEPTABLE_FORMATS) {
-        return null;
-    }
-
-    qualityFormatProperties.format = components[1];
-
-    return qualityFormatProperties;
-}
-
-
-/**
- *
- * @param url
- * @param width
- * @param height
- * @returns {null/*}
- */
-export function parseImageURL(url, width, height) {
-    let imageDetails = {};
-    const aspectRatio = width / height;
-    const parsedURL = new URL(url);
-
-    if(!parsedURL){
-        return null;
-    }
-
-    const pathComponents = parsedURL.pathname.split("/");
-
-    if (pathComponents.length !== 8) {
-        return null;
-    }
-
-    if (!_validateUUID(pathComponents[3])) {
-        return null;
-    }
-
-    imageDetails.uuid = pathComponents[3];
-
-    const size = _mapSize(pathComponents[5], aspectRatio);
-
-    if (size === null) {
-        return null;
-    }
-
-    imageDetails.size = size;
-
-    const intersection = _mapIntersection(pathComponents[4], size.width, size.height);
-
-    if (intersection === null) {
-        return null;
-    }
-
-    imageDetails.intersection = intersection;
-
-
-    imageDetails.rotation = pathComponents[6];
-
-    const formatQuality = _mapQualityAndFormat(pathComponents[7]);
-
-    if (formatQuality === null) {
-        return null;
-    }
-
-    imageDetails.quality = formatQuality.quality;
-    imageDetails.format = formatQuality.format;
-
-    return imageDetails;
 }
 
 /**
@@ -293,12 +123,41 @@ export function getMinMaxProperty(type, property, tiles) {
     return null
 }
 
+/**
+ * 
+ * @param property
+ * @param tiles
+ * @returns {null|*}
+ */
+export function getProperty(property, tiles) {
+    const items = tiles.map(item => {
+        return item[property];
+    })
+    
+    if (!items) {
+        return null;
+    }
+    
+    return items
+}
+
+/**
+ * 
+ * @param mapURL
+ * @param data
+ * @param tilesIndex
+ * @returns {{}}
+ */
 export const getImageData = (mapURL, data, tilesIndex) => {
     let imageConfig = {}
-    imageConfig.id = mapURL;
+    const id = mapURL;
     imageConfig.width = parseTiles(data, "width");
     imageConfig.height = parseTiles(data, "height");
-    imageConfig.tiles = parseTiles(data, "tiles")[0];  // tiles is index 0 of a singleton?
-    imageConfig.urls = explode(imageConfig.id, imageConfig.width, imageConfig.height, imageConfig.tiles, tilesIndex);
+    const tiles = parseTiles(data, "tiles")[0];  // tiles is index 0 of a singleton?
+    
+    const tileData = generateTiles(id, imageConfig.width, imageConfig.height, tiles, tilesIndex);
+    imageConfig.urls = getProperty("url", tileData);
+    imageConfig.intersections = getProperty("intersection", tileData);
+    
     return imageConfig
 }

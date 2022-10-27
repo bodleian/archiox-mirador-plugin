@@ -2,48 +2,49 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FlashlightOnIcon from '@mui/icons-material/FlashlightOn';
 import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
-import ThreeCanvas from './threeCanvas';
-import {getImageData, getMinMaxProperty, parseImageURL} from "./helpers";
+import ThreeCanvas from './three-canvas';
+import { getImageData, getMinMaxProperty } from "./helpers";
 
-function TorchButton(props) {
+function TorchButton( props ) {
     return (
         <div>
             <button
                 className="MuiButtonBase-root MuiIconButton-root WithPlugins(WorkspaceControlPanelButtons)-ctrlBtn-12"
-                onClick={props.onClick}
+                onClick={ props.onClick }
             >
-                {props.value}
+                { props.value }
             </button>
         </div>
     );
 }
 
-function Overlay(props) {
+function Overlay( props ) {
     return (
         <ThreeCanvas
-            tiles={props.tiles}
+            albedoTiles={ props.albedoTiles }
+            normalTiles={ props.normalTiles }
             // tileLevel={props.tileLevel}
-            diffusemap={props.diffuseMap}
-            normalmap={props.normalMap}
-            zoom={props.zoom}
-            contentWidth={props.contentWidth}
-            contentHeight={props.contentHeight}
-            width={props.rendererInstructions.intersection.width}
-            height={props.rendererInstructions.intersection.height}
-            x={props.rendererInstructions.intersection.x}
-            y={props.rendererInstructions.intersection.y}
-            bottomLeft={props.rendererInstructions.intersectionBottomLeft}
-            topLeft={props.rendererInstructions.intersectionTopLeft}
+            diffusemap={ props.diffuseMap }
+            normalmap={ props.normalMap }
+            zoom={ props.zoom }
+            contentWidth={ props.contentWidth }
+            contentHeight={ props.contentHeight }
+            width={ props.rendererInstructions.intersection.width }
+            height={ props.rendererInstructions.intersection.height }
+            x={ props.rendererInstructions.intersection.x }
+            y={ props.rendererInstructions.intersection.y }
+            bottomLeft={ props.rendererInstructions.intersectionBottomLeft }
+            topLeft={ props.rendererInstructions.intersectionTopLeft }
         />
     );
 }
 
-function getMap(annotationBodies, mapType) {
+function getMap( annotationBodies, mapType ) {
     let map;
-    annotationBodies.forEach(function(element) {
-        const service = element.getService('http://iiif.io/api/annex/services/lightingmap');
-        if (service !== null) {
-            if(service.__jsonld.mapType === mapType){
+    annotationBodies.forEach( function( element ) {
+        const service = element.getService( 'http://iiif.io/api/annex/services/lightingmap' );
+        if ( service !== null ) {
+            if( service.__jsonld.mapType === mapType ){
                 map = element.__jsonld.service[0]['id'];
             }
         }
@@ -51,42 +52,19 @@ function getMap(annotationBodies, mapType) {
     return map;
 }
 
-function getTiles(tileData, tileLevel, albedoMap, normalMap) {
-    const albedoImageData = getImageData(albedoMap, tileData, tileLevel);
-    const normalImageData = getImageData(normalMap, tileData, tileLevel);
-    const length = albedoImageData.urls.length;
-    let tiles = [];
+function getTiles( tileData, tileLevel, map ) {
+    const ImageData = getImageData( map, tileData, tileLevel );
 
-    // for each url in the object yielded by getImageData we can use
-    // parseURL to get all the things like x, y, and width, and height of each tile that we need
-    for (let i = 0; i < length; i++) {
-        const albedoImageProperties = parseImageURL(
-            albedoImageData.urls[i],
-            albedoImageData.width,
-            albedoImageData.height
-        );
-        tiles.push(
-            {
-                albedo: albedoImageData.urls[i],
-                normal: normalImageData.urls[i],
-                x: albedoImageProperties.intersection.x,
-                y: albedoImageProperties.intersection.y,
-                width: albedoImageProperties.intersection.w,
-                height: albedoImageProperties.intersection.h
-            }
-        );
-    }
-
-    return tiles;
+    return ImageData
 }
 
-function getRendererInstructions(props) {
+function getRendererInstructions( props ) {
     let rendererInstructions = {};
-    const viewportBounds = props.viewer.viewport.getBounds(true);
-    const tiledImage = props.viewer.world.getItemAt(0);
-    const imageBounds = tiledImage.getBounds(true);
-    const intersection = viewportBounds.intersection(imageBounds);
-    if (intersection) {
+    const viewportBounds = props.viewer.viewport.getBounds( true );
+    const tiledImage = props.viewer.world.getItemAt( 0 );
+    const imageBounds = tiledImage.getBounds( true );
+    const intersection = viewportBounds.intersection( imageBounds );
+    if ( intersection ) {
         rendererInstructions.intersectionTopLeft = intersection.getTopLeft();
         rendererInstructions.intersectionBottomLeft = intersection.getBottomLeft();
         rendererInstructions.intersection = intersection;
@@ -94,9 +72,9 @@ function getRendererInstructions(props) {
     }
 }
 
-class LightNormals extends Component {
-    constructor(props) {
-        super(props);
+class lightNormals extends Component {
+    constructor( props ) {
+        super( props );
         this.state = {
             active: false,
             zoomLevel: 0,
@@ -117,7 +95,7 @@ class LightNormals extends Component {
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
 
-        this.setState(prevState => ({active: !prevState.active}));
+        this.setState( prevState => ( { active: !prevState.active } ) );
         this.threeCanvasProps.contentWidth = this.props.viewer.viewport._contentSize.x;
         this.threeCanvasProps.contentHeight = this.props.viewer.viewport._contentSize.y;
         this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
@@ -137,12 +115,17 @@ class LightNormals extends Component {
 
             const overlay = this.props.viewer.getOverlayById(this.threeCanvas);
 
-            this.threeCanvasProps.tiles = getTiles(
+            this.threeCanvasProps.albedoTiles = getTiles(
                 this.props.viewer.source,
                 5,
-                this.threeCanvasProps.albedoMap,
-                this.threeCanvasProps.normalMap
+                this.threeCanvasProps.albedoMap
             );
+
+            this.threeCanvasProps.normalTiles = getTiles(
+                this.props.viewer.source,
+                5,
+                this.threeCanvasProps.normalMap
+            )
 
             overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
@@ -212,4 +195,4 @@ class LightNormals extends Component {
     }
 }
 
-export default LightNormals;
+export default lightNormals;
