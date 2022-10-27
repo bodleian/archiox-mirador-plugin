@@ -84,8 +84,6 @@ class ThreeCanvas extends React.Component{
             bottomLeft: this.props.bottomLeft
         }
 
-        console.log(this.props.albedoTiles);
-
         this.manager = new THREE.LoadingManager();
 
         this.manager.onLoad = () => {
