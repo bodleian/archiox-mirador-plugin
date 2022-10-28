@@ -24,10 +24,10 @@ function Overlay(props) {
             albedoTiles={props.albedoTiles}
             normalTiles={props.normalTiles}
             // tileLevel={props.tileLevel}
-            zoom={ props.zoom }
-            intersection={ props.rendererInstructions.intersection }
-            contentWidth={ props.contentWidth }
-            contentHeight={ props.contentHeight }
+            zoom={props.zoom}
+            intersection={props.rendererInstructions.intersection}
+            contentWidth={props.contentWidth}
+            contentHeight={props.contentHeight}
         />
     );
 }
