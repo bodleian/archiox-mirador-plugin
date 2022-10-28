@@ -23,7 +23,6 @@ function Overlay(props) {
         <ThreeCanvas
             albedoTiles={props.albedoTiles}
             normalTiles={props.normalTiles}
-            // tileLevel={props.tileLevel}
             zoom={props.zoom}
             intersection={props.rendererInstructions.intersection}
             contentWidth={props.contentWidth}
@@ -135,11 +134,8 @@ class lightNormals extends Component {
                 const zoom_level = this.props.viewer.viewport.getZoom(true);
                 this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
                 this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
-                // this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
-
                 this.setState({zoom:   this.threeCanvasProps.zoom});
                 this.setState({rendererInstructions: this.threeCanvasProps.rendererInstructions});
-                //this.setState({tileLevel: this.threeCanvasProps.tileLevel});
                 overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
             });
 
@@ -162,7 +158,7 @@ class lightNormals extends Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevState.zoom !== this.threeCanvasProps.zoom ||
             prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection
-            prevState.active !== this.state.active // || prevState.tileLevel !== this.threeCanvasProps.tileLevel
+            prevState.active !== this.state.active
         ) {
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
