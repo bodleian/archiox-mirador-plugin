@@ -145,12 +145,12 @@ class ThreeCanvas extends React.Component{
                 normalScale: new THREE.Vector3(1, 1)
             });
 
-            const x = this.state.albedoTiles.intersections[i].x + this.state.albedoTiles.intersections[i].w / 2
-            const y = this.state.albedoTiles.intersections[i].y + this.state.albedoTiles.intersections[i].h / 2
+            const x = this.state.albedoTiles.tiles[i].x + this.state.albedoTiles.tiles[i].w / 2
+            const y = this.state.albedoTiles.tiles[i].y + this.state.albedoTiles.tiles[i].h / 2
 
             const plane_geometry = new THREE.PlaneGeometry(
-                this.state.albedoTiles.intersections[i].w,
-                this.state.albedoTiles.intersections[i].h
+                this.state.albedoTiles.tiles[i].w,
+                this.state.albedoTiles.tiles[i].h
             );
             const mesh = new THREE.Mesh(plane_geometry, plane_material);
             mesh.position.set(x, this.state.height - y, 0);

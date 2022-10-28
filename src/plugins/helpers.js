@@ -67,7 +67,7 @@ export function generateTiles(id, width, height, tileSource, scaleFactor) {
             
             tiles.push({
                 url: id + iiifArgs,
-                intersection: {
+                tile: {
                     w: parseInt(rw),
                     h: parseInt(rh),
                     x: parseInt(x),
@@ -157,7 +157,7 @@ export const getImageData = (mapURL, data, tilesIndex) => {
     
     const tileData = generateTiles(id, imageConfig.width, imageConfig.height, tiles, tilesIndex);
     imageConfig.urls = getProperty("url", tileData);
-    imageConfig.intersections = getProperty("intersection", tileData);
+    imageConfig.tiles = getProperty("tile", tileData);
     
     return imageConfig
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FlashlightOnIcon from '@mui/icons-material/FlashlightOn';
 import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
-import ThreeCanvas from './three-canvas';
+import ThreeCanvas from './threeCanvas';
 import { getImageData, getMinMaxProperty } from "./helpers";
 
 function TorchButton( props ) {
