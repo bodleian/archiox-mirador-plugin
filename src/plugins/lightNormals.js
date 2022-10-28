@@ -1,28 +1,28 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import FlashlightOnIcon from '@mui/icons-material/FlashlightOn';
 import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
 import ThreeCanvas from './threeCanvas';
-import { getImageData, getMinMaxProperty } from "./helpers";
+import {getImageData, getMinMaxProperty} from "./helpers";
 
-function TorchButton( props ) {
+function TorchButton(props) {
     return (
         <div>
             <button
                 className="MuiButtonBase-root MuiIconButton-root WithPlugins(WorkspaceControlPanelButtons)-ctrlBtn-12"
-                onClick={ props.onClick }
+                onClick={props.onClick}
             >
-                { props.value }
+                {props.value}
             </button>
         </div>
     );
 }
 
-function Overlay( props ) {
+function Overlay(props) {
     return (
         <ThreeCanvas
-            albedoTiles={ props.albedoTiles }
-            normalTiles={ props.normalTiles }
+            albedoTiles={props.albedoTiles}
+            normalTiles={props.normalTiles}
             // tileLevel={props.tileLevel}
             zoom={ props.zoom }
             intersection={ props.rendererInstructions.intersection }
@@ -32,12 +32,12 @@ function Overlay( props ) {
     );
 }
 
-function getMap( annotationBodies, mapType ) {
+function getMap(annotationBodies, mapType) {
     let map;
-    annotationBodies.forEach( function( element ) {
-        const service = element.getService( 'http://iiif.io/api/annex/services/lightingmap' );
-        if ( service !== null ) {
-            if( service.__jsonld.mapType === mapType ){
+    annotationBodies.forEach(function(element) {
+        const service = element.getService('http://iiif.io/api/annex/services/lightingmap');
+        if (service !== null) {
+            if(service.__jsonld.mapType === mapType){
                 map = element.__jsonld.service[0]['id'];
             }
         }
@@ -45,19 +45,19 @@ function getMap( annotationBodies, mapType ) {
     return map;
 }
 
-function getTiles( tileData, tileLevel, map ) {
-    const ImageData = getImageData( map, tileData, tileLevel );
+function getTiles(tileData, tileLevel, map) {
+    const ImageData = getImageData(map, tileData, tileLevel);
 
     return ImageData
 }
 
-function getRendererInstructions( props ) {
+function getRendererInstructions(props) {
     let rendererInstructions = {};
-    const viewportBounds = props.viewer.viewport.getBounds( true );
-    const tiledImage = props.viewer.world.getItemAt( 0 );
-    const imageBounds = tiledImage.getBounds( true );
-    const intersection = viewportBounds.intersection( imageBounds );
-    if ( intersection ) {
+    const viewportBounds = props.viewer.viewport.getBounds(true);
+    const tiledImage = props.viewer.world.getItemAt(0);
+    const imageBounds = tiledImage.getBounds(true);
+    const intersection = viewportBounds.intersection(imageBounds);
+    if (intersection) {
         rendererInstructions.intersectionTopLeft = intersection.getTopLeft();
         rendererInstructions.intersectionBottomLeft = intersection.getBottomLeft();
         rendererInstructions.intersection = intersection;
@@ -66,8 +66,8 @@ function getRendererInstructions( props ) {
 }
 
 class lightNormals extends Component {
-    constructor( props ) {
-        super( props );
+    constructor(props) {
+        super(props);
         this.state = {
             active: false,
             zoomLevel: 0,
@@ -88,7 +88,7 @@ class lightNormals extends Component {
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
 
-        this.setState( prevState => ( { active: !prevState.active } ) );
+        this.setState( prevState => ({active: !prevState.active}));
         this.threeCanvasProps.contentWidth = this.props.viewer.viewport._contentSize.x;
         this.threeCanvasProps.contentHeight = this.props.viewer.viewport._contentSize.y;
         this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
