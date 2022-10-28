@@ -24,17 +24,10 @@ function Overlay( props ) {
             albedoTiles={ props.albedoTiles }
             normalTiles={ props.normalTiles }
             // tileLevel={props.tileLevel}
-            diffusemap={ props.diffuseMap }
-            normalmap={ props.normalMap }
             zoom={ props.zoom }
+            intersection={ props.rendererInstructions.intersection }
             contentWidth={ props.contentWidth }
             contentHeight={ props.contentHeight }
-            width={ props.rendererInstructions.intersection.width }
-            height={ props.rendererInstructions.intersection.height }
-            x={ props.rendererInstructions.intersection.x }
-            y={ props.rendererInstructions.intersection.y }
-            bottomLeft={ props.rendererInstructions.intersectionBottomLeft }
-            topLeft={ props.rendererInstructions.intersectionTopLeft }
         />
     );
 }
@@ -168,10 +161,7 @@ class lightNormals extends Component {
     // a rerender
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevState.zoom !== this.threeCanvasProps.zoom ||
-            prevState.rendererInstructions.intersection.width !== this.threeCanvasProps.rendererInstructions.intersection.width ||
-            prevState.rendererInstructions.intersection.height !== this.threeCanvasProps.rendererInstructions.intersection.height ||
-            prevState.rendererInstructions.intersection.x !== this.threeCanvasProps.rendererInstructions.intersection.x ||
-            prevState.rendererInstructions.intersection.y !== this.threeCanvasProps.rendererInstructions.intersection.y ||
+            prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection
             prevState.active !== this.state.active // || prevState.tileLevel !== this.threeCanvasProps.tileLevel
         ) {
             this.state.active ? ReactDOM.render(
