@@ -6,10 +6,10 @@ import React from "react";
  * @returns {boolean}
  */
 export function resizeCanvas(canvas) {
-    const { width, height } = canvas.getBoundingClientRect();
+    const {width, height} = canvas.getBoundingClientRect();
 
     if (canvas.width !== width || canvas.height !== height) {
-        const { devicePixelRation:ratio = 1 } = window;
+        const {devicePixelRation:ratio = 1} = window;
         const context = canvas.getContext('2d');
         canvas.width = width * ratio;
         canvas.height = height * ratio;
