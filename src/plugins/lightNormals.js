@@ -156,8 +156,9 @@ class lightNormals extends Component {
     // this keeps track of values stored in state and compares them to the current values, if any of them change it causes
     // a rerender
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevState.zoom !== this.threeCanvasProps.zoom ||
-            prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection
+        if (
+            prevState.zoom !== this.threeCanvasProps.zoom ||
+            prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection ||
             prevState.active !== this.state.active
         ) {
             this.state.active ? ReactDOM.render(
