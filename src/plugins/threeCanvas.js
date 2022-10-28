@@ -60,10 +60,10 @@ function _camera_offset(camera, props) {
     camera.setViewOffset(
         props.contentWidth * props.zoom,
         props.contentHeight * props.zoom,
-        props.x * props.zoom,
-        props.y * props.zoom,
-        props.width * props.zoom,
-        props.height * props.zoom
+        props.intersection.x * props.zoom,
+        props.intersection.y * props.zoom,
+        props.intersection.width * props.zoom,
+        props.intersection.height * props.zoom
     )
 }
 
@@ -74,14 +74,14 @@ class ThreeCanvas extends React.Component{
             albedoTiles: this.props.albedoTiles,
             normalTiles: this.props.normalTiles,
             zoom: this.props.zoom,
-            width: this.props.width,
-            height: this.props.height,
+            width: this.props.intersection.width,
+            height: this.props.intersection.height,
             contentWidth: this.props.contentWidth,
             contentHeight: this.props.contentHeight,
-            x: this.props.x,
-            y: this.props.y,
-            topLeft: this.props.topLeft,
-            bottomLeft: this.props.bottomLeft
+            x: this.props.intersection.x,
+            y: this.props.intersection.y,
+            topLeft: this.props.intersection.topLeft,
+            bottomLeft: this.props.intersection.bottomLeft
         }
 
         this.manager = new THREE.LoadingManager();
@@ -94,16 +94,16 @@ class ThreeCanvas extends React.Component{
 
         this.renderer = new THREE.WebGLRenderer({alpha: false});
         this.renderer.setSize(
-            this.props.width * this.props.zoom,
-            this.props.height * this.props.zoom
+            this.state.width * this.state.zoom,
+            this.state.height * this.state.zoom
         );
 
         // define an orthographic camera
         this.camera = new THREE.OrthographicCamera(
-          (this.props.contentWidth) / -2,
-            (this.props.contentWidth) / 2,
-            (this.props.contentHeight) / 2,
-            (this.props.contentHeight) /-2,
+          (this.state.contentWidth) / -2,
+            (this.state.contentWidth) / 2,
+            (this.state.contentHeight) / 2,
+            (this.state.contentHeight) /-2,
             -1,
             1
         );
@@ -176,7 +176,7 @@ class ThreeCanvas extends React.Component{
     }
 
     rerender(){
-        this.renderer.setSize((this.props.width * this.props.zoom), (this.props.height * this.props.zoom));
+        this.renderer.setSize((this.props.intersection.width * this.props.zoom), (this.props.intersection.height * this.props.zoom));
         _camera_offset(this.camera, this.props);
     }
 
@@ -186,9 +186,7 @@ class ThreeCanvas extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.zoom !== this.props.zoom || prevProps.width !== this.props.width || prevProps.height !== this.props.height ||
-            prevProps.bottomLeft.y !== this.props.bottomLeft.y || prevProps.topLeft.y !== this.props.topLeft.y ||
-            prevProps.x !== this.props.x) {
+        if (prevProps.zoom !== this.props.zoom || prevProps.intersection !== this.props.intersection {
             this.rerender();
             this.camera.updateProjectionMatrix();
         }
@@ -205,8 +203,8 @@ class ThreeCanvas extends React.Component{
     render(){
         return(
             <Loader
-                width = {this.props.width * this.props.zoom}
-                height = {this.props.height * this.props.zoom}
+                width = {this.props.intersection.width * this.props.zoom}
+                height = {this.props.intersection.height * this.props.zoom}
                 camera = {this.camera}
                 directionalLight = {this.directionalLight}
             />
