@@ -68,8 +68,8 @@ function _camera_offset(camera, props) {
 }
 
 class ThreeCanvas extends React.Component{
-    constructor( props ){
-        super( props )
+    constructor(props){
+        super(props)
         this.state = {
             albedoTiles: this.props.albedoTiles,
             normalTiles: this.props.normalTiles,
