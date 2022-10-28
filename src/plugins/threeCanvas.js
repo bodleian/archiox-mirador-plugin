@@ -186,7 +186,10 @@ class ThreeCanvas extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.zoom !== this.props.zoom || prevProps.intersection !== this.props.intersection {
+        if (
+            prevProps.zoom !== this.props.zoom ||
+            prevProps.intersection !== this.props.intersection
+        ) {
             this.rerender();
             this.camera.updateProjectionMatrix();
         }
