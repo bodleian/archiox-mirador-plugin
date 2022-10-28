@@ -71,7 +71,8 @@ class ThreeCanvas extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-            tiles: this.props.tiles,
+            albedoTiles: this.props.albedoTiles,
+            normalTiles: this.props.normalTiles,
             zoom: this.props.zoom,
             width: this.props.width,
             height: this.props.height,
@@ -80,9 +81,7 @@ class ThreeCanvas extends React.Component{
             x: this.props.x,
             y: this.props.y,
             topLeft: this.props.topLeft,
-            bottomLeft: this.props.bottomLeft,
-            diffusemap: this.props.diffusemap,
-            normalmap: this.props.normalmap
+            bottomLeft: this.props.bottomLeft
         }
 
         this.manager = new THREE.LoadingManager();
@@ -136,20 +135,23 @@ class ThreeCanvas extends React.Component{
         // define a group so we can handle all the tiles together
         this.group = new THREE.Group();
 
-        for (let i = 0; i < this.props.tiles.length; i++) {
-            this.diffuseMap = new THREE.TextureLoader(this.manager).load(this.state.tiles[i].albedo);
-            this.normalMap = new THREE.TextureLoader(this.manager).load(this.state.tiles[i].normal);
+        for (let i = 0; i < this.props.albedoTiles.urls.length; i++) {
+            this.albedoMap = new THREE.TextureLoader(this.manager).load(this.state.albedoTiles.urls[i]);
+            this.normalMap = new THREE.TextureLoader(this.manager).load(this.state.normalTiles.urls[i]);
             const plane_material = new THREE.MeshPhongMaterial({
-                map: this.diffuseMap,
+                map: this.albedoMap,
                 normalMap: this.normalMap,
                 flatShading: true,
                 normalScale: new THREE.Vector3(1, 1)
             });
 
-            const x = this.state.tiles[i].x + this.state.tiles[i].width / 2
-            const y = this.state.tiles[i].y + this.state.tiles[i].height / 2
+            const x = this.state.albedoTiles.tiles[i].x + this.state.albedoTiles.tiles[i].w / 2
+            const y = this.state.albedoTiles.tiles[i].y + this.state.albedoTiles.tiles[i].h / 2
 
-            const plane_geometry = new THREE.PlaneGeometry(this.state.tiles[i].width, this.state.tiles[i].height);
+            const plane_geometry = new THREE.PlaneGeometry(
+                this.state.albedoTiles.tiles[i].w,
+                this.state.albedoTiles.tiles[i].h
+            );
             const mesh = new THREE.Mesh(plane_geometry, plane_material);
             mesh.position.set(x, this.state.height - y, 0);
             this.group.add(mesh);

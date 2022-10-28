@@ -15,21 +15,18 @@ module.exports = function(env, argv) {
         module: {
             rules: [
                 {
-                    test: /\.m?js$/,
-                    exclude: /(node_modules)/,
-                    use: {
-                        loader: 'babel-loader',
-                        options: {
-                            presets: ['@babel/preset-react']
-                        }
-                    }
+                    test: /\.(js|jsx)$/,
+                    loader: 'babel-loader',
+                    options: { presets: ['@babel/env','@babel/preset-react'] },
                 }
             ]
         },
         output: {
-            filename: 'main.js',
+            filename: 'archiox-mirador-plugin.js',
             path: path.resolve(__dirname, 'dist'),
-            publicPath: '/dist/',
+            publicPath: './dist/',
+            libraryExport: 'default',
+            libraryTarget: 'umd'
         },
         plugins: [
             new CleanWebpackPlugin(),
