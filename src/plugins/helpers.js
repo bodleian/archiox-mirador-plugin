@@ -149,15 +149,15 @@ export function getProperty(property, tiles) {
  * @returns {{}}
  */
 export const getImageData = (mapURL, data, tilesIndex) => {
-    let imageConfig = {}
+    let imageData = {}
     const id = mapURL;
-    imageConfig.width = parseTiles(data, "width");
-    imageConfig.height = parseTiles(data, "height");
+    imageData.width = parseTiles(data, "width");
+    imageData.height = parseTiles(data, "height");
     const tiles = parseTiles(data, "tiles")[0];  // tiles is index 0 of a singleton?
     
-    const tileData = generateTiles(id, imageConfig.width, imageConfig.height, tiles, tilesIndex);
-    imageConfig.urls = getProperty("url", tileData);
-    imageConfig.tiles = getProperty("tile", tileData);
+    const tileData = generateTiles(id, imageData.width, imageData.height, tiles, tilesIndex);
+    imageData.urls = getProperty("url", tileData);
+    imageData.tiles = getProperty("tile", tileData);
     
-    return imageConfig
+    return imageData
 }
