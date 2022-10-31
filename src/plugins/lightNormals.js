@@ -107,7 +107,7 @@ class lightNormals extends Component {
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
-            this.props.viewer.removeHandler('viewport-change', this.updateOverlay.bind(this));
+            this.props.viewer.removeHandler('viewport-change', this.updateOverlay);
         } else {
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
@@ -138,12 +138,12 @@ class lightNormals extends Component {
             // glitch and not re-render until we cause the viewport-change event to trigger
             this.props.viewer.forceRedraw();
 
-            this.props.viewer.addHandler('viewport-change', this.updateOverlay.bind(this));
+            this.props.viewer.addHandler('viewport-change', this.updateOverlay);
 
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
                 // remove all handlers so viewport-change isn't activated!
-                this.props.viewer.removeHandler('viewport-change', this.updateOverlay.bind(this));
+                this.props.viewer.removeHandler('viewport-change', this.updateOverlay);
             });
         }
 
