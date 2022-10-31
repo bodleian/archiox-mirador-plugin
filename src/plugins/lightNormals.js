@@ -136,11 +136,12 @@ class lightNormals extends Component {
                 this.setState({zoom:   this.threeCanvasProps.zoom});
                 this.setState({rendererInstructions: this.threeCanvasProps.rendererInstructions});
                 overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+                console.log("Event happening!");
             });
 
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
-                // remove all handlers os viewport-change isn't activated!
+                // remove all handlers so viewport-change isn't activated!
                 this.props.viewer.removeAllHandlers();
             });
         }
