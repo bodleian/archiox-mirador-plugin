@@ -142,7 +142,7 @@ class lightNormals extends Component {
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
                 // remove all handlers so viewport-change isn't activated!
-                this.props.viewer.removeHandler('viewport-change', this.updateOverlay);
+                this.props.viewer.removeHandler('viewport-change', this.updateOverlay.bind(this));
             });
         }
 
