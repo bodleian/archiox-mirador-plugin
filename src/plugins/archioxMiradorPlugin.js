@@ -2,7 +2,7 @@ import LightNormals from './lightNormals';
 import {getCurrentCanvas} from 'mirador/dist/es/src/state/selectors';
 
 export default [{
-   target: 'OpenSeadragonViewer',
+   target: 'WindowTopBarPluginMenu',
    mapStateToProps: (state, {windowId}) => ({
         canvas: getCurrentCanvas(state, { windowId })
     }),
