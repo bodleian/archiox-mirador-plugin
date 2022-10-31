@@ -9,7 +9,6 @@ function TorchButton(props) {
     return (
         <div>
             <button
-                className="MuiButtonBase-root MuiIconButton-root WithPlugins(WorkspaceControlPanelButtons)-ctrlBtn-12"
                 onClick={props.onClick}
             >
                 {props.value}
