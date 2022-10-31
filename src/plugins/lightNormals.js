@@ -97,7 +97,8 @@ class lightNormals extends Component {
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
-            this.props.viewer.removeAllHandlers();
+            this.props.viewer.removeHandler('viewport-change', () => {});
+            this.props.viewer.removeHandler('close', () => {});
 
         } else {
             this.threeCanvas = document.createElement("div");
@@ -142,7 +143,8 @@ class lightNormals extends Component {
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
                 // remove all handlers so viewport-change isn't activated!
-                this.props.viewer.removeAllHandlers();
+                this.props.viewer.removeHandler('viewport-change',() => {});
+                this.props.viewer.removeHandler('close', () => {});
             });
         }
 
