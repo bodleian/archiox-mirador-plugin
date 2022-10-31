@@ -82,7 +82,18 @@ class lightNormals extends Component {
         this.threeCanvasProps = {};
     }
 
+    updateOverlay() {
+        const zoom_level = this.props.viewer.viewport.getZoom(true);
+        this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
+        this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
+        this.setState({zoom:   this.threeCanvasProps.zoom});
+        this.setState({rendererInstructions: this.threeCanvasProps.rendererInstructions});
+        this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+        console.log("Event happening!");
+    }
+
     torchHandler() {
+
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
 
@@ -97,15 +108,14 @@ class lightNormals extends Component {
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
-            this.props.viewer.removeHandler('viewport-change', () => {});
-            this.props.viewer.removeHandler('close', () => {});
+            this.props.viewer.removeHandler('viewport-change', this.updateOverlay);
 
         } else {
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
             this.props.viewer.addOverlay(this.threeCanvas);
 
-            const overlay = this.props.viewer.getOverlayById(this.threeCanvas);
+            this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
 
             this.threeCanvasProps.albedoTiles = getTiles(
                 this.props.viewer.source,
@@ -119,7 +129,7 @@ class lightNormals extends Component {
                 this.threeCanvasProps.normalMap
             )
 
-            overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+            this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
             // uncomment code below to enable debug mode in OpenSeaDragon
             // for (var i = 0; i < this.props.viewer.world.getItemCount(); i++) {
@@ -130,21 +140,12 @@ class lightNormals extends Component {
             // glitch and not re-render until we cause the viewport-change event to trigger
             this.props.viewer.forceRedraw();
 
-            this.props.viewer.addHandler('viewport-change',  (event) => {
-                const zoom_level = this.props.viewer.viewport.getZoom(true);
-                this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
-                this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
-                this.setState({zoom:   this.threeCanvasProps.zoom});
-                this.setState({rendererInstructions: this.threeCanvasProps.rendererInstructions});
-                overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
-                console.log("Event happening!");
-            });
+            this.props.viewer.addHandler('viewport-change',  this.updateOverlay);
 
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
                 // remove all handlers so viewport-change isn't activated!
-                this.props.viewer.removeHandler('viewport-change',() => {});
-                this.props.viewer.removeHandler('close', () => {});
+                this.props.viewer.removeHandler('viewport-change', this.updateOverlay);
             });
         }
 
