@@ -89,6 +89,7 @@ class lightNormals extends Component {
         this.setState({zoom: this.threeCanvasProps.zoom});
         this.setState({rendererInstructions: this.threeCanvasProps.rendererInstructions});
         this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+        console.log("This is happening!");
     }
 
     torchHandler() {
