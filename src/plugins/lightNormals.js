@@ -107,6 +107,7 @@ class lightNormals extends Component {
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
+            this.props.viewer.removeHandler('viewport-change', this.updateOverlay.bind(this));
         } else {
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
