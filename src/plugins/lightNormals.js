@@ -97,8 +97,6 @@ class lightNormals extends Component {
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
-            this.props.viewer.removeHandler('viewport-change', updateOverlay);
-
         } else {
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
@@ -129,7 +127,7 @@ class lightNormals extends Component {
             // glitch and not re-render until we cause the viewport-change event to trigger
             this.props.viewer.forceRedraw();
 
-            function updateOverlay() {
+            const updateOverlay = function() {
                 const zoom_level = this.props.viewer.viewport.getZoom(true);
                 this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
                 this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
