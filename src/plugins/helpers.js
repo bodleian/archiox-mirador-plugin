@@ -6,10 +6,10 @@ import React from "react";
  * @returns {boolean}
  */
 export function resizeCanvas(canvas) {
-    const {width, height} = canvas.getBoundingClientRect();
+    const { width, height } = canvas.getBoundingClientRect();
 
     if (canvas.width !== width || canvas.height !== height) {
-        const {devicePixelRation:ratio = 1} = window;
+        const { devicePixelRation:ratio = 1 } = window;
         const context = canvas.getContext('2d');
         canvas.width = width * ratio;
         canvas.height = height * ratio;
@@ -34,7 +34,7 @@ export function generateTiles(id, width, height, tileSource, scaleFactor) {
     let tileCount = 0;
     const tileWidth = tileSource.width;
     const tileHeight = tileSource.height || tileSource.width;
-    const factors = tileSource.scaleFactors.sort(function(a,b){return b-a}); // spec doesn't actually specify order
+    const factors = tileSource.scaleFactors.sort(function(a, b){ return b - a }); // spec doesn't actually specify order
 
     let scale = factors[scaleFactor];
     const regionWidth = scale * tileWidth;
