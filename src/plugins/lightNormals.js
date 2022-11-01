@@ -3,30 +3,46 @@ import ReactDOM from 'react-dom';
 import FlashlightOnIcon from '@mui/icons-material/FlashlightOn';
 import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
 import ThreeCanvas from './threeCanvas';
-import {getImageData, getMinMaxProperty} from "./helpers";
+import { getImageData, getMinMaxProperty } from "./helpers";
+
+function ToolsMenu({ children }) {
+    return (
+        <div
+            style={{
+                position: "absolute",
+                left: "8px",
+                top: "8px",
+                borderRadius: "25px",
+                zIndex: 999,
+                backgroundColor: `rgba(255, 255, 255, 0.8)`
+            }}
+            className={ 'MuiPaper-elevation4 '}
+        >
+            { children }
+        </div>
+    )
+}
 
 function TorchButton(props) {
     return (
-        <div>
-            <button
-                className="MuiButtonBase-root MuiIconButton-root WithPlugins(WorkspaceControlPanelButtons)-ctrlBtn-12"
-                onClick={props.onClick}
-            >
-                {props.value}
-            </button>
-        </div>
+        <button
+            className={ 'MuiButtonBase-root MuiIconButton-root' }
+            onClick={ props.onClick }
+        >
+            { props.value }
+        </button>
     );
 }
 
 function Overlay(props) {
     return (
         <ThreeCanvas
-            albedoTiles={props.albedoTiles}
-            normalTiles={props.normalTiles}
-            zoom={props.zoom}
-            intersection={props.rendererInstructions.intersection}
-            contentWidth={props.contentWidth}
-            contentHeight={props.contentHeight}
+            albedoTiles={ props.albedoTiles }
+            normalTiles={ props.normalTiles }
+            zoom={ props.zoom }
+            intersection={ props.rendererInstructions.intersection }
+            contentWidth={ props.contentWidth }
+            contentHeight={ props.contentHeight }
         />
     );
 }
@@ -45,9 +61,7 @@ function getMap(annotationBodies, mapType) {
 }
 
 function getTiles(tileData, tileLevel, map) {
-    const ImageData = getImageData(map, tileData, tileLevel);
-
-    return ImageData
+    return getImageData(map, tileData, tileLevel);
 }
 
 function getRendererInstructions(props) {
@@ -69,6 +83,7 @@ class lightNormals extends Component {
         super(props);
         this.state = {
             active: false,
+            visible: false,
             zoomLevel: 0,
             zoom: 0,
             rendererInstructions: {
@@ -86,26 +101,24 @@ class lightNormals extends Component {
     torchHandler() {
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
-
-        this.setState( prevState => ({active: !prevState.active}));
+        this.setState( prevState => ({ active: !prevState.active }));
         this.threeCanvasProps.contentWidth = this.props.viewer.viewport._contentSize.x;
         this.threeCanvasProps.contentHeight = this.props.viewer.viewport._contentSize.y;
         this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
         this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
-        this.threeCanvasProps.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
-        this.threeCanvasProps.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
+        this.threeCanvasProps.albedoMap = this.albedoMap;
+        this.threeCanvasProps.normalMap = this.normalMap;
         this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
-            this.props.viewer.removeAllHandlers();
-
+            this.props.viewer.removeAllHandlers('viewport-change');
         } else {
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
             this.props.viewer.addOverlay(this.threeCanvas);
 
-            const overlay = this.props.viewer.getOverlayById(this.threeCanvas);
+            this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
 
             this.threeCanvasProps.albedoTiles = getTiles(
                 this.props.viewer.source,
@@ -119,7 +132,7 @@ class lightNormals extends Component {
                 this.threeCanvasProps.normalMap
             )
 
-            overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+            this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
             // uncomment code below to enable debug mode in OpenSeaDragon
             // for (var i = 0; i < this.props.viewer.world.getItemCount(); i++) {
@@ -130,19 +143,20 @@ class lightNormals extends Component {
             // glitch and not re-render until we cause the viewport-change event to trigger
             this.props.viewer.forceRedraw();
 
-            this.props.viewer.addHandler('viewport-change',  (event) => {
+            this.props.viewer.addHandler('viewport-change', (event) => {
                 const zoom_level = this.props.viewer.viewport.getZoom(true);
                 this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
                 this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
-                this.setState({zoom:   this.threeCanvasProps.zoom});
-                this.setState({rendererInstructions: this.threeCanvasProps.rendererInstructions});
-                overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+                this.setState({ zoom: this.threeCanvasProps.zoom });
+                this.setState({ rendererInstructions: this.threeCanvasProps.rendererInstructions });
+                this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+                console.log("This is happening!");
             });
 
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
-                // remove all handlers os viewport-change isn't activated!
-                this.props.viewer.removeAllHandlers();
+                // remove all handlers so viewport-change isn't activated!
+                this.props.viewer.removeAllHandlers('viewport-change');
             });
         }
 
@@ -171,13 +185,27 @@ class lightNormals extends Component {
     render() {
         const light = this.state.active ? <FlashlightOnIcon/> : <FlashlightOffIcon/>;
 
+        if (typeof this.props.canvas !== 'undefined') {
+            this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
+            this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
+
+            if (
+                typeof this.albedoMap !== 'undefined' &&
+                typeof this.normalMap !== 'undefined' &&
+                !this.state.visible
+            ) {
+                this.setState( prevState => ({ visible: !prevState.visible }));
+            }
+        }
+
         return (
-            <div>
-                <TorchButton
-                    onClick={() => this.torchHandler()}
-                    value={light}
-                />
-            </div>
+            this.state.visible ?
+                <ToolsMenu visible={ this.state.visible }>
+                    <TorchButton
+                        onClick={ () => this.torchHandler() }
+                        value={ light }
+                    />
+                </ToolsMenu> : null
         );
     }
 }
