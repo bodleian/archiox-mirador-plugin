@@ -37,12 +37,12 @@ function TorchButton(props) {
 function Overlay(props) {
     return (
         <ThreeCanvas
-            albedoTiles={props.albedoTiles}
-            normalTiles={props.normalTiles}
-            zoom={props.zoom}
-            intersection={props.rendererInstructions.intersection}
-            contentWidth={props.contentWidth}
-            contentHeight={props.contentHeight}
+            albedoTiles={ props.albedoTiles }
+            normalTiles={ props.normalTiles }
+            zoom={ props.zoom }
+            intersection={ props.rendererInstructions.intersection }
+            contentWidth={ props.contentWidth }
+            contentHeight={ props.contentHeight }
         />
     );
 }
@@ -103,7 +103,7 @@ class lightNormals extends Component {
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
 
-        this.setState( prevState => ({active: !prevState.active}));
+        this.setState( prevState => ({ active: !prevState.active }));
         this.threeCanvasProps.contentWidth = this.props.viewer.viewport._contentSize.x;
         this.threeCanvasProps.contentHeight = this.props.viewer.viewport._contentSize.y;
         this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
@@ -149,8 +149,8 @@ class lightNormals extends Component {
                 const zoom_level = this.props.viewer.viewport.getZoom(true);
                 this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
                 this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
-                this.setState({zoom: this.threeCanvasProps.zoom});
-                this.setState({rendererInstructions: this.threeCanvasProps.rendererInstructions});
+                this.setState({ zoom: this.threeCanvasProps.zoom });
+                this.setState({ rendererInstructions: this.threeCanvasProps.rendererInstructions });
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 console.log("This is happening!");
             });
