@@ -3,17 +3,34 @@ import ReactDOM from 'react-dom';
 import FlashlightOnIcon from '@mui/icons-material/FlashlightOn';
 import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
 import ThreeCanvas from './threeCanvas';
-import {getImageData, getMinMaxProperty} from "./helpers";
+import { getImageData, getMinMaxProperty } from "./helpers";
+
+function ToolsMenu({ children }) {
+    return (
+        <div
+            style={{
+                position: "absolute",
+                left: "8px",
+                top: "8px",
+                borderRadius: "25px",
+                zIndex: 999,
+                backgroundColor: `rgba(255, 255, 255, 0.8)`
+            }}
+            className={ 'MuiPaper-elevation4 '}
+        >
+            { children }
+        </div>
+    )
+}
 
 function TorchButton(props) {
     return (
-        <div>
-            <button
-                onClick={props.onClick}
-            >
-                {props.value}
-            </button>
-        </div>
+        <button
+            className={ 'MuiButtonBase-root MuiIconButton-root' }
+            onClick={ props.onClick }
+        >
+            { props.value }
+        </button>
     );
 }
 
@@ -171,12 +188,12 @@ class lightNormals extends Component {
         const light = this.state.active ? <FlashlightOnIcon/> : <FlashlightOffIcon/>;
 
         return (
-            <div>
+            <ToolsMenu>
                 <TorchButton
-                    onClick={() => this.torchHandler()}
+                    onClick={ () => this.torchHandler()}
                     value={light}
                 />
-            </div>
+            </ToolsMenu>
         );
     }
 }
