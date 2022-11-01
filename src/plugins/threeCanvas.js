@@ -1,6 +1,6 @@
 import React from "react";
 import * as THREE from "three";
-import {BallTriangle} from "react-loader-spinner";
+import { BallTriangle } from "react-loader-spinner";
 
 function  onMouseMove(event, props) {
     event.preventDefault();
@@ -38,8 +38,8 @@ function Loader(props) {
     }
 
     return (
-        <div id="container" style={container}>
-            <div id="loading-overlay" style={overlay}>
+        <div id="container" style={ container }>
+            <div id="loading-overlay" style={ overlay }>
                 <BallTriangle
                     height="100"
                     width="100"
@@ -49,8 +49,8 @@ function Loader(props) {
             </div>
             <div
                 id="canvas-container"
-                style={canvas}
-                onMouseMove={(e) => onMouseMove(e, props)}
+                style={ canvas }
+                onMouseMove={ (e) => onMouseMove(e, props) }
             />
         </div>
     );
@@ -206,10 +206,10 @@ class ThreeCanvas extends React.Component{
     render(){
         return(
             <Loader
-                width = {this.props.intersection.width * this.props.zoom}
-                height = {this.props.intersection.height * this.props.zoom}
-                camera = {this.camera}
-                directionalLight = {this.directionalLight}
+                width = { this.props.intersection.width * this.props.zoom }
+                height = { this.props.intersection.height * this.props.zoom }
+                camera = { this.camera }
+                directionalLight = { this.directionalLight }
             />
         );
     }
