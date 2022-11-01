@@ -83,6 +83,7 @@ class lightNormals extends Component {
         super(props);
         this.state = {
             active: false,
+            visible: false,
             zoomLevel: 0,
             zoom: 0,
             rendererInstructions: {
@@ -100,14 +101,13 @@ class lightNormals extends Component {
     torchHandler() {
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
-
         this.setState( prevState => ({ active: !prevState.active }));
         this.threeCanvasProps.contentWidth = this.props.viewer.viewport._contentSize.x;
         this.threeCanvasProps.contentHeight = this.props.viewer.viewport._contentSize.y;
         this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
         this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
-        this.threeCanvasProps.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
-        this.threeCanvasProps.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
+        this.threeCanvasProps.albedoMap = this.albedoMap;
+        this.threeCanvasProps.normalMap = this.normalMap;
         this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
 
         if (this.state.active) {
@@ -185,13 +185,27 @@ class lightNormals extends Component {
     render() {
         const light = this.state.active ? <FlashlightOnIcon/> : <FlashlightOffIcon/>;
 
+        if (typeof this.props.canvas !== 'undefined') {
+            this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
+            this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
+
+            if (
+                typeof this.albedoMap !== 'undefined' &&
+                typeof this.normalMap !== 'undefined' &&
+                !this.state.visible
+            ) {
+                this.setState( prevState => ({ visible: !prevState.visible }));
+            }
+        }
+
         return (
-            <ToolsMenu>
-                <TorchButton
-                    onClick={ () => this.torchHandler()}
-                    value={light}
-                />
-            </ToolsMenu>
+            this.state.visible ?
+                <ToolsMenu visible={ this.state.visible }>
+                    <TorchButton
+                        onClick={ () => this.torchHandler() }
+                        value={ light }
+                    />
+                </ToolsMenu> : null
         );
     }
 }
