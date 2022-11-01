@@ -61,9 +61,7 @@ function getMap(annotationBodies, mapType) {
 }
 
 function getTiles(tileData, tileLevel, map) {
-    const ImageData = getImageData(map, tileData, tileLevel);
-
-    return ImageData
+    return getImageData(map, tileData, tileLevel);
 }
 
 function getRendererInstructions(props) {
