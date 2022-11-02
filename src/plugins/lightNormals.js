@@ -117,20 +117,20 @@ class lightNormals extends Component {
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
             this.props.viewer.addOverlay(this.threeCanvas);
-
             this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
+            this.max_tileLevel = this.props.viewer.source.scale_factors.length - 1;
 
             this.threeCanvasProps.albedoTiles = getTiles(
                 this.props.viewer.source,
-                5,
+                this.max_tileLevel,
                 this.threeCanvasProps.albedoMap
             );
 
             this.threeCanvasProps.normalTiles = getTiles(
                 this.props.viewer.source,
-                5,
+                this.max_tileLevel,
                 this.threeCanvasProps.normalMap
-            )
+            );
 
             this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
