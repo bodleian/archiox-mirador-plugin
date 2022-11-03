@@ -49,13 +49,29 @@ function Overlay(props) {
 
 function getMap(annotationBodies, mapType) {
     let map;
+
     annotationBodies.forEach(function(element) {
-        const service = element.getService('http://iiif.io/api/annex/services/lightingmap');
+        let service = element.getService('http://iiif.io/api/annex/services/lightingmap');
+
+        // anticipate future edge case now, we can always fix this at a later date
+        if (service === null) {
+            service = element.getService('http://iiif.io/api/extension/lightingmap');
+        }
+
+        const services = element.getServices();
+
         if (service !== null) {
-            if(service.__jsonld.mapType === mapType){
-                element.__jsonld.service.forEach(function(service){
-                    if(service.type === "ImageService3") {
+            if(service.__jsonld.mapType === mapType) {
+                services.forEach(function(service) {
+
+                    if(service.__jsonld["type"] === "ImageService3") {
                         map = service['id'];
+                    }
+
+                    if (map === null) {
+                        if(service.__jsonld["@type"] === "ImageService2") {
+                            map = service['@id'];
+                        }
                     }
                 });
             }
