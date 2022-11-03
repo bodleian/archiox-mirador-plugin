@@ -53,7 +53,7 @@ function getMap(annotationBodies, mapType) {
         const service = element.getService('http://iiif.io/api/annex/services/lightingmap');
         if (service !== null) {
             if(service.__jsonld.mapType === mapType){
-                map = element.__jsonld.service[0]['id'];
+                map = element.__jsonld.service[1]['id'];
             }
         }
     });
