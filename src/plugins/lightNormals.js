@@ -175,6 +175,7 @@ class lightNormals extends Component {
 
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
+                this.setState({visible: false});
                 // remove all handlers so viewport-change isn't activated!
                 this.props.viewer.removeAllHandlers('viewport-change');
             });
@@ -205,7 +206,7 @@ class lightNormals extends Component {
     render() {
         const light = this.state.active ? <FlashlightOnIcon/> : <FlashlightOffIcon/>;
 
-        if (typeof this.props.canvas !== 'undefined') {
+        if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
             this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
             this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
 
