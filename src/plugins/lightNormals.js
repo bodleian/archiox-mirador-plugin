@@ -49,11 +49,31 @@ function Overlay(props) {
 
 function getMap(annotationBodies, mapType) {
     let map;
+
     annotationBodies.forEach(function(element) {
-        const service = element.getService('http://iiif.io/api/annex/services/lightingmap');
+        let service = element.getService('http://iiif.io/api/annex/services/lightingmap');
+
+        // anticipate future edge case now, we can always fix this at a later date
+        if (service === null) {
+            service = element.getService('http://iiif.io/api/extension/lightingmap');
+        }
+
+        const services = element.getServices();
+
         if (service !== null) {
-            if(service.__jsonld.mapType === mapType){
-                map = element.__jsonld.service[0]['id'];
+            if(service.__jsonld.mapType === mapType) {
+                services.forEach(function(service) {
+
+                    if(service.__jsonld["type"] === "ImageService3") {
+                        map = service['id'];
+                    }
+
+                    if (map === null) {
+                        if(service.__jsonld["@type"] === "ImageService2") {
+                            map = service['@id'];
+                        }
+                    }
+                });
             }
         }
     });
@@ -155,6 +175,7 @@ class lightNormals extends Component {
 
             this.props.viewer.addHandler('close',  (event) => {
                 this.setState({active: false});
+                this.setState({visible: false});
                 // remove all handlers so viewport-change isn't activated!
                 this.props.viewer.removeAllHandlers('viewport-change');
             });
@@ -185,7 +206,7 @@ class lightNormals extends Component {
     render() {
         const light = this.state.active ? <FlashlightOnIcon/> : <FlashlightOffIcon/>;
 
-        if (typeof this.props.canvas !== 'undefined') {
+        if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
             this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
             this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
 
