@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import FlashlightOnIcon from '@mui/icons-material/FlashlightOn';
-import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
+import FlashlightOnIcon from '@material-ui/icons/WbIncandescent';
+import FlashlightOffIcon from '@material-ui/icons/WbIncandescentOutlined';
 import ThreeCanvas from './threeCanvas';
 import { getImageData, getMinMaxProperty } from "./helpers";
 
