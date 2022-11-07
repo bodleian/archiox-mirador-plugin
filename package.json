@@ -29,5 +29,21 @@
   "dependencies": {
     "react-loader-spinner": "^5.3.4",
     "three": "^0.146.0"
+  },
+  "devDependencies": {
+    "mirador": "^3.0.0-rc.4",
+    "react": "16.x",
+    "react-dom": "16.x",
+    "@babel/core": "^7.12.3",
+    "@babel/preset-react": "^7.12.5",
+    "@babel/preset-env": "^7.19.4",
+    "babel-loader": "^8.2.1",
+    "clean-webpack-plugin": "^3.0.0",
+    "react-loader-spinner": "^5.1.5",
+    "reselect": "^4.1.5",
+    "three": "^0.139.2",
+    "webpack": "^5.5.1",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.1"
   }
 }
