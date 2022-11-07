@@ -5,6 +5,36 @@ import FlashlightOffIcon from '@material-ui/icons/WbIncandescentOutlined';
 import ThreeCanvas from './threeCanvas';
 import { getImageData, getMinMaxProperty } from "./helpers";
 
+function  onMouseMove(event, props) {
+    event.preventDefault();
+    let x = Math.round(event.clientX / 50);
+    let y = Math.round(event.clientY /50);
+    // props.style.backgroundImage = "radial-gradient(at " + x + "% " + y + "%, #3498db, #9b59b6)";
+    // let vector = new THREE.Vector3(x, y, 0);
+    // let dir = vector.sub(props.camera.position).normalize();
+    // let distance = -props.camera.position.z / dir.z;
+    // let pos = props.camera.position.clone().add(dir.multiplyScalar(distance));
+    // props.directionalLight.position.set(pos.x, pos.y, 0.5);
+    console.log(x, y);
+}
+
+function LightDirection(props) {
+    return (
+        <div
+            style={{
+                float: "right",
+                width: "100px",
+                height: "100px",
+                borderRadius: "50px",
+                backgroundImage: "radial-gradient(at center, #3498db, #9b59b6)"
+            }}
+            onMouseMove={ (e) => onMouseMove(e, props) }
+        >
+
+        </div>
+    );
+}
+
 function ToolsMenu({ children }) {
     return (
         <div
@@ -27,6 +57,9 @@ function TorchButton(props) {
     return (
         <button
             className={ 'MuiButtonBase-root MuiIconButton-root' }
+            style={{
+                float: "left"
+            }}
             onClick={ props.onClick }
         >
             { props.value }
@@ -116,6 +149,13 @@ class lightNormals extends Component {
             }
         }
         this.threeCanvasProps = {};
+        this.style = {
+
+        }
+    }
+
+    lightDirection(event, props) {
+        console.log(event, event);
     }
 
     torchHandler() {
@@ -225,6 +265,9 @@ class lightNormals extends Component {
                     <TorchButton
                         onClick={ () => this.torchHandler() }
                         value={ light }
+                    />
+                    <LightDirection
+                        style={ this.style }
                     />
                 </ToolsMenu> : null
         );
