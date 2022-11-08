@@ -21,6 +21,7 @@ function LightDirection(props) {
             onMouseMove={ props.onMouseMove }
             onMouseDown={ props.onMouseDown }
             onMouseUp={ props.onMouseUp }
+            onMouseLeave={ props.onMouseLeave }
         />
     );
 }
@@ -170,6 +171,10 @@ class lightNormals extends Component {
         this.mouseDown = false;
     }
 
+    onMouseLeave(event) {
+        this.mouseDown = false;
+    }
+
     torchHandler() {
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
@@ -300,6 +305,7 @@ class lightNormals extends Component {
                         onMouseMove={ (event) => this.onMouseMove(event) }
                         onMouseDown={ (event) => this.onMouseDown(event) }
                         onMouseUp={ (event) => this.onMouseUp(event) }
+                        onMouseLeave={ (event) => this.onMouseLeave(event) }
                     />
                 </ToolsMenu> : null
         );
