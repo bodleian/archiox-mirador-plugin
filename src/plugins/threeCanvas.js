@@ -154,6 +154,7 @@ class ThreeCanvas extends React.Component{
         this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         this.directionalLight.position.set(0, 0, 1);
         this.directionalLight.castShadow = true;
+        this.moveLight();
         this.scene.add(this.group);
         this.scene.add(this.camera);
         this.scene.add(this.directionalLight);
@@ -190,7 +191,6 @@ class ThreeCanvas extends React.Component{
             prevProps.lightX !== this.props.lightX ||
             prevProps.lightY !== this.props.lightY
         ) {
-            console.log(this.props.lightX, this.props.lightY);
             this.moveLight();
             this.rerender();
             this.camera.updateProjectionMatrix();
