@@ -176,7 +176,7 @@ class ThreeCanvas extends React.Component{
         let dir = vector.sub(this.camera.position).normalize();
         let distance = -this.camera.position.z / dir.z;
         let pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
-        this.directionalLight.position.set(pos.x, pos.y, 0.5);
+        this.directionalLight.position.set(pos.x, pos.y, 1);
     }
 
     componentDidMount() {
