@@ -159,7 +159,7 @@ class lightNormals extends Component {
             document.getElementById("LightDirectionControl").style.background = `radial-gradient(at ` + x + `% ` + y + `%, #ffffff, #000000)`;
             this.lightX = (x/100) * 2 - 1;
             this.lightY =  -(y/100) * 2 + 1;
-        };
+        }
     }
 
     onMouseDown(event) {
