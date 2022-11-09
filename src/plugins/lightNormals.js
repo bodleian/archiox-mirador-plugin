@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import FlashlightOnIcon from '@material-ui/icons/WbIncandescent';
 import FlashlightOffIcon from '@material-ui/icons/WbIncandescentOutlined';
+import ViewInArIcon from '@mui/icons-material/ViewInAr';
+import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import Slider from '@material-ui/core/Slider';
 import ThreeCanvas from './threeCanvas';
 import { getImageData, getMinMaxProperty } from "./helpers";
@@ -11,7 +13,7 @@ function AmbientLightIntensity(props) {
         <Slider
             id="AmbientLightIntensity"
             style={{
-                float: "right",
+                float: "left",
                 marginTop: "20px",
                 marginBottom: "20px",
                 marginLeft: "8px",
@@ -35,7 +37,7 @@ function DirectionalLightIntensity(props) {
         <Slider
             id="DirectionalLightIntensity"
             style={{
-                float: "right",
+                float: "left",
                 marginTop: "20px",
                 marginBottom: "20px",
                 marginLeft: "8px",
@@ -60,7 +62,7 @@ function LightDirection(props) {
             id="LightDirectionControl"
             style={{
                 border: "#000000",
-                float: "right",
+                float: "left",
                 width: "100px",
                 height: "100px",
                 borderRadius: "50px",
@@ -93,12 +95,28 @@ function ToolsMenu({ children }) {
     )
 }
 
+function MenuButton(props) {
+    return (
+        <button
+            className={ 'MuiButtonBase-root MuiIconButton-root' }
+            style={{
+                float: "left",
+                clear: "both"
+            }}
+            onClick={ props.onClick }
+        >
+            { props.open ? <CloseSharpIcon /> : <ViewInArIcon/> }
+        </button>
+    );
+}
+
 function TorchButton(props) {
     return (
         <button
             className={ 'MuiButtonBase-root MuiIconButton-root' }
             style={{
-                float: "left"
+                float: "left",
+                clear: "both"
             }}
             onClick={ props.onClick }
         >
@@ -180,6 +198,7 @@ class lightNormals extends Component {
         super(props);
         this.state = {
             active: false,
+            open: false,
             visible: false,
             zoomLevel: 0,
             zoom: 0,
@@ -246,6 +265,10 @@ class lightNormals extends Component {
         this.setState({ ambientIntensity: value });
     }
 
+    menuHandler() {
+        this.setState( prevState => ({ open: !prevState.open }));
+    }
+
     torchHandler() {
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
@@ -265,14 +288,6 @@ class lightNormals extends Component {
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
             this.props.viewer.removeAllHandlers('viewport-change');
-            this.lightX = 0;
-            this.lightY = 0;
-            this.directionalIntensity = 1;
-            this.ambientIntensity = 0.1;
-            this.setState({lightX: this.threeCanvasProps.lightX});
-            this.setState({lightY: this.threeCanvasProps.lightY});
-            this.setState({ directionalIntensity: value });
-            this.setState({ ambientIntensity: value });
         } else {
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
@@ -366,36 +381,44 @@ class lightNormals extends Component {
 
         let toolMenu = null;
 
-        if (this.state.visible && this.state.active) {
+        if (this.state.visible && this.state.open) {
             toolMenu = <ToolsMenu visible={ this.state.visible }>
-                <TorchButton
-                    onClick={() => this.torchHandler()}
-                    value={light}
-                />
+                <div style={{
+                    float: "left"
+                }}>
+                    <MenuButton
+                        open={ this.state.open }
+                        onClick={ () => this.menuHandler() }
+                    />
+                    <TorchButton
+                        onClick={ () => this.torchHandler() }
+                        value={ light }
+                    />
+                </div>
                 <LightDirection
-                    onMouseMove={(event) => this.onMouseMove(event)}
-                    onMouseDown={(event) => this.onMouseDown(event)}
-                    onMouseUp={(event) => this.onMouseUp(event)}
-                    onMouseLeave={(event) => this.onMouseLeave(event)}
+                    onMouseMove={ (event) => this.onMouseMove(event) }
+                    onMouseDown={ (event) => this.onMouseDown(event) }
+                    onMouseUp={ (event) => this.onMouseUp(event) }
+                    onMouseLeave={ (event) => this.onMouseLeave(event) }
                 />
                 <DirectionalLightIntensity
-                    onChange={(event, value) => this.onDirectionalLightChange(event, value)}
+                    onChange={ (event, value) => this.onDirectionalLightChange(event, value) }
                 />
                 <AmbientLightIntensity
-                    onChange={(event, value) => this.onAmbientLightChange(event, value)}
+                    onChange={ (event, value) => this.onAmbientLightChange(event, value) }
                 />
             </ToolsMenu>;
-        } else if (this.state.visible && !this.state.active) {
+        } else if (this.state.visible && !this.state.open) {
             toolMenu =  <ToolsMenu visible={ this.state.visible }>
-                <TorchButton
-                    onClick={() => this.torchHandler()}
-                    value={light}
+                <MenuButton
+                    open={ this.state.open }
+                    onClick={ () => this.menuHandler() }
                 />
             </ToolsMenu>
         } else if (!this.state.visible) {
             toolMenu = null;
         }
-
+        
         return (
             <>
                 { toolMenu }
