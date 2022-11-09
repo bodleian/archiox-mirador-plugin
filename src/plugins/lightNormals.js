@@ -23,7 +23,7 @@ function AmbientLightIntensity(props) {
             size="small"
             orientation="vertical"
             marks
-            defaultValue={ 0.1 }
+            defaultValue={ props.ambientIntensity }
             step={ 0.1 }
             min={ 0 }
             max={ 1 }
@@ -47,7 +47,7 @@ function DirectionalLightIntensity(props) {
             size="small"
             orientation="vertical"
             marks
-            defaultValue={ 1 }
+            defaultValue={ props.directionalIntensity }
             step={ 0.1 }
             min={ 0.1 }
             max={ 1 }
@@ -66,7 +66,7 @@ function LightDirection(props) {
                 width: "100px",
                 height: "100px",
                 borderRadius: "50px",
-                background: `radial-gradient(at center, #ffffff, #000000)`,
+                background: `radial-gradient(at ` + props.mouseX + `% ` + props.mouseY + `%, #ffffff, #000000)`,
                 margin: "13px"
             }}
             onMouseMove={ props.onMouseMove }
@@ -202,10 +202,12 @@ class lightNormals extends Component {
             visible: false,
             zoomLevel: 0,
             zoom: 0,
+            mouseX: 50,
+            mouseY: 50,
             lightX: 0,
             lightY: 0,
-            directionalIntensity: 0,
-            ambientIntensity: 0,
+            directionalIntensity: 1,
+            ambientIntensity: 0.1,
             rendererInstructions: {
                 intersection:{
                     width:0,
@@ -217,6 +219,8 @@ class lightNormals extends Component {
         }
         this.threeCanvasProps = {};
         this.mouseDown = false;
+        this.mouseX = 0;
+        this.mouseY = 0;
         this.lightX = 0;
         this.lightY = 0;
         this.directionalIntensity = 1;
@@ -227,17 +231,19 @@ class lightNormals extends Component {
         event.preventDefault();
         const control = document.getElementById("LightDirectionControl");
         const boundingBox = control.getBoundingClientRect();
-        const x = event.clientX - boundingBox.left;
-        const y = event.clientY - boundingBox.top;
+        this.mouseX = event.clientX - boundingBox.left;
+        this.mouseY = event.clientY - boundingBox.top;
 
         if (this.mouseDown) {
-            document.getElementById("LightDirectionControl").style.background = `radial-gradient(at ` + x + `% ` + y + `%, #ffffff, #000000)`;
-            this.lightX = (x/100) * 2 - 1;
-            this.lightY =  -(y/100) * 2 + 1;
+            document.getElementById("LightDirectionControl").style.background = `radial-gradient(at ` + this.mouseX + `% ` + this.mouseY + `%, #ffffff, #000000)`;
+            this.lightX = (this.mouseX / 100) * 2 - 1;
+            this.lightY =  - (this.mouseY / 100) * 2 + 1;
             this.threeCanvasProps.lightX = this.lightX;
             this.threeCanvasProps.lightY = this.lightY;
-            this.setState({lightX: this.threeCanvasProps.lightX});
-            this.setState({lightY: this.threeCanvasProps.lightY});
+            this.setState({ mouseX: this.mouseX });
+            this.setState({ mouseY: this.mouseY });
+            this.setState({ lightX: this.threeCanvasProps.lightX });
+            this.setState({ lightY: this.threeCanvasProps.lightY });
         }
     }
 
@@ -396,15 +402,19 @@ class lightNormals extends Component {
                     />
                 </div>
                 <LightDirection
+                    mouseX={ this.state.mouseX }
+                    mouseY={ this.state.mouseY }
                     onMouseMove={ (event) => this.onMouseMove(event) }
                     onMouseDown={ (event) => this.onMouseDown(event) }
                     onMouseUp={ (event) => this.onMouseUp(event) }
                     onMouseLeave={ (event) => this.onMouseLeave(event) }
                 />
                 <DirectionalLightIntensity
+                    directionalIntensity={ this.state.directionalIntensity }
                     onChange={ (event, value) => this.onDirectionalLightChange(event, value) }
                 />
                 <AmbientLightIntensity
+                    ambientIntensity={ this.state.ambientIntensity }
                     onChange={ (event, value) => this.onAmbientLightChange(event, value) }
                 />
             </ToolsMenu>;
@@ -418,7 +428,7 @@ class lightNormals extends Component {
         } else if (!this.state.visible) {
             toolMenu = null;
         }
-        
+
         return (
             <>
                 { toolMenu }
