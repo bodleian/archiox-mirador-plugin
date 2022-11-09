@@ -61,6 +61,8 @@ class ThreeCanvas extends React.Component{
         this.state = {
             lightX: this.props.lightX,
             lightY: this.props.lightY,
+            directionalIntensity: this.props.directionalIntensity,
+            ambientIntensity: this.props.ambientIntensity,
             albedoTiles: this.props.albedoTiles,
             normalTiles: this.props.normalTiles,
             zoom: this.props.zoom,
@@ -150,8 +152,8 @@ class ThreeCanvas extends React.Component{
         // centre the group of planes in the centre of the scene
         new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, this.state.ambientIntensity);
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, this.state.directionalIntensity);
         this.directionalLight.position.set(0, 0, 1);
         this.directionalLight.castShadow = true;
         this.moveLight();
@@ -189,8 +191,12 @@ class ThreeCanvas extends React.Component{
             prevProps.zoom !== this.props.zoom ||
             prevProps.intersection !== this.props.intersection ||
             prevProps.lightX !== this.props.lightX ||
-            prevProps.lightY !== this.props.lightY
+            prevProps.lightY !== this.props.lightY ||
+            prevProps.directionalIntensity !== this.props.directionalIntensity ||
+            prevProps.ambientIntensity !== this.props.ambientIntensity
         ) {
+            this.ambientLight.intensity = this.props.ambientIntensity;
+            this.directionalLight.intensity = this.props.directionalIntensity;
             this.moveLight();
             this.rerender();
             this.camera.updateProjectionMatrix();
