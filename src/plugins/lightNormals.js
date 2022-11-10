@@ -4,9 +4,25 @@ import FlashlightOnIcon from '@material-ui/icons/WbIncandescent';
 import FlashlightOffIcon from '@material-ui/icons/WbIncandescentOutlined';
 import ViewInArIcon from '@mui/icons-material/ViewInAr';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
+import ReplaySharpIcon from '@material-ui/icons/ReplaySharp';
 import Slider from '@material-ui/core/Slider';
 import ThreeCanvas from './threeCanvas';
 import { getImageData, getMinMaxProperty } from "./helpers";
+
+function ResetLightPositions(props) {
+    return (
+        <button
+            className={ 'MuiButtonBase-root MuiIconButton-root' }
+            style={{
+                float: "left",
+                clear: "both"
+            }}
+            onClick={ props.onClick }
+        >
+            <ReplaySharpIcon />
+        </button>
+    );
+}
 
 function AmbientLightIntensity(props) {
     return (
@@ -24,6 +40,7 @@ function AmbientLightIntensity(props) {
             orientation="vertical"
             marks
             defaultValue={ props.ambientIntensity }
+            value={ props.ambientIntensity }
             step={ 0.1 }
             min={ 0 }
             max={ 1 }
@@ -48,6 +65,7 @@ function DirectionalLightIntensity(props) {
             orientation="vertical"
             marks
             defaultValue={ props.directionalIntensity }
+            value={ props.directionalIntensity }
             step={ 0.1 }
             min={ 0.1 }
             max={ 1 }
@@ -275,6 +293,27 @@ class lightNormals extends Component {
         this.setState( prevState => ({ open: !prevState.open }));
     }
 
+    resetHandler() {
+        this.mouseX = 50;
+        this.mouseY = 50;
+        this.lightX = 0;
+        this.lightY = 0;
+        this.ambientIntensity = 0.1;
+        this.directionalIntensity = 1;
+
+        this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
+        this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
+        this.threeCanvasProps.lightX = this.lightX;
+        this.threeCanvasProps.lightY = this.lighY;
+
+        this.setState({ mouseX: this.mouseX });
+        this.setState({ mouseY: this.mouseY });
+        this.setState({ lightX: this.lightX });
+        this.setState({ lightY: this.lightY });
+        this.setState({ ambientIntensity: this.ambientIntensity });
+        this.setState({ directionalIntensity: this.directionalIntensity });
+    }
+
     torchHandler() {
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
@@ -399,6 +438,9 @@ class lightNormals extends Component {
                     <TorchButton
                         onClick={ () => this.torchHandler() }
                         value={ light }
+                    />
+                    <ResetLightPositions
+                        onClick={ () => this.resetHandler() }
                     />
                 </div>
                 <LightDirection
