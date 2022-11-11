@@ -2,17 +2,6 @@ import React from "react";
 import * as THREE from "three";
 import { BallTriangle } from "react-loader-spinner";
 
-function  onMouseMove(event, props) {
-    event.preventDefault();
-    let x = (event.clientX / window.innerWidth) * 2 - 1;
-    let y = -(event.clientY / window.innerHeight) * 2 + 1;
-    let vector = new THREE.Vector3(x, y, 0);
-    let dir = vector.sub(props.camera.position).normalize();
-    let distance = -props.camera.position.z / dir.z;
-    let pos = props.camera.position.clone().add(dir.multiplyScalar(distance));
-    props.directionalLight.position.set(pos.x, pos.y, 0.5);
-}
-
 function Loader(props) {
     const container = {
         position: "relative"
@@ -50,7 +39,6 @@ function Loader(props) {
             <div
                 id="canvas-container"
                 style={ canvas }
-                onMouseMove={ (e) => onMouseMove(e, props) }
             />
         </div>
     );
@@ -71,6 +59,10 @@ class ThreeCanvas extends React.Component{
     constructor(props){
         super(props)
         this.state = {
+            lightX: this.props.lightX,
+            lightY: this.props.lightY,
+            directionalIntensity: this.props.directionalIntensity,
+            ambientIntensity: this.props.ambientIntensity,
             albedoTiles: this.props.albedoTiles,
             normalTiles: this.props.normalTiles,
             zoom: this.props.zoom,
@@ -100,7 +92,7 @@ class ThreeCanvas extends React.Component{
 
         // define an orthographic camera
         this.camera = new THREE.OrthographicCamera(
-          (this.state.contentWidth) / -2,
+            (this.state.contentWidth) / -2,
             (this.state.contentWidth) / 2,
             (this.state.contentHeight) / 2,
             (this.state.contentHeight) /-2,
@@ -160,10 +152,11 @@ class ThreeCanvas extends React.Component{
         // centre the group of planes in the centre of the scene
         new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, this.state.ambientIntensity);
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, this.state.directionalIntensity);
         this.directionalLight.position.set(0, 0, 1);
         this.directionalLight.castShadow = true;
+        this.moveLight();
         this.scene.add(this.group);
         this.scene.add(this.camera);
         this.scene.add(this.directionalLight);
@@ -180,6 +173,14 @@ class ThreeCanvas extends React.Component{
         _camera_offset(this.camera, this.props);
     }
 
+    moveLight(){
+        let vector = new THREE.Vector3(this.props.lightX, this.props.lightY, 0);
+        let dir = vector.sub(this.camera.position).normalize();
+        let distance = -this.camera.position.z / dir.z;
+        let pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
+        this.directionalLight.position.set(pos.x, pos.y, 1);
+    }
+
     componentDidMount() {
         document.getElementById("canvas-container").appendChild(this.renderer.domElement);
         this.animate();
@@ -188,8 +189,15 @@ class ThreeCanvas extends React.Component{
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (
             prevProps.zoom !== this.props.zoom ||
-            prevProps.intersection !== this.props.intersection
+            prevProps.intersection !== this.props.intersection ||
+            prevProps.lightX !== this.props.lightX ||
+            prevProps.lightY !== this.props.lightY ||
+            prevProps.directionalIntensity !== this.props.directionalIntensity ||
+            prevProps.ambientIntensity !== this.props.ambientIntensity
         ) {
+            this.ambientLight.intensity = this.props.ambientIntensity;
+            this.directionalLight.intensity = this.props.directionalIntensity;
+            this.moveLight();
             this.rerender();
             this.camera.updateProjectionMatrix();
         }
@@ -200,7 +208,7 @@ class ThreeCanvas extends React.Component{
     }
 
     onTexturesLoaded() {
-            document.getElementById("loading-overlay").style.display = "none";
+        document.getElementById("loading-overlay").style.display = "none";
     }
 
     render(){

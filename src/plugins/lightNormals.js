@@ -2,13 +2,123 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import FlashlightOnIcon from '@material-ui/icons/WbIncandescent';
 import FlashlightOffIcon from '@material-ui/icons/WbIncandescentOutlined';
+import ViewInArIcon from '@mui/icons-material/ViewInAr';
+import CloseSharpIcon from '@material-ui/icons/CloseSharp';
+import ReplaySharpIcon from '@material-ui/icons/ReplaySharp';
+import Slider from '@material-ui/core/Slider';
 import ThreeCanvas from './threeCanvas';
 import { getImageData, getMinMaxProperty } from "./helpers";
+
+function ResetLightPositions(props) {
+    return (
+        <button
+            className={ 'MuiButtonBase-root MuiIconButton-root' }
+            style={{
+                float: "left",
+                clear: "both"
+            }}
+            onClick={ props.onClick }
+        >
+            <ReplaySharpIcon />
+        </button>
+    );
+}
+
+function AmbientLightIntensity(props) {
+    return (
+        <Slider
+            id="AmbientLightIntensity"
+            style={{
+                marginTop: "20px",
+                marginBottom: "20px",
+                marginLeft: "8px",
+                marginRight: "8px",
+                height: "87px"
+            }}
+            size="small"
+            orientation="vertical"
+            marks
+            defaultValue={ props.ambientIntensity }
+            value={ props.ambientIntensity }
+            step={ 0.1 }
+            min={ 0 }
+            max={ 1 }
+            onChange={ props.onChange }
+        />
+    )
+}
+
+function DirectionalLightIntensity(props) {
+    return (
+        <Slider
+            id="DirectionalLightIntensity"
+            style={{
+                marginTop: "20px",
+                marginBottom: "20px",
+                marginLeft: "8px",
+                marginRight: "8px",
+                height: "87px"
+            }}
+            size="small"
+            orientation="vertical"
+            marks
+            defaultValue={ props.directionalIntensity }
+            value={ props.directionalIntensity }
+            step={ 0.1 }
+            min={ 0.1 }
+            max={ 1 }
+            onChange={ props.onChange }
+        />
+    )
+}
+
+function LightDirection(props) {
+    return (
+        <div
+            id="LightDirectionControl"
+            style={{
+                border: "#000000",
+                width: "100px",
+                height: "100px",
+                borderRadius: "50px",
+                background: `radial-gradient(at ` + props.mouseX + `% ` + props.mouseY + `%, #ffffff, #000000)`,
+                margin: "13px"
+            }}
+            onMouseMove={ props.onMouseMove }
+            onMouseDown={ props.onMouseDown }
+            onMouseUp={ props.onMouseUp }
+            onMouseLeave={ props.onMouseLeave }
+        />
+    );
+}
+
+function LightButtons({ children }) {
+    return (
+        <div>
+            { children }
+        </div>
+    )
+}
+
+function LightControls({ children }) {
+    return (
+        <div
+            style={{
+                float: "left",
+                display: "flex"
+            }}
+        >
+            { children }
+        </div>
+    )
+}
 
 function ToolsMenu({ children }) {
     return (
         <div
             style={{
+                display: "flex",
+                alignItems: "center",
                 position: "absolute",
                 left: "8px",
                 top: "8px",
@@ -23,10 +133,29 @@ function ToolsMenu({ children }) {
     )
 }
 
+function MenuButton(props) {
+    return (
+        <button
+            className={ 'MuiButtonBase-root MuiIconButton-root' }
+            style={{
+                float: "left",
+                clear: "both"
+            }}
+            onClick={ props.onClick }
+        >
+            { props.open ? <CloseSharpIcon /> : <ViewInArIcon/> }
+        </button>
+    );
+}
+
 function TorchButton(props) {
     return (
         <button
             className={ 'MuiButtonBase-root MuiIconButton-root' }
+            style={{
+                float: "left",
+                clear: "both"
+            }}
             onClick={ props.onClick }
         >
             { props.value }
@@ -43,6 +172,10 @@ function Overlay(props) {
             intersection={ props.rendererInstructions.intersection }
             contentWidth={ props.contentWidth }
             contentHeight={ props.contentHeight }
+            lightX={ props.lightX }
+            lightY={ props.lightY }
+            directionalIntensity={ props.directionalIntensity }
+            ambientIntensity={ props.ambientIntensity }
         />
     );
 }
@@ -103,9 +236,16 @@ class lightNormals extends Component {
         super(props);
         this.state = {
             active: false,
+            open: false,
             visible: false,
             zoomLevel: 0,
             zoom: 0,
+            mouseX: 50,
+            mouseY: 50,
+            lightX: 0,
+            lightY: 0,
+            directionalIntensity: 1,
+            ambientIntensity: 0.1,
             rendererInstructions: {
                 intersection:{
                     width:0,
@@ -116,6 +256,82 @@ class lightNormals extends Component {
             }
         }
         this.threeCanvasProps = {};
+        this.mouseDown = false;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.lightX = 0;
+        this.lightY = 0;
+        this.directionalIntensity = 1;
+        this.ambientIntensity = 0.1;
+    }
+
+    onMouseMove(event) {
+        event.preventDefault();
+        const control = document.getElementById("LightDirectionControl");
+        const boundingBox = control.getBoundingClientRect();
+        this.mouseX = event.clientX - boundingBox.left;
+        this.mouseY = event.clientY - boundingBox.top;
+
+        if (this.mouseDown) {
+            document.getElementById("LightDirectionControl").style.background = `radial-gradient(at ` + this.mouseX + `% ` + this.mouseY + `%, #ffffff, #000000)`;
+            this.lightX = (this.mouseX / 100) * 2 - 1;
+            this.lightY =  - (this.mouseY / 100) * 2 + 1;
+            this.threeCanvasProps.lightX = this.lightX;
+            this.threeCanvasProps.lightY = this.lightY;
+            this.setState({ mouseX: this.mouseX });
+            this.setState({ mouseY: this.mouseY });
+            this.setState({ lightX: this.threeCanvasProps.lightX });
+            this.setState({ lightY: this.threeCanvasProps.lightY });
+        }
+    }
+
+    onMouseDown(event) {
+        this.mouseDown = true;
+    }
+
+    onMouseUp(event) {
+        this.mouseDown = false;
+    }
+
+    onMouseLeave(event) {
+        this.mouseDown = false;
+    }
+
+    onDirectionalLightChange(event, value) {
+        this.directionalIntensity = value;
+        this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
+        this.setState({ directionalIntensity: value });
+    }
+
+    onAmbientLightChange(event, value) {
+        this.ambientIntensity = value;
+        this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
+        this.setState({ ambientIntensity: value });
+    }
+
+    menuHandler() {
+        this.setState( prevState => ({ open: !prevState.open }));
+    }
+
+    resetHandler() {
+        this.mouseX = 50;
+        this.mouseY = 50;
+        this.lightX = 0;
+        this.lightY = 0;
+        this.ambientIntensity = 0.1;
+        this.directionalIntensity = 1;
+
+        this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
+        this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
+        this.threeCanvasProps.lightX = this.lightX;
+        this.threeCanvasProps.lightY = this.lighY;
+
+        this.setState({ mouseX: this.mouseX });
+        this.setState({ mouseY: this.mouseY });
+        this.setState({ lightX: this.lightX });
+        this.setState({ lightY: this.lightY });
+        this.setState({ ambientIntensity: this.ambientIntensity });
+        this.setState({ directionalIntensity: this.directionalIntensity });
     }
 
     torchHandler() {
@@ -128,6 +344,10 @@ class lightNormals extends Component {
         this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
         this.threeCanvasProps.albedoMap = this.albedoMap;
         this.threeCanvasProps.normalMap = this.normalMap;
+        this.threeCanvasProps.lightX = this.lightX;
+        this.threeCanvasProps.lightY = this.lightY;
+        this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
+        this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
         this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
 
         if (this.state.active) {
@@ -169,6 +389,7 @@ class lightNormals extends Component {
                 this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
                 this.setState({ zoom: this.threeCanvasProps.zoom });
                 this.setState({ rendererInstructions: this.threeCanvasProps.rendererInstructions });
+                this.setState( {directionalIntensity: this.threeCanvasProps.directionalIntensity});
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
             });
@@ -194,7 +415,11 @@ class lightNormals extends Component {
         if (
             prevState.zoom !== this.threeCanvasProps.zoom ||
             prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection ||
-            prevState.active !== this.state.active
+            prevState.active !== this.state.active ||
+            prevState.lightX !== this.threeCanvasProps.lightX ||
+            prevState.lightY !== this.threeCanvasProps.lightY ||
+            prevState.directionalIntensity !== this.state.directionalIntensity ||
+            prevState.ambientIntensity !== this.state.ambientIntensity
         ) {
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
@@ -219,14 +444,57 @@ class lightNormals extends Component {
             }
         }
 
-        return (
-            this.state.visible ?
-                <ToolsMenu visible={ this.state.visible }>
+        let toolMenu = null;
+
+        if (this.state.visible && this.state.open) {
+            toolMenu = <ToolsMenu visible={ this.state.visible }>
+                <LightButtons>
+                    <MenuButton
+                        open={ this.state.open }
+                        onClick={ () => this.menuHandler() }
+                    />
                     <TorchButton
                         onClick={ () => this.torchHandler() }
                         value={ light }
                     />
-                </ToolsMenu> : null
+                    <ResetLightPositions
+                        onClick={ () => this.resetHandler() }
+                    />
+                </LightButtons>
+                <LightControls>
+                    <LightDirection
+                        mouseX={ this.state.mouseX }
+                        mouseY={ this.state.mouseY }
+                        onMouseMove={ (event) => this.onMouseMove(event) }
+                        onMouseDown={ (event) => this.onMouseDown(event) }
+                        onMouseUp={ (event) => this.onMouseUp(event) }
+                        onMouseLeave={ (event) => this.onMouseLeave(event) }
+                    />
+                    <DirectionalLightIntensity
+                        directionalIntensity={ this.state.directionalIntensity }
+                        onChange={ (event, value) => this.onDirectionalLightChange(event, value) }
+                    />
+                    <AmbientLightIntensity
+                        ambientIntensity={ this.state.ambientIntensity }
+                        onChange={ (event, value) => this.onAmbientLightChange(event, value) }
+                    />
+                </LightControls>
+            </ToolsMenu>;
+        } else if (this.state.visible && !this.state.open) {
+            toolMenu =  <ToolsMenu visible={ this.state.visible }>
+                <MenuButton
+                    open={ this.state.open }
+                    onClick={ () => this.menuHandler() }
+                />
+            </ToolsMenu>
+        } else if (!this.state.visible) {
+            toolMenu = null;
+        }
+
+        return (
+            <>
+                { toolMenu }
+            </>
         );
     }
 }
