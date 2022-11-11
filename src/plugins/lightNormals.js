@@ -29,7 +29,6 @@ function AmbientLightIntensity(props) {
         <Slider
             id="AmbientLightIntensity"
             style={{
-                float: "left",
                 marginTop: "20px",
                 marginBottom: "20px",
                 marginLeft: "8px",
@@ -54,7 +53,6 @@ function DirectionalLightIntensity(props) {
         <Slider
             id="DirectionalLightIntensity"
             style={{
-                float: "left",
                 marginTop: "20px",
                 marginBottom: "20px",
                 marginLeft: "8px",
@@ -80,7 +78,6 @@ function LightDirection(props) {
             id="LightDirectionControl"
             style={{
                 border: "#000000",
-                float: "left",
                 width: "100px",
                 height: "100px",
                 borderRadius: "50px",
@@ -95,10 +92,33 @@ function LightDirection(props) {
     );
 }
 
+function LightButtons({ children }) {
+    return (
+        <div>
+            { children }
+        </div>
+    )
+}
+
+function LightControls({ children }) {
+    return (
+        <div
+            style={{
+                float: "left",
+                display: "flex"
+            }}
+        >
+            { children }
+        </div>
+    )
+}
+
 function ToolsMenu({ children }) {
     return (
         <div
             style={{
+                display: "flex",
+                alignItems: "center",
                 position: "absolute",
                 left: "8px",
                 top: "8px",
@@ -428,9 +448,7 @@ class lightNormals extends Component {
 
         if (this.state.visible && this.state.open) {
             toolMenu = <ToolsMenu visible={ this.state.visible }>
-                <div style={{
-                    float: "left"
-                }}>
+                <LightButtons>
                     <MenuButton
                         open={ this.state.open }
                         onClick={ () => this.menuHandler() }
@@ -442,23 +460,25 @@ class lightNormals extends Component {
                     <ResetLightPositions
                         onClick={ () => this.resetHandler() }
                     />
-                </div>
-                <LightDirection
-                    mouseX={ this.state.mouseX }
-                    mouseY={ this.state.mouseY }
-                    onMouseMove={ (event) => this.onMouseMove(event) }
-                    onMouseDown={ (event) => this.onMouseDown(event) }
-                    onMouseUp={ (event) => this.onMouseUp(event) }
-                    onMouseLeave={ (event) => this.onMouseLeave(event) }
-                />
-                <DirectionalLightIntensity
-                    directionalIntensity={ this.state.directionalIntensity }
-                    onChange={ (event, value) => this.onDirectionalLightChange(event, value) }
-                />
-                <AmbientLightIntensity
-                    ambientIntensity={ this.state.ambientIntensity }
-                    onChange={ (event, value) => this.onAmbientLightChange(event, value) }
-                />
+                </LightButtons>
+                <LightControls>
+                    <LightDirection
+                        mouseX={ this.state.mouseX }
+                        mouseY={ this.state.mouseY }
+                        onMouseMove={ (event) => this.onMouseMove(event) }
+                        onMouseDown={ (event) => this.onMouseDown(event) }
+                        onMouseUp={ (event) => this.onMouseUp(event) }
+                        onMouseLeave={ (event) => this.onMouseLeave(event) }
+                    />
+                    <DirectionalLightIntensity
+                        directionalIntensity={ this.state.directionalIntensity }
+                        onChange={ (event, value) => this.onDirectionalLightChange(event, value) }
+                    />
+                    <AmbientLightIntensity
+                        ambientIntensity={ this.state.ambientIntensity }
+                        onChange={ (event, value) => this.onAmbientLightChange(event, value) }
+                    />
+                </LightControls>
             </ToolsMenu>;
         } else if (this.state.visible && !this.state.open) {
             toolMenu =  <ToolsMenu visible={ this.state.visible }>
