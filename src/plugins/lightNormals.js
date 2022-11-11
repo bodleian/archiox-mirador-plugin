@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import FlashlightOnIcon from '@material-ui/icons/WbIncandescent';
 import FlashlightOffIcon from '@material-ui/icons/WbIncandescentOutlined';
-import ViewInArIcon from '@mui/icons-material/ViewInAr';
+import GamepadIcon from '@material-ui/icons/Gamepad';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import ReplaySharpIcon from '@material-ui/icons/ReplaySharp';
 import Slider from '@material-ui/core/Slider';
@@ -143,7 +143,7 @@ function MenuButton(props) {
             }}
             onClick={ props.onClick }
         >
-            { props.open ? <CloseSharpIcon /> : <ViewInArIcon/> }
+            { props.open ? <CloseSharpIcon /> : <GamepadIcon /> }
         </button>
     );
 }
