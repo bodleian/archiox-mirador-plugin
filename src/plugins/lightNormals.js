@@ -143,7 +143,7 @@ function MenuButton(props) {
             }}
             onClick={ props.onClick }
         >
-            { props.open ? <CloseSharpIcon /> : <GamepadIcon/> }
+            { props.open ? <CloseSharpIcon /> : <GamepadIcon /> }
         </button>
     );
 }
