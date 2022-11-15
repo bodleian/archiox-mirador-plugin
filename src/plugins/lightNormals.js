@@ -1,18 +1,20 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import FlashlightOnIcon from '@material-ui/icons/WbIncandescent';
-import FlashlightOffIcon from '@material-ui/icons/WbIncandescentOutlined';
-import GamepadIcon from '@material-ui/icons/Gamepad';
+import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
+import WbIncandescentOutlinedIcon from '@material-ui/icons/WbIncandescentOutlined';
+import HighlightIcon from '@material-ui/icons/Highlight';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import ReplaySharpIcon from '@material-ui/icons/ReplaySharp';
+import Tooltip from '@material-ui/core/Tooltip';
+import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import Slider from '@material-ui/core/Slider';
 import ThreeCanvas from './threeCanvas';
 import { getImageData, getMinMaxProperty } from "./helpers";
 
 function ResetLightPositions(props) {
     return (
-        <button
-            className={ 'MuiButtonBase-root MuiIconButton-root' }
+        <MiradorMenuButton
+            aria-label={"Reset Lighting Settings"}
             style={{
                 float: "left",
                 clear: "both"
@@ -20,75 +22,83 @@ function ResetLightPositions(props) {
             onClick={ props.onClick }
         >
             <ReplaySharpIcon />
-        </button>
+        </MiradorMenuButton>
     );
 }
 
 function AmbientLightIntensity(props) {
     return (
-        <Slider
-            id="AmbientLightIntensity"
-            style={{
-                marginTop: "20px",
-                marginBottom: "20px",
-                marginLeft: "8px",
-                marginRight: "8px",
-                height: "87px"
-            }}
-            size="small"
-            orientation="vertical"
-            marks
-            defaultValue={ props.ambientIntensity }
-            value={ props.ambientIntensity }
-            step={ 0.1 }
-            min={ 0 }
-            max={ 1 }
-            onChange={ props.onChange }
-        />
+        <Tooltip title={ "Change Ambient Light Intensity" }>
+            <Slider
+                id="AmbientLightIntensity"
+                style={{
+                    marginTop: "20px",
+                    marginBottom: "20px",
+                    marginLeft: "8px",
+                    marginRight: "8px",
+                    height: "87px"
+                }}
+                size="small"
+                orientation="vertical"
+                marks
+                defaultValue={ props.ambientIntensity }
+                value={ props.ambientIntensity }
+                step={ 0.1 }
+                min={ 0 }
+                max={ 1 }
+                onChange={ props.onChange }
+            />
+        </Tooltip>
     )
 }
 
 function DirectionalLightIntensity(props) {
     return (
-        <Slider
-            id="DirectionalLightIntensity"
-            style={{
-                marginTop: "20px",
-                marginBottom: "20px",
-                marginLeft: "8px",
-                marginRight: "8px",
-                height: "87px"
-            }}
-            size="small"
-            orientation="vertical"
-            marks
-            defaultValue={ props.directionalIntensity }
-            value={ props.directionalIntensity }
-            step={ 0.1 }
-            min={ 0.1 }
-            max={ 1 }
-            onChange={ props.onChange }
-        />
+        <Tooltip title={ "Change Directional Light Intensity" }>
+            <Slider
+                id="DirectionalLightIntensity"
+                style={{
+                    marginTop: "20px",
+                    marginBottom: "20px",
+                    marginLeft: "8px",
+                    marginRight: "8px",
+                    height: "87px"
+                }}
+                size="small"
+                orientation="vertical"
+                marks
+                defaultValue={ props.directionalIntensity }
+                value={ props.directionalIntensity }
+                step={ 0.1 }
+                min={ 0.1 }
+                max={ 1 }
+                onChange={ props.onChange }
+            />
+        </Tooltip>
     )
 }
 
 function LightDirection(props) {
     return (
-        <div
-            id="LightDirectionControl"
-            style={{
-                border: "#000000",
-                width: "100px",
-                height: "100px",
-                borderRadius: "50px",
-                background: `radial-gradient(at ` + props.mouseX + `% ` + props.mouseY + `%, #ffffff, #000000)`,
-                margin: "13px"
-            }}
-            onMouseMove={ props.onMouseMove }
-            onMouseDown={ props.onMouseDown }
-            onMouseUp={ props.onMouseUp }
-            onMouseLeave={ props.onMouseLeave }
-        />
+        <Tooltip title={ "Change Light Direction" }>
+            <div
+                id="LightDirectionControl"
+                style={{
+                    border: "#000000",
+                    width: "100px",
+                    height: "100px",
+                    borderRadius: "50px",
+                    background: `radial-gradient(at ` + props.mouseX + `% ` + props.mouseY + `%, #ffffff, #000000)`,
+                    margin: "13px"
+                }}
+                aria-label="Change light direction"
+                aria-expanded="False"
+                onMouseMove={ props.onMouseMove }
+                onMouseDown={ props.onMouseDown }
+                onMouseUp={ props.onMouseUp }
+                onMouseLeave={ props.onMouseLeave }
+            />
+        </Tooltip>
     );
 }
 
@@ -135,31 +145,31 @@ function ToolsMenu({ children }) {
 
 function MenuButton(props) {
     return (
-        <button
-            className={ 'MuiButtonBase-root MuiIconButton-root' }
+        <MiradorMenuButton
+            aria-label={ props.open ? "Collapse Relighting Tools" : "Expand Relighting Tools" }
             style={{
                 float: "left",
                 clear: "both"
             }}
             onClick={ props.onClick }
         >
-            { props.open ? <CloseSharpIcon /> : <GamepadIcon /> }
-        </button>
+            { props.open ? <CloseSharpIcon /> : <HighlightIcon /> }
+        </MiradorMenuButton>
     );
 }
 
 function TorchButton(props) {
     return (
-        <button
-            className={ 'MuiButtonBase-root MuiIconButton-root' }
+        <MiradorMenuButton
+            aria-label={ props.active ? "Turn On 3D Overlay" : "Turn Off 3D Overlay" }
             style={{
                 float: "left",
                 clear: "both"
             }}
             onClick={ props.onClick }
         >
-            { props.value }
-        </button>
+            { props.active ? <WbIncandescentIcon/> : <WbIncandescentOutlinedIcon/> }
+        </MiradorMenuButton>
     );
 }
 
@@ -429,8 +439,6 @@ class lightNormals extends Component {
     }
 
     render() {
-        const light = this.state.active ? <FlashlightOnIcon/> : <FlashlightOffIcon/>;
-
         if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
             this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
             this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
@@ -455,7 +463,7 @@ class lightNormals extends Component {
                     />
                     <TorchButton
                         onClick={ () => this.torchHandler() }
-                        value={ light }
+                        active={ this.state.active }
                     />
                     <ResetLightPositions
                         onClick={ () => this.resetHandler() }
