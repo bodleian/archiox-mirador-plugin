@@ -154,7 +154,7 @@ class ThreeCanvas extends React.Component{
 
         this.ambientLight = new THREE.AmbientLight(0xffffff, this.state.ambientIntensity);
         this.directionalLight = new THREE.DirectionalLight(0xffffff, this.state.directionalIntensity);
-        this.directionalLight.position.set(0, 0, 1);
+        this.directionalLight.position.set(0, 0, 0.5);
         this.directionalLight.castShadow = true;
         this.moveLight();
         this.scene.add(this.group);
@@ -174,11 +174,11 @@ class ThreeCanvas extends React.Component{
     }
 
     moveLight(){
-        let vector = new THREE.Vector3(this.props.lightX, this.props.lightY, 0);
+        let vector = new THREE.Vector3(this.props.lightX, this.props.lightY, 0.5);
         let dir = vector.sub(this.camera.position).normalize();
         let distance = -this.camera.position.z / dir.z;
         let pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
-        this.directionalLight.position.set(pos.x, pos.y, 1);
+        this.directionalLight.position.set(pos.x, pos.y, pos.z + 2);
     }
 
     componentDidMount() {
