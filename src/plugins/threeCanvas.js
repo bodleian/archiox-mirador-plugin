@@ -133,7 +133,6 @@ class ThreeCanvas extends React.Component{
             const plane_material = new THREE.MeshPhongMaterial({
                 map: this.albedoMap,
                 normalMap: this.normalMap,
-                flatShading: true,
                 normalScale: new THREE.Vector3(1, 1)
             });
 

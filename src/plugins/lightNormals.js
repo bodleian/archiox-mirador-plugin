@@ -285,7 +285,7 @@ class lightNormals extends Component {
         if (this.mouseDown) {
             document.getElementById("LightDirectionControl").style.background = `radial-gradient(at ` + this.mouseX + `% ` + this.mouseY + `%, #ffffff, #000000)`;
             this.lightX = (this.mouseX / 100) * 2 - 1;
-            this.lightY =  - (this.mouseY / 100) * 2 + 1;
+            this.lightY = (this.mouseY / 100) * 2 - 1;
             this.threeCanvasProps.lightX = this.lightX;
             this.threeCanvasProps.lightY = this.lightY;
             this.setState({ mouseX: this.mouseX });
