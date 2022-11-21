@@ -178,6 +178,7 @@ function Overlay(props) {
         <ThreeCanvas
             albedoTiles={ props.albedoTiles }
             normalTiles={ props.normalTiles }
+            images={ props.images }
             zoom={ props.zoom }
             intersection={ props.rendererInstructions.intersection }
             contentWidth={ props.contentWidth }
@@ -273,6 +274,7 @@ class lightNormals extends Component {
         this.lightY = 0;
         this.directionalIntensity = 1;
         this.ambientIntensity = 0.1;
+        this.images = {};
     }
 
     onMouseMove(event) {
@@ -369,16 +371,18 @@ class lightNormals extends Component {
             this.props.viewer.addOverlay(this.threeCanvas);
             this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
             this.max_tileLevel = this.props.viewer.source.scale_factors.length - 1;
+            this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+            this.threeCanvasProps.images = this.images;
 
             this.threeCanvasProps.albedoTiles = getTiles(
                 this.props.viewer.source,
-                this.max_tileLevel,
+                this.threeCanvasProps.tileLevel,
                 this.threeCanvasProps.albedoMap
             );
 
             this.threeCanvasProps.normalTiles = getTiles(
                 this.props.viewer.source,
-                this.max_tileLevel,
+                this.threeCanvasProps.tileLevel,
                 this.threeCanvasProps.normalMap
             );
 
@@ -402,6 +406,20 @@ class lightNormals extends Component {
                 this.setState( {directionalIntensity: this.threeCanvasProps.directionalIntensity});
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+                this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+                this.threeCanvasProps.images = this.images;
+            });
+
+            // this may need to go elsewhere for this to work from opening
+            this.props.viewer.addHandler('tile-loaded', (event) => {
+                var canvas = document.createElement('canvas');
+                canvas.width = event.image.width;
+                canvas.height = event.image.height;
+                event.tile.context2D = canvas.getContext('2d');
+                event.tile.context2D.drawImage(event.image, 0, 0);
+                const key = event.tile.cacheKey;
+                //img['crossOrigin'] = "Anonymous";
+                this.images[key] = canvas;
             });
 
             this.props.viewer.addHandler('close',  (event) => {
