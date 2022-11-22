@@ -9,6 +9,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import Slider from '@material-ui/core/Slider';
 import ThreeCanvas from './threeCanvas';
+import * as THREE from "three";
 import { getImageData, getMinMaxProperty } from "./helpers";
 
 function ResetLightPositions(props) {
@@ -416,10 +417,11 @@ class lightNormals extends Component {
                 canvas.width = event.image.width;
                 canvas.height = event.image.height;
                 event.tile.context2D = canvas.getContext('2d');
+                //event.image.crossOrigin = false;
+                const tile_texture = new THREE.Texture(event.image);
                 event.tile.context2D.drawImage(event.image, 0, 0);
                 const key = event.tile.cacheKey;
-                //img['crossOrigin'] = "Anonymous";
-                this.images[key] = canvas;
+                this.images[key] = tile_texture;
             });
 
             this.props.viewer.addHandler('close',  (event) => {
