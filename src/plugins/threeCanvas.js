@@ -55,6 +55,40 @@ function _camera_offset(camera, props) {
     )
 }
 
+function generate_canvas(group, state, props) {
+    for (let i = 0; i < props.albedoTiles.urls.length; i++) {
+        const albedoMap = props.images[props.albedoTiles.urls[i]] || null;
+        const normalMap = props.images[props.normalTiles.urls[i]] || null;
+
+        let plane_material;
+
+        if (albedoMap && normalMap) {
+            albedoMap.needsUpdate = true;
+            normalMap.needsUpdate = true;
+            plane_material = new THREE.MeshPhongMaterial({
+                map: albedoMap,
+                normalMap: normalMap,
+                flatShading: true,
+                normalScale: new THREE.Vector3(1, 1)
+            });
+        } else {
+            plane_material = new THREE.MeshPhongMaterial({
+            });
+        }
+        const x = props.albedoTiles.tiles[i].x + props.albedoTiles.tiles[i].w / 2
+        const y = props.albedoTiles.tiles[i].y + props.albedoTiles.tiles[i].h / 2
+
+        const plane_geometry = new THREE.PlaneGeometry(
+            props.albedoTiles.tiles[i].w,
+            props.albedoTiles.tiles[i].h
+        );
+
+        const mesh = new THREE.Mesh(plane_geometry, plane_material);
+        mesh.position.set(x, props.intersection.height - y, 0);
+        group.add(mesh);
+    }
+}
+
 class ThreeCanvas extends React.Component{
     constructor(props){
         super(props)
@@ -84,7 +118,7 @@ class ThreeCanvas extends React.Component{
 
         this.scene = new THREE.Scene();
 
-        this.renderer = new THREE.WebGLRenderer({alpha: false});
+        this.renderer = new THREE.WebGLRenderer({alpha: true});
         this.renderer.setSize(
             this.state.width * this.state.zoom,
             this.state.height * this.state.zoom
@@ -127,32 +161,7 @@ class ThreeCanvas extends React.Component{
         // define a group so we can handle all the tiles together
         this.group = new THREE.Group();
 
-        for (let i = 0; i < this.props.albedoTiles.urls.length; i++) {
-
-            if (this.props.images[this.state.albedoTiles.urls[i]]) {
-                this.albedoMap = this.props.images[this.state.albedoTiles.urls[i]];
-                this.albedoMap.needsUpdate = true;
-                this.normalMap = this.props.images[this.state.normalTiles.urls[i]];
-                this.normalMap.needsUpdate = true;
-                const plane_material = new THREE.MeshPhongMaterial({
-                    map: this.albedoMap,
-                    normalMap: this.normalMap,
-                    flatShading: true,
-                    normalScale: new THREE.Vector3(1, 1)
-                });
-
-                const x = this.state.albedoTiles.tiles[i].x + this.state.albedoTiles.tiles[i].w / 2
-                const y = this.state.albedoTiles.tiles[i].y + this.state.albedoTiles.tiles[i].h / 2
-
-                const plane_geometry = new THREE.PlaneGeometry(
-                    this.state.albedoTiles.tiles[i].w,
-                    this.state.albedoTiles.tiles[i].h
-                );
-                const mesh = new THREE.Mesh(plane_geometry, plane_material);
-                mesh.position.set(x, this.state.height - y, 0);
-                this.group.add(mesh);
-            }
-        }
+        generate_canvas(this.group, this.state, this.props);
 
         // centre the group of planes in the centre of the scene
         new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
@@ -198,10 +207,17 @@ class ThreeCanvas extends React.Component{
             prevProps.lightX !== this.props.lightX ||
             prevProps.lightY !== this.props.lightY ||
             prevProps.directionalIntensity !== this.props.directionalIntensity ||
-            prevProps.ambientIntensity !== this.props.ambientIntensity
+            prevProps.ambientIntensity !== this.props.ambientIntensity ||
+            prevProps.tileLevel !== this.props.tileLevel ||
+            prevProps.images !== this.props.images
         ) {
             this.ambientLight.intensity = this.props.ambientIntensity;
             this.directionalLight.intensity = this.props.directionalIntensity;
+            this.scene.remove(this.group);
+            this.group = new THREE.Group();
+            generate_canvas(this.group, this.state, this.props);
+            new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
+            this.scene.add(this.group);
             this.moveLight();
             this.rerender();
             this.camera.updateProjectionMatrix();

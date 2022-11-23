@@ -188,6 +188,7 @@ function Overlay(props) {
             lightY={ props.lightY }
             directionalIntensity={ props.directionalIntensity }
             ambientIntensity={ props.ambientIntensity }
+            tileLevel={ props.tileLevel }
         />
     );
 }
@@ -250,6 +251,7 @@ class lightNormals extends Component {
             active: false,
             open: false,
             visible: false,
+            loaded: false,
             zoomLevel: 0,
             zoom: 0,
             mouseX: 50,
@@ -397,7 +399,6 @@ class lightNormals extends Component {
             // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
             // glitch and not re-render until we cause the viewport-change event to trigger
             this.props.viewer.forceRedraw();
-
             this.props.viewer.addHandler('viewport-change', (event) => {
                 const zoom_level = this.props.viewer.viewport.getZoom(true);
                 this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
@@ -409,19 +410,6 @@ class lightNormals extends Component {
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
                 this.threeCanvasProps.images = this.images;
-            });
-
-            // this may need to go elsewhere for this to work from opening
-            this.props.viewer.addHandler('tile-loaded', (event) => {
-                var canvas = document.createElement('canvas');
-                canvas.width = event.image.width;
-                canvas.height = event.image.height;
-                event.tile.context2D = canvas.getContext('2d');
-                //event.image.crossOrigin = false;
-                const tile_texture = new THREE.Texture(event.image);
-                event.tile.context2D.drawImage(event.image, 0, 0);
-                const key = event.tile.cacheKey;
-                this.images[key] = tile_texture;
             });
 
             this.props.viewer.addHandler('close',  (event) => {
@@ -459,6 +447,22 @@ class lightNormals extends Component {
     }
 
     render() {
+        if (!this.state.loaded) {
+            if (this.props.viewer) {
+                this.setState({loaded: true});
+                this.props.viewer.addHandler('tile-loaded', (event) => {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = event.image.width;
+                    canvas.height = event.image.height;
+                    event.tile.context2D = canvas.getContext('2d');
+                    const tileTexture = new THREE.Texture(event.image);
+                    event.tile.context2D.drawImage(event.image, 0, 0);
+                    const key = event.tile.cacheKey;
+                    this.images[key] = tileTexture;
+                });
+            }
+        }
+
         if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
             this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
             this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
