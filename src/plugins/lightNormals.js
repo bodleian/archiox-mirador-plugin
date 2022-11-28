@@ -227,7 +227,31 @@ function getMap(annotationBodies, mapType) {
 }
 
 function getTiles(tileData, tileLevel, map) {
-    return getImageData(map, tileData, tileLevel);
+    const imageData = getImageData(map, tileData, tileLevel);
+    // todo: add something here to build a list associating resource UUID with map type so we can ignore others in the
+    //  tileLoaded handler!
+    return imageData;
+}
+
+function getTileSets() {
+    // todo: try and pre-build a data structure that would allow for better loading and manaagement of three resources
+    //  tileLevels: {
+    //     0: {
+    //         height: 1028,
+    //         width: 1028,
+    //         tiles: {
+    //          url: {
+    //              normalTexture: img from tileLoaded,
+    //              albedoTexture: img from tileLoaded,
+    //              geometry: width + height of tile,
+    //              material: normalTexture + albedoTexture,
+    //              mesh: geometry + material + position set
+    //          }
+    //        }
+    //     },
+    //     1:  {
+    //     }
+    //  }
 }
 
 function getRendererInstructions(props) {
@@ -267,7 +291,9 @@ class lightNormals extends Component {
                     x:0,
                     y:0
                 }
-            }
+            },
+            images: {},
+            tileLevel: 0
         }
         this.threeCanvasProps = {};
         this.mouseDown = false;
@@ -410,6 +436,8 @@ class lightNormals extends Component {
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
                 this.threeCanvasProps.images = this.images;
+                this.setState({ images: this.threeCanvasProps.images });
+                this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
             });
 
             this.props.viewer.addHandler('close',  (event) => {
@@ -431,13 +459,31 @@ class lightNormals extends Component {
     // a rerender
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (
+            prevState.tileLevel !== this.state.tileLevel
+        ) {
+            this.threeCanvasProps.albedoTiles = getTiles(
+                this.props.viewer.source,
+                this.threeCanvasProps.tileLevel,
+                this.threeCanvasProps.albedoMap
+            );
+
+            this.threeCanvasProps.normalTiles = getTiles(
+                this.props.viewer.source,
+                this.threeCanvasProps.tileLevel,
+                this.threeCanvasProps.normalMap
+            );
+        }
+
+        if (
             prevState.zoom !== this.threeCanvasProps.zoom ||
             prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection ||
             prevState.active !== this.state.active ||
             prevState.lightX !== this.threeCanvasProps.lightX ||
             prevState.lightY !== this.threeCanvasProps.lightY ||
             prevState.directionalIntensity !== this.state.directionalIntensity ||
-            prevState.ambientIntensity !== this.state.ambientIntensity
+            prevState.ambientIntensity !== this.state.ambientIntensity ||
+            prevState.images !== this.state.images ||
+            prevState.tileLevel !== this.state.tileLevel
         ) {
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
@@ -455,6 +501,7 @@ class lightNormals extends Component {
                     canvas.width = event.image.width;
                     canvas.height = event.image.height;
                     event.tile.context2D = canvas.getContext('2d');
+                    // todo: add a check for if it's one of the types we wish to keep
                     const tileTexture = new THREE.Texture(event.image);
                     event.tile.context2D.drawImage(event.image, 0, 0);
                     const key = event.tile.cacheKey;
