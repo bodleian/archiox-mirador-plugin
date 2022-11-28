@@ -201,6 +201,12 @@ class ThreeCanvas extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        if ( prevProps.tileLevel !== this.props.tileLevel ||
+            prevProps.images !== this.props.images) {
+
+            generate_canvas(this.group, this.state, this.props);
+        }
+
         if (
             prevProps.zoom !== this.props.zoom ||
             prevProps.intersection !== this.props.intersection ||
