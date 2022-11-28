@@ -203,8 +203,11 @@ class ThreeCanvas extends React.Component{
     componentDidUpdate(prevProps, prevState, snapshot) {
         if ( prevProps.tileLevel !== this.props.tileLevel ||
             prevProps.images !== this.props.images) {
-
+            this.scene.remove(this.group);
+            this.group = new THREE.Group();
             generate_canvas(this.group, this.state, this.props);
+            new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
+            this.scene.add(this.group);
         }
 
         if (
@@ -219,11 +222,6 @@ class ThreeCanvas extends React.Component{
         ) {
             this.ambientLight.intensity = this.props.ambientIntensity;
             this.directionalLight.intensity = this.props.directionalIntensity;
-            this.scene.remove(this.group);
-            this.group = new THREE.Group();
-            generate_canvas(this.group, this.state, this.props);
-            new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
-            this.scene.add(this.group);
             this.moveLight();
             this.rerender();
             this.camera.updateProjectionMatrix();
