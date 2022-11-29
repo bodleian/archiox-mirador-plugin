@@ -233,7 +233,26 @@ function getTiles(tileData, tileLevel, map) {
     return imageData;
 }
 
-function getTileSets() {
+function getTileSets(maxTileLevel, source, albedoMap, normalMap) {
+    let tileLevels = {} ;
+
+    for (let i = 1; i < maxTileLevel + 1; i++) {
+
+        tileLevels[i] = {
+            albedoTiles: getTiles(
+                source,
+                i,
+                albedoMap
+            ),
+            normalTiles: getTiles(
+                source,
+                i,
+                normalMap
+            )
+        };
+    }
+
+    return tileLevels;
     // todo: try and pre-build a data structure that would allow for better loading and manaagement of three resources
     //  tileLevels: {
     //     0: {
@@ -304,6 +323,7 @@ class lightNormals extends Component {
         this.directionalIntensity = 1;
         this.ambientIntensity = 0.1;
         this.images = {};
+        this.tileSets = {};
     }
 
     onMouseMove(event) {
@@ -395,25 +415,24 @@ class lightNormals extends Component {
             this.props.viewer.removeOverlay(this.threeCanvas);
             this.props.viewer.removeAllHandlers('viewport-change');
         } else {
+
+            this.max_tileLevel = this.props.viewer.source.scale_factors.length - 1;
+            this.tileSets = getTileSets(
+                this.max_tileLevel,
+                this.props.viewer.source,
+                this.threeCanvasProps.albedoMap,
+                this.threeCanvasProps.normalMap
+            );
+            console.log(this.tileSets);
+
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
             this.props.viewer.addOverlay(this.threeCanvas);
             this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
-            this.max_tileLevel = this.props.viewer.source.scale_factors.length - 1;
             this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
             this.threeCanvasProps.images = this.images;
-
-            this.threeCanvasProps.albedoTiles = getTiles(
-                this.props.viewer.source,
-                this.threeCanvasProps.tileLevel,
-                this.threeCanvasProps.albedoMap
-            );
-
-            this.threeCanvasProps.normalTiles = getTiles(
-                this.props.viewer.source,
-                this.threeCanvasProps.tileLevel,
-                this.threeCanvasProps.normalMap
-            );
+            this.threeCanvasProps.albedoTiles = this.tileSets[this.threeCanvasProps.tileLevel].albedoTiles;
+            this.threeCanvasProps.normalTiles = this.tileSets[this.threeCanvasProps.tileLevel].normalTiles;
 
             this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
@@ -436,6 +455,8 @@ class lightNormals extends Component {
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
                 this.threeCanvasProps.images = this.images;
+                this.threeCanvasProps.albedoTiles = this.tileSets[this.threeCanvasProps.tileLevel].albedoTiles;
+                this.threeCanvasProps.normalTiles = this.tileSets[this.threeCanvasProps.tileLevel].normalTiles;
                 this.setState({ images: this.threeCanvasProps.images });
                 this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
             });
@@ -459,22 +480,6 @@ class lightNormals extends Component {
     // a rerender
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (
-            prevState.tileLevel !== this.state.tileLevel
-        ) {
-            this.threeCanvasProps.albedoTiles = getTiles(
-                this.props.viewer.source,
-                this.threeCanvasProps.tileLevel,
-                this.threeCanvasProps.albedoMap
-            );
-
-            this.threeCanvasProps.normalTiles = getTiles(
-                this.props.viewer.source,
-                this.threeCanvasProps.tileLevel,
-                this.threeCanvasProps.normalMap
-            );
-        }
-
-        if (
             prevState.zoom !== this.threeCanvasProps.zoom ||
             prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection ||
             prevState.active !== this.state.active ||
@@ -482,8 +487,8 @@ class lightNormals extends Component {
             prevState.lightY !== this.threeCanvasProps.lightY ||
             prevState.directionalIntensity !== this.state.directionalIntensity ||
             prevState.ambientIntensity !== this.state.ambientIntensity ||
-            prevState.images !== this.state.images ||
-            prevState.tileLevel !== this.state.tileLevel
+            prevState.tileLevel !== this.state.tileLevel ||
+            prevState.images !== this.state.images
         ) {
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
@@ -493,8 +498,8 @@ class lightNormals extends Component {
     }
 
     render() {
-        if (!this.state.loaded) {
-            if (this.props.viewer) {
+        if (this.props.viewer) {
+            if (!this.state.loaded) {
                 this.setState({loaded: true});
                 this.props.viewer.addHandler('tile-loaded', (event) => {
                     var canvas = document.createElement('canvas');
@@ -519,7 +524,7 @@ class lightNormals extends Component {
                 typeof this.normalMap !== 'undefined' &&
                 !this.state.visible
             ) {
-                this.setState( prevState => ({ visible: !prevState.visible }));
+                this.setState(prevState => ({visible: !prevState.visible}));
             }
         }
 
