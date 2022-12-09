@@ -55,40 +55,6 @@ function _camera_offset(camera, props) {
     )
 }
 
-function generate_canvas(group, state, props) {
-    for (let i = 0; i < props.albedoTiles.urls.length; i++) {
-        const albedoMap = props.images[props.albedoTiles.urls[i]] || null;
-        const normalMap = props.images[props.normalTiles.urls[i]] || null;
-
-        let plane_material;
-
-        if (albedoMap && normalMap) {
-            albedoMap.needsUpdate = true;
-            normalMap.needsUpdate = true;
-            plane_material = new THREE.MeshPhongMaterial({
-                map: albedoMap,
-                normalMap: normalMap,
-                flatShading: true,
-                normalScale: new THREE.Vector3(1, 1)
-            });
-        } else {
-            plane_material = new THREE.MeshPhongMaterial({
-            });
-        }
-        const x = props.albedoTiles.tiles[i].x + props.albedoTiles.tiles[i].w / 2
-        const y = props.albedoTiles.tiles[i].y + props.albedoTiles.tiles[i].h / 2
-
-        const plane_geometry = new THREE.PlaneGeometry(
-            props.albedoTiles.tiles[i].w,
-            props.albedoTiles.tiles[i].h
-        );
-
-        const mesh = new THREE.Mesh(plane_geometry, plane_material);
-        mesh.position.set(x, props.intersection.height - y, 0);
-        group.add(mesh);
-    }
-}
-
 class ThreeCanvas extends React.Component{
     constructor(props){
         super(props)
@@ -109,7 +75,8 @@ class ThreeCanvas extends React.Component{
             topLeft: this.props.intersection.topLeft,
             bottomLeft: this.props.intersection.bottomLeft
         }
-
+        this.threeResources = {};
+        this.groups = {};
         this.manager = new THREE.LoadingManager();
 
         this.manager.onLoad = () => {
@@ -159,9 +126,12 @@ class ThreeCanvas extends React.Component{
         // this.scene.add(this.gridHelper);
 
         // define a group so we can handle all the tiles together
-        this.group = new THREE.Group();
+        this.generateTiles();
 
-        generate_canvas(this.group, this.state, this.props);
+        console.log(this.groups);
+        console.log(this.threeResources);
+
+        this.group = this.groups[this.props.tileLevel];
 
         // centre the group of planes in the centre of the scene
         new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
@@ -175,6 +145,70 @@ class ThreeCanvas extends React.Component{
         this.scene.add(this.camera);
         this.scene.add(this.directionalLight);
         this.scene.add(this.ambientLight);
+    }
+
+    /**
+     * Here we will update the textures of the pre-generated meshes, this gets called each time new textures are added
+     * @private
+     */
+    _updateTextures(){
+        // loop through the materials and update with new textures
+        for (let i = 0; i < this.props.albedoTiles.urls.length; i++){
+            this.threeResources[this.props.tileLevel]['materials'][this.props.albedoTiles.urls[i]].map = this.props.images[this.props.albedoTiles.urls[i]] || null;
+            this.threeResources[this.props.tileLevel]['materials'][this.props.normalTiles.urls[i]].map = this.props.images[this.props.normalTiles.urls[i]] || null;
+        }
+    }
+
+    /**
+     * Here we generate all the geometry we will use in our scene, we pre-build all the geometreis, materials, and
+     * meshes so they can be added or removed to the scene, updated when loading in more tiles, and removed when the
+     * component is unmounted.  This will only be run onece.  Another helper function will update the textures.
+     */
+    generateTiles(){
+        for (let i = 0; i < this.props.maxTileLevel; i++) {
+            this.groups[i] = new THREE.Group();
+            for (let j = 0; j < this.props.albedoTiles.urls.length; j++) {
+                const albedoMap = this.props.images[this.props.albedoTiles.urls[j]] || null;
+                const normalMap = this.props.images[this.props.normalTiles.urls[j]] || null;
+
+                let plane_material;
+
+                if (albedoMap && normalMap) {
+                    albedoMap.needsUpdate = true;
+                    normalMap.needsUpdate = true;
+                    plane_material = new THREE.MeshPhongMaterial({
+                        map: albedoMap,
+                        normalMap: normalMap,
+                        flatShading: true,
+                        normalScale: new THREE.Vector3(1, 1)
+                    });
+                } else {
+                    plane_material = new THREE.MeshPhongMaterial({
+                    });
+                }
+                const x = this.props.albedoTiles.tiles[j].x + this.props.albedoTiles.tiles[j].w / 2
+                const y = this.props.albedoTiles.tiles[j].y + this.props.albedoTiles.tiles[j].h / 2
+
+                const plane_geometry = new THREE.PlaneGeometry(
+                    this.props.albedoTiles.tiles[j].w,
+                    this.props.albedoTiles.tiles[j].h
+                );
+
+                const mesh = new THREE.Mesh(plane_geometry, plane_material);
+                mesh.position.set(x, this.props.intersection.height - y, 0);
+
+                // store these items so we can dispose of them correctly later
+                this.threeResources[i] = {};
+                this.threeResources[i]['geometries'] = {};
+                this.threeResources[i]['geometries'][this.props.albedoTiles.urls[j]] = plane_geometry;
+                this.threeResources[i]['materials'] = {};
+                this.threeResources[i]['materials'][this.props.albedoTiles.urls[j]] = plane_material;
+                this.threeResources[i]['meshes'] = {};
+                this.threeResources[i]['meshes'][this.props.albedoTiles.urls[j]] = mesh;
+                // try adding the mesh to a group of groups
+                this.groups[i].add(mesh);
+            }
+        }
     }
 
     animate = () => {
@@ -196,27 +230,34 @@ class ThreeCanvas extends React.Component{
     }
 
     componentDidMount() {
+        // generate the geometry here?
+        // store the textures in an object
         document.getElementById("canvas-container").appendChild(this.renderer.domElement);
         this.animate();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (
+            prevProps.tileLevel !== this.props.tileLevel ||
+            prevProps.images !== this.props.images
+        ) {
+            console.log(this.groups);
+            console.log(this.threeResources);
+            this.scene.remove(this.group);
+            this.group = this.groups[this.props.tileLevel];
+            this._updateTextures();
+            new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
+            this.scene.add(this.group);
+        }
+
+        if (
             prevProps.zoom !== this.props.zoom ||
             prevProps.intersection !== this.props.intersection ||
             prevProps.lightX !== this.props.lightX ||
             prevProps.lightY !== this.props.lightY ||
             prevProps.directionalIntensity !== this.props.directionalIntensity ||
-            prevProps.ambientIntensity !== this.props.ambientIntensity ||
-            prevProps.tileLevel !== this.props.tileLevel ||
-            prevProps.images !== this.props.images
+            prevProps.ambientIntensity !== this.props.ambientIntensity
         ) {
-            this.scene.remove(this.group);
-            this.group = new THREE.Group();
-            generate_canvas(this.group, this.state, this.props);
-            new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
-            this.scene.add(this.group);
-
             this.ambientLight.intensity = this.props.ambientIntensity;
             this.directionalLight.intensity = this.props.directionalIntensity;
             this.moveLight();

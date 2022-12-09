@@ -189,6 +189,7 @@ function Overlay(props) {
             directionalIntensity={ props.directionalIntensity }
             ambientIntensity={ props.ambientIntensity }
             tileLevel={ props.tileLevel }
+            maxTileLevel={ props.maxTileLevel }
         />
     );
 }
@@ -416,14 +417,13 @@ class lightNormals extends Component {
             this.props.viewer.removeAllHandlers('viewport-change');
         } else {
 
-            this.max_tileLevel = this.props.viewer.source.scale_factors.length - 1;
+            this.threeCanvasProps.maxTileLevel = this.props.viewer.source.scale_factors.length - 1;
             this.tileSets = getTileSets(
-                this.max_tileLevel,
+                this.threeCanvasProps.maxTileLevel,
                 this.props.viewer.source,
                 this.threeCanvasProps.albedoMap,
                 this.threeCanvasProps.normalMap
             );
-            console.log(this.tileSets);
 
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
@@ -498,22 +498,6 @@ class lightNormals extends Component {
     }
 
     render() {
-        if (this.props.viewer) {
-            if (!this.state.loaded) {
-                this.setState({loaded: true});
-                this.props.viewer.addHandler('tile-loaded', (event) => {
-                    var canvas = document.createElement('canvas');
-                    canvas.width = event.image.width;
-                    canvas.height = event.image.height;
-                    event.tile.context2D = canvas.getContext('2d');
-                    // todo: add a check for if it's one of the types we wish to keep
-                    const tileTexture = new THREE.Texture(event.image);
-                    event.tile.context2D.drawImage(event.image, 0, 0);
-                    const key = event.tile.cacheKey;
-                    this.images[key] = tileTexture;
-                });
-            }
-        }
 
         if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
             this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
@@ -525,6 +509,33 @@ class lightNormals extends Component {
                 !this.state.visible
             ) {
                 this.setState(prevState => ({visible: !prevState.visible}));
+                this.map_ids = [
+                    this.albedoMap.split("/").pop(),
+                    this.normalMap.split("/").pop()
+                ]
+            }
+        }
+
+        if (this.props.viewer) {
+            if (!this.state.loaded) {
+                this.setState({loaded: true});
+                this.props.viewer.addHandler('tile-loaded', (event) => {
+                    // check where the tile came from
+                    const sourceKey = event.image.currentSrc.split("/")[5];
+                    const canvas = document.createElement('canvas');
+                    canvas.width = event.image.width;
+                    canvas.height = event.image.height;
+                    event.tile.context2D = canvas.getContext('2d');
+                    // todo: add a check for if it's one of the types we wish to keep
+                    const tileTexture = new THREE.Texture(event.image);
+                    event.tile.context2D.drawImage(event.image, 0, 0);
+                    const key = event.tile.cacheKey;
+
+                    if (this.map_ids.includes(sourceKey)) {
+                        // only keep tile textures we are interested in
+                        this.images[key] = tileTexture;
+                    }
+                });
             }
         }
 
@@ -584,3 +595,4 @@ class lightNormals extends Component {
 }
 
 export default lightNormals;
+    
