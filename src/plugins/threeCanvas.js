@@ -125,13 +125,22 @@ class ThreeCanvas extends React.Component{
         // this.gridHelper.position.set(0, 0, 0);
         // this.scene.add(this.gridHelper);
 
+        console.log(this.props.maxTileLevel);
+        console.log(this.props.tileLevel);
+        console.log(this.props.albedoTiles);
+
+        for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
+            this.threeResources[i] = {};
+            this.threeResources[i]['geometries'] = {};
+            this.threeResources[i]['materials'] = {};
+            this.threeResources[i]['meshes'] = {};
+        }
+
         // define a group so we can handle all the tiles together
         this.generateTiles();
-
-        console.log(this.groups);
-        console.log(this.threeResources);
-
         this.group = this.groups[this.props.tileLevel];
+        console.log(this.groups);
+        console.log(this.group);
 
         // centre the group of planes in the centre of the scene
         new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
@@ -154,8 +163,11 @@ class ThreeCanvas extends React.Component{
     _updateTextures(){
         // loop through the materials and update with new textures
         for (let i = 0; i < this.props.albedoTiles.urls.length; i++){
-            this.threeResources[this.props.tileLevel]['materials'][this.props.albedoTiles.urls[i]].map = this.props.images[this.props.albedoTiles.urls[i]] || null;
-            this.threeResources[this.props.tileLevel]['materials'][this.props.normalTiles.urls[i]].map = this.props.images[this.props.normalTiles.urls[i]] || null;
+            // todo: find out why these resources are undefined
+            console.log("albedo", this.threeResources[this.props.tileLevel]['materials'][this.props.albedoTiles.urls[i]]);
+            console.log("normal", this.threeResources[this.props.tileLevel]['materials'][this.props.normalTiles.urls[i]]);
+            //this.threeResources[this.props.tileLevel]['materials'][this.props.albedoTiles.urls[i]].map = this.props.images[this.props.albedoTiles.urls[i]] || null;
+            //this.threeResources[this.props.tileLevel]['materials'][this.props.normalTiles.urls[i]].normalMap = this.props.images[this.props.normalTiles.urls[i]] || null;
         }
     }
 
@@ -165,7 +177,7 @@ class ThreeCanvas extends React.Component{
      * component is unmounted.  This will only be run onece.  Another helper function will update the textures.
      */
     generateTiles(){
-        for (let i = 0; i < this.props.maxTileLevel; i++) {
+        for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
             this.groups[i] = new THREE.Group();
             for (let j = 0; j < this.props.albedoTiles.urls.length; j++) {
                 const albedoMap = this.props.images[this.props.albedoTiles.urls[j]] || null;
@@ -198,12 +210,8 @@ class ThreeCanvas extends React.Component{
                 mesh.position.set(x, this.props.intersection.height - y, 0);
 
                 // store these items so we can dispose of them correctly later
-                this.threeResources[i] = {};
-                this.threeResources[i]['geometries'] = {};
                 this.threeResources[i]['geometries'][this.props.albedoTiles.urls[j]] = plane_geometry;
-                this.threeResources[i]['materials'] = {};
                 this.threeResources[i]['materials'][this.props.albedoTiles.urls[j]] = plane_material;
-                this.threeResources[i]['meshes'] = {};
                 this.threeResources[i]['meshes'][this.props.albedoTiles.urls[j]] = mesh;
                 // try adding the mesh to a group of groups
                 this.groups[i].add(mesh);
@@ -241,8 +249,6 @@ class ThreeCanvas extends React.Component{
             prevProps.tileLevel !== this.props.tileLevel ||
             prevProps.images !== this.props.images
         ) {
-            console.log(this.groups);
-            console.log(this.threeResources);
             this.scene.remove(this.group);
             this.group = this.groups[this.props.tileLevel];
             this._updateTextures();

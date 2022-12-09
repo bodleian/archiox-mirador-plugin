@@ -235,10 +235,9 @@ function getTiles(tileData, tileLevel, map) {
 }
 
 function getTileSets(maxTileLevel, source, albedoMap, normalMap) {
-    let tileLevels = {} ;
+    let tileLevels = {};
 
     for (let i = 1; i < maxTileLevel + 1; i++) {
-
         tileLevels[i] = {
             albedoTiles: getTiles(
                 source,
@@ -251,7 +250,7 @@ function getTileSets(maxTileLevel, source, albedoMap, normalMap) {
                 normalMap
             )
         };
-    }
+    };
 
     return tileLevels;
     // todo: try and pre-build a data structure that would allow for better loading and manaagement of three resources
@@ -433,7 +432,6 @@ class lightNormals extends Component {
             this.threeCanvasProps.images = this.images;
             this.threeCanvasProps.albedoTiles = this.tileSets[this.threeCanvasProps.tileLevel].albedoTiles;
             this.threeCanvasProps.normalTiles = this.tileSets[this.threeCanvasProps.tileLevel].normalTiles;
-
             this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
             // uncomment code below to enable debug mode in OpenSeaDragon
