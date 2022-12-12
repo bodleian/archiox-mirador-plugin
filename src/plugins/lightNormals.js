@@ -177,8 +177,8 @@ function TorchButton(props) {
 function Overlay(props) {
     return (
         <ThreeCanvas
-            albedoTiles={ props.albedoTiles }
-            normalTiles={ props.normalTiles }
+            //albedoTiles={ props.albedoTiles }
+            //normalTiles={ props.normalTiles }
             images={ props.images }
             zoom={ props.zoom }
             intersection={ props.rendererInstructions.intersection }
@@ -190,6 +190,7 @@ function Overlay(props) {
             ambientIntensity={ props.ambientIntensity }
             tileLevel={ props.tileLevel }
             maxTileLevel={ props.maxTileLevel }
+            tileSets={ props.tileSets }
         />
     );
 }
@@ -430,8 +431,9 @@ class lightNormals extends Component {
             this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
             this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
             this.threeCanvasProps.images = this.images;
-            this.threeCanvasProps.albedoTiles = this.tileSets[this.threeCanvasProps.tileLevel].albedoTiles;
-            this.threeCanvasProps.normalTiles = this.tileSets[this.threeCanvasProps.tileLevel].normalTiles;
+            //this.threeCanvasProps.albedoTiles = this.tileSets[this.threeCanvasProps.tileLevel].albedoTiles;
+            //this.threeCanvasProps.normalTiles = this.tileSets[this.threeCanvasProps.tileLevel].normalTiles;
+            this.threeCanvasProps.tileSets = this.tileSets;
             this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
             // uncomment code below to enable debug mode in OpenSeaDragon
@@ -453,8 +455,8 @@ class lightNormals extends Component {
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
                 this.threeCanvasProps.images = this.images;
-                this.threeCanvasProps.albedoTiles = this.tileSets[this.threeCanvasProps.tileLevel].albedoTiles;
-                this.threeCanvasProps.normalTiles = this.tileSets[this.threeCanvasProps.tileLevel].normalTiles;
+                //this.threeCanvasProps.albedoTiles = this.tileSets[this.threeCanvasProps.tileLevel].albedoTiles;
+                //this.threeCanvasProps.normalTiles = this.tileSets[this.threeCanvasProps.tileLevel].normalTiles;
                 this.setState({ images: this.threeCanvasProps.images });
                 this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
             });
@@ -485,8 +487,8 @@ class lightNormals extends Component {
             prevState.lightY !== this.threeCanvasProps.lightY ||
             prevState.directionalIntensity !== this.state.directionalIntensity ||
             prevState.ambientIntensity !== this.state.ambientIntensity ||
-            prevState.tileLevel !== this.state.tileLevel ||
-            prevState.images !== this.state.images
+            prevState.tileLevel !== this.threeCanvasProps.tileLevel ||
+            prevState.images !== this.threeCanvasProps.images
         ) {
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
@@ -506,7 +508,7 @@ class lightNormals extends Component {
                 typeof this.normalMap !== 'undefined' &&
                 !this.state.visible
             ) {
-                this.setState(prevState => ({visible: !prevState.visible}));
+                this.setState(prevState => ({ visible: !prevState.visible }));
                 this.map_ids = [
                     this.albedoMap.split("/").pop(),
                     this.normalMap.split("/").pop()
@@ -516,7 +518,7 @@ class lightNormals extends Component {
 
         if (this.props.viewer) {
             if (!this.state.loaded) {
-                this.setState({loaded: true});
+                this.setState({ loaded: true });
                 this.props.viewer.addHandler('tile-loaded', (event) => {
                     // check where the tile came from
                     const sourceKey = event.image.currentSrc.split("/")[5];
@@ -593,4 +595,3 @@ class lightNormals extends Component {
 }
 
 export default lightNormals;
-    
