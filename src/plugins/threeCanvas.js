@@ -166,8 +166,6 @@ class ThreeCanvas extends React.Component{
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].map = this.props.images[this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]] || null;
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].normalMap = this.props.images[this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]] || null;
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].needsUpdate = true;
-
-            console.log("albedo", this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]]);
         }
     }
 
