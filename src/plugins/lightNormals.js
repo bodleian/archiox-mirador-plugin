@@ -528,6 +528,7 @@ class lightNormals extends Component {
                     event.tile.context2D = canvas.getContext('2d');
                     // todo: add a check for if it's one of the types we wish to keep
                     const tileTexture = new THREE.Texture(event.image);
+                    tileTexture.needsUpdate = true;
                     event.tile.context2D.drawImage(event.image, 0, 0);
                     const key = event.tile.cacheKey;
 
