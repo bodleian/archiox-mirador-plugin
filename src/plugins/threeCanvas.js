@@ -166,6 +166,15 @@ class ThreeCanvas extends React.Component{
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].map = this.props.images[this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]] || null;
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].normalMap = this.props.images[this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]] || null;
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].needsUpdate = true;
+
+            if (
+                this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].map === null ||
+                this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].normalMap === null
+            ) {
+                this.threeResources[this.props.tileLevel]['meshes'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].visible = false;
+            } else {
+                this.threeResources[this.props.tileLevel]['meshes'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].visible = true;
+            }
         }
     }
 
@@ -197,8 +206,7 @@ class ThreeCanvas extends React.Component{
                         normalScale: new THREE.Vector3(1, 1)
                     });
                 } else {
-                    plane_material = new THREE.MeshPhongMaterial({
-                    });
+                    plane_material = new THREE.MeshPhongMaterial();
                 }
                 const x = this.props.tileSets[i].albedoTiles.tiles[j].x + this.props.tileSets[i].albedoTiles.tiles[j].w / 2
                 const y = this.props.tileSets[i].albedoTiles.tiles[j].y + this.props.tileSets[i].albedoTiles.tiles[j].h / 2
@@ -207,6 +215,10 @@ class ThreeCanvas extends React.Component{
                     this.props.tileSets[i].albedoTiles.tiles[j].w,
                     this.props.tileSets[i].albedoTiles.tiles[j].h
                 );
+
+                if (!albedoMap && !normalMap) {
+                    plane_geometry.visible = false;
+                }
 
                 const mesh = new THREE.Mesh(plane_geometry, plane_material);
                 mesh.position.set(x, this.props.intersection.height - y, 0);
@@ -253,7 +265,7 @@ class ThreeCanvas extends React.Component{
         if (
             prevProps.tileLevel !== this.props.tileLevel
         ) {
-            this.groups[prevProps.tileLevel].visible = false;
+            //this.groups[prevProps.tileLevel].visible = false;
             this.groups[this.props.tileLevel].visible = true;
             //new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
         }
