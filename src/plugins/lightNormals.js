@@ -189,8 +189,10 @@ function Overlay(props) {
             directionalIntensity={ props.directionalIntensity }
             ambientIntensity={ props.ambientIntensity }
             tileLevel={ props.tileLevel }
+            minTileLevel={ props.minTileLevel }
             maxTileLevel={ props.maxTileLevel }
             tileSets={ props.tileSets }
+            tileLevels={ props.tileLevels }
         />
     );
 }
@@ -325,6 +327,7 @@ class lightNormals extends Component {
         this.ambientIntensity = 0.1;
         this.images = {};
         this.tileSets = {};
+        this.tileLevels = {};
     }
 
     onMouseMove(event) {
@@ -411,6 +414,8 @@ class lightNormals extends Component {
         this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
         this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
         this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+        this.threeCanvasProps.minTileLevel = getMinMaxProperty("min","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+        this.threeCanvasProps.tileLevels = this.tileLevels;
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
@@ -500,6 +505,7 @@ class lightNormals extends Component {
     render() {
 
         if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
+
             this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
             this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
 
@@ -517,8 +523,14 @@ class lightNormals extends Component {
         }
 
         if (this.props.viewer) {
+
             if (!this.state.loaded) {
                 this.setState({ loaded: true });
+
+                this.props.viewer.addHandler('tile-drawn', (event) => {
+                    this.tileLevels[event.tile.level] = event.tile.level;
+                });
+
                 this.props.viewer.addHandler('tile-loaded', (event) => {
                     // check where the tile came from
                     const sourceKey = event.image.currentSrc.split("/")[5];
@@ -535,6 +547,8 @@ class lightNormals extends Component {
                     if (this.map_ids.includes(sourceKey)) {
                         // only keep tile textures we are interested in
                         this.images[key] = tileTexture;
+                        this.threeCanvasProps.images = this.images;
+                        this.setState({ images: this.threeCanvasProps.images });
                     }
                 });
             }

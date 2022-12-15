@@ -139,7 +139,7 @@ class ThreeCanvas extends React.Component{
         // define a group so we can handle all the tiles together
         this.generateTiles();
 
-        this.groups[this.props.tileLevel].visible = true;
+        this.groups[this.props.tileLevels.length-2].visible = true;
         // console.log(this.groups);
         // console.log(this.group);
 
@@ -197,6 +197,7 @@ class ThreeCanvas extends React.Component{
                 let plane_material;
 
                 if (albedoMap && normalMap) {
+                    // make first tile level visible
                     albedoMap.needsUpdate = true;
                     normalMap.needsUpdate = true;
                     plane_material = new THREE.MeshPhongMaterial({
@@ -216,12 +217,12 @@ class ThreeCanvas extends React.Component{
                     this.props.tileSets[i].albedoTiles.tiles[j].h
                 );
 
-                if (!albedoMap && !normalMap) {
-                    plane_geometry.visible = false;
-                }
-
                 const mesh = new THREE.Mesh(plane_geometry, plane_material);
                 mesh.position.set(x, this.props.intersection.height - y, 0);
+
+                if (!albedoMap && !normalMap) {
+                    mesh.visible = false;
+                }
 
                 // store these items so we can dispose of them correctly later
                 this.threeResources[i]['geometries'][this.props.tileSets[i].albedoTiles.urls[j]] = plane_geometry;
@@ -230,7 +231,8 @@ class ThreeCanvas extends React.Component{
                 // try adding the mesh to a group of groups
                 this.groups[i].add(mesh);
             }
-            this.groups[i].visible = false;
+
+            //this.groups[i].visible = false;
             new THREE.Box3().setFromObject(this.groups[i]).getCenter(this.groups[i].position).multiplyScalar(- 1);
             this.scene.add(this.groups[i]);
         }
@@ -262,6 +264,7 @@ class ThreeCanvas extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        this._updateTextures();
         if (
             prevProps.tileLevel !== this.props.tileLevel
         ) {
@@ -277,9 +280,8 @@ class ThreeCanvas extends React.Component{
             prevProps.lightY !== this.props.lightY ||
             prevProps.directionalIntensity !== this.props.directionalIntensity ||
             prevProps.ambientIntensity !== this.props.ambientIntensity ||
-            prevProps.images !== this.props.images
+            prevProps.images.length !== this.props.images.length
         ) {
-            this._updateTextures();
             this.ambientLight.intensity = this.props.ambientIntensity;
             this.directionalLight.intensity = this.props.directionalIntensity;
             this.moveLight();
