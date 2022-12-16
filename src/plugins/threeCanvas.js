@@ -1,7 +1,7 @@
 import React from "react";
 import * as THREE from "three";
 
-function Loader(props) {
+function Canvas(props) {
     const container = {
         position: "relative"
     }
@@ -246,7 +246,7 @@ class ThreeCanvas extends React.Component{
 
     render(){
         return(
-            <Loader
+            <Canvas
                 width = { this.props.intersection.width * this.props.zoom }
                 height = { this.props.intersection.height * this.props.zoom }
                 camera = { this.camera }
