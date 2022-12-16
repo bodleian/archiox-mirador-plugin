@@ -1,6 +1,5 @@
 import React from "react";
 import * as THREE from "three";
-import { BallTriangle } from "react-loader-spinner";
 
 function Loader(props) {
     const container = {
@@ -13,29 +12,9 @@ function Loader(props) {
         top: "0",
         left: "0"
     }
-    const overlay = {
-        justifyContent: "center",
-        alignItems: "center",
-        display: "flex",
-        width: props.width,
-        height: props.height,
-        position: "absolute",
-        top: "0",
-        left: "0",
-        zIndex: "2",
-        backgroundColor: "black"
-    }
 
     return (
         <div id="container" style={ container }>
-            {/*<div id="loading-overlay" style={ overlay }>*/}
-            {/*    <BallTriangle*/}
-            {/*        height="100"*/}
-            {/*        width="100"*/}
-            {/*        color="grey"*/}
-            {/*        ariaLabel="loading-indicator"*/}
-            {/*    />*/}
-            {/*</div>*/}
             <div
                 id="canvas-container"
                 style={ canvas }
@@ -63,8 +42,6 @@ class ThreeCanvas extends React.Component{
             lightY: this.props.lightY,
             directionalIntensity: this.props.directionalIntensity,
             ambientIntensity: this.props.ambientIntensity,
-            //albedoTiles: this.props.albedoTiles,
-            //normalTiles: this.props.normalTiles,
             zoom: this.props.zoom,
             width: this.props.intersection.width,
             height: this.props.intersection.height,
@@ -77,11 +54,6 @@ class ThreeCanvas extends React.Component{
         }
         this.threeResources = {};
         this.groups = {};
-        this.manager = new THREE.LoadingManager();
-
-        this.manager.onLoad = () => {
-            this.onTexturesLoaded();
-        }
 
         this.scene = new THREE.Scene();
 
@@ -107,7 +79,6 @@ class ThreeCanvas extends React.Component{
             1
         )
 
-        // offset the camera view, still an issue here when re-starting from a non standard location!
         _camera_offset(this.camera, this.props)
 
         // this is a cube to help with debugging
@@ -125,10 +96,6 @@ class ThreeCanvas extends React.Component{
         // this.gridHelper.position.set(0, 0, 0);
         // this.scene.add(this.gridHelper);
 
-        // console.log(this.props.maxTileLevel);
-        // console.log(this.props.tileLevel);
-        // console.log(this.props.tileSets);
-
         for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
             this.threeResources[i] = {};
             this.threeResources[i]['geometries'] = {};
@@ -139,12 +106,6 @@ class ThreeCanvas extends React.Component{
         // define a group so we can handle all the tiles together
         this.generateTiles();
 
-        this.groups[this.props.tileLevels.length-2].visible = true;
-        // console.log(this.groups);
-        // console.log(this.group);
-
-        // centre the group of planes in the centre of the scene
-        // new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
         this.ambientLight = new THREE.AmbientLight(0xffffff, this.state.ambientIntensity);
         this.directionalLight = new THREE.DirectionalLight(0xffffff, this.state.directionalIntensity);
         this.directionalLight.position.set(0, 0, 1);
@@ -162,7 +123,6 @@ class ThreeCanvas extends React.Component{
     _updateTextures(){
         // loop through the materials and update with new textures
         for (let i = 0; i < this.props.tileSets[this.props.tileLevel].albedoTiles.urls.length; i++){
-            // todo: find out why these resources are undefined
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].map = this.props.images[this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]] || null;
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].normalMap = this.props.images[this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]] || null;
             this.threeResources[this.props.tileLevel]['materials'][this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]].needsUpdate = true;
@@ -187,9 +147,6 @@ class ThreeCanvas extends React.Component{
         for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
             this.groups[i] = new THREE.Group();
 
-            // the this.props.albedoTiles.urls list will only have the initial layer present...
-            // what we need to do is to get all tile levels in and then fish them out of this.props.images...
-            // as they become available.
             for (let j = 0; j < this.props.tileSets[i].albedoTiles.urls.length; j++) {
                 const albedoMap = this.props.images[this.props.tileSets[i].albedoTiles.urls[j]] || null;
                 const normalMap = this.props.images[this.props.tileSets[i].normalTiles.urls[j]] || null;
@@ -197,7 +154,6 @@ class ThreeCanvas extends React.Component{
                 let plane_material;
 
                 if (albedoMap && normalMap) {
-                    // make first tile level visible
                     albedoMap.needsUpdate = true;
                     normalMap.needsUpdate = true;
                     plane_material = new THREE.MeshPhongMaterial({
@@ -228,11 +184,9 @@ class ThreeCanvas extends React.Component{
                 this.threeResources[i]['geometries'][this.props.tileSets[i].albedoTiles.urls[j]] = plane_geometry;
                 this.threeResources[i]['materials'][this.props.tileSets[i].albedoTiles.urls[j]] = plane_material;
                 this.threeResources[i]['meshes'][this.props.tileSets[i].albedoTiles.urls[j]] = mesh;
-                // try adding the mesh to a group of groups
                 this.groups[i].add(mesh);
             }
 
-            //this.groups[i].visible = false;
             new THREE.Box3().setFromObject(this.groups[i]).getCenter(this.groups[i].position).multiplyScalar(- 1);
             this.scene.add(this.groups[i]);
         }
@@ -257,8 +211,6 @@ class ThreeCanvas extends React.Component{
     }
 
     componentDidMount() {
-        // generate the geometry here?
-        // store the textures in an object
         document.getElementById("canvas-container").appendChild(this.renderer.domElement);
         this.animate();
     }
@@ -268,9 +220,7 @@ class ThreeCanvas extends React.Component{
         if (
             prevProps.tileLevel !== this.props.tileLevel
         ) {
-            //this.groups[prevProps.tileLevel].visible = false;
             this.groups[this.props.tileLevel].visible = true;
-            //new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
         }
 
         if (
@@ -292,10 +242,6 @@ class ThreeCanvas extends React.Component{
 
     componentWillUnmount() {
         cancelAnimationFrame(this.animate_req);
-    }
-
-    onTexturesLoaded() {
-        document.getElementById("loading-overlay").style.display = "none";
     }
 
     render(){
