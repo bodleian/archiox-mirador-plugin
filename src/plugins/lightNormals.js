@@ -9,6 +9,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import Slider from '@material-ui/core/Slider';
 import ThreeCanvas from './threeCanvas';
+import * as THREE from "three";
 import { getImageData, getMinMaxProperty } from "./helpers";
 
 function ResetLightPositions(props) {
@@ -176,8 +177,7 @@ function TorchButton(props) {
 function Overlay(props) {
     return (
         <ThreeCanvas
-            albedoTiles={ props.albedoTiles }
-            normalTiles={ props.normalTiles }
+            images={ props.images }
             zoom={ props.zoom }
             intersection={ props.rendererInstructions.intersection }
             contentWidth={ props.contentWidth }
@@ -186,6 +186,11 @@ function Overlay(props) {
             lightY={ props.lightY }
             directionalIntensity={ props.directionalIntensity }
             ambientIntensity={ props.ambientIntensity }
+            tileLevel={ props.tileLevel }
+            minTileLevel={ props.minTileLevel }
+            maxTileLevel={ props.maxTileLevel }
+            tileSets={ props.tileSets }
+            tileLevels={ props.tileLevels }
         />
     );
 }
@@ -224,7 +229,30 @@ function getMap(annotationBodies, mapType) {
 }
 
 function getTiles(tileData, tileLevel, map) {
-    return getImageData(map, tileData, tileLevel);
+    const imageData = getImageData(map, tileData, tileLevel);
+
+    return imageData;
+}
+
+function getTileSets(maxTileLevel, source, albedoMap, normalMap) {
+    let tileLevels = {};
+
+    for (let i = 1; i < maxTileLevel + 1; i++) {
+        tileLevels[i] = {
+            albedoTiles: getTiles(
+                source,
+                i,
+                albedoMap
+            ),
+            normalTiles: getTiles(
+                source,
+                i,
+                normalMap
+            )
+        };
+    };
+
+    return tileLevels;
 }
 
 function getRendererInstructions(props) {
@@ -248,6 +276,7 @@ class lightNormals extends Component {
             active: false,
             open: false,
             visible: false,
+            loaded: false,
             zoomLevel: 0,
             zoom: 0,
             mouseX: 50,
@@ -263,7 +292,9 @@ class lightNormals extends Component {
                     x:0,
                     y:0
                 }
-            }
+            },
+            images: {},
+            tileLevel: 0
         }
         this.threeCanvasProps = {};
         this.mouseDown = false;
@@ -273,6 +304,9 @@ class lightNormals extends Component {
         this.lightY = 0;
         this.directionalIntensity = 1;
         this.ambientIntensity = 0.1;
+        this.images = {};
+        this.tileSets = {};
+        this.tileLevels = {};
     }
 
     onMouseMove(event) {
@@ -359,29 +393,29 @@ class lightNormals extends Component {
         this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
         this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
         this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+        this.threeCanvasProps.minTileLevel = getMinMaxProperty("min","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+        this.threeCanvasProps.tileLevels = this.tileLevels;
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
             this.props.viewer.removeAllHandlers('viewport-change');
         } else {
+
+            this.threeCanvasProps.maxTileLevel = this.props.viewer.source.scale_factors.length - 1;
+            this.tileSets = getTileSets(
+                this.threeCanvasProps.maxTileLevel,
+                this.props.viewer.source,
+                this.threeCanvasProps.albedoMap,
+                this.threeCanvasProps.normalMap
+            );
+
             this.threeCanvas = document.createElement("div");
             this.threeCanvas.id = "three-canvas";
             this.props.viewer.addOverlay(this.threeCanvas);
             this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
-            this.max_tileLevel = this.props.viewer.source.scale_factors.length - 1;
-
-            this.threeCanvasProps.albedoTiles = getTiles(
-                this.props.viewer.source,
-                this.max_tileLevel,
-                this.threeCanvasProps.albedoMap
-            );
-
-            this.threeCanvasProps.normalTiles = getTiles(
-                this.props.viewer.source,
-                this.max_tileLevel,
-                this.threeCanvasProps.normalMap
-            );
-
+            this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+            this.threeCanvasProps.images = this.images;
+            this.threeCanvasProps.tileSets = this.tileSets;
             this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
             // uncomment code below to enable debug mode in OpenSeaDragon
@@ -392,7 +426,6 @@ class lightNormals extends Component {
             // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
             // glitch and not re-render until we cause the viewport-change event to trigger
             this.props.viewer.forceRedraw();
-
             this.props.viewer.addHandler('viewport-change', (event) => {
                 const zoom_level = this.props.viewer.viewport.getZoom(true);
                 this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
@@ -402,6 +435,10 @@ class lightNormals extends Component {
                 this.setState( {directionalIntensity: this.threeCanvasProps.directionalIntensity});
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
+                this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+                this.threeCanvasProps.images = this.images;
+                this.setState({ images: this.threeCanvasProps.images });
+                this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
             });
 
             this.props.viewer.addHandler('close',  (event) => {
@@ -429,7 +466,9 @@ class lightNormals extends Component {
             prevState.lightX !== this.threeCanvasProps.lightX ||
             prevState.lightY !== this.threeCanvasProps.lightY ||
             prevState.directionalIntensity !== this.state.directionalIntensity ||
-            prevState.ambientIntensity !== this.state.ambientIntensity
+            prevState.ambientIntensity !== this.state.ambientIntensity ||
+            prevState.tileLevel !== this.threeCanvasProps.tileLevel ||
+            prevState.images !== this.threeCanvasProps.images
         ) {
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
@@ -439,7 +478,9 @@ class lightNormals extends Component {
     }
 
     render() {
+
         if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
+
             this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
             this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
 
@@ -448,7 +489,41 @@ class lightNormals extends Component {
                 typeof this.normalMap !== 'undefined' &&
                 !this.state.visible
             ) {
-                this.setState( prevState => ({ visible: !prevState.visible }));
+                this.setState(prevState => ({ visible: !prevState.visible }));
+                this.map_ids = [
+                    this.albedoMap.split("/").pop(),
+                    this.normalMap.split("/").pop()
+                ]
+            }
+        }
+
+        if (this.props.viewer) {
+
+            if (!this.state.loaded) {
+                this.setState({ loaded: true });
+
+                this.props.viewer.addHandler('tile-drawn', (event) => {
+                    this.tileLevels[event.tile.level] = event.tile.level;
+                });
+
+                this.props.viewer.addHandler('tile-loaded', (event) => {
+                    const sourceKey = event.image.currentSrc.split("/")[5];
+                    const canvas = document.createElement('canvas');
+                    canvas.width = event.image.width;
+                    canvas.height = event.image.height;
+                    event.tile.context2D = canvas.getContext('2d');
+                    const tileTexture = new THREE.Texture(event.image);
+                    tileTexture.needsUpdate = true;
+                    event.tile.context2D.drawImage(event.image, 0, 0);
+                    const key = event.tile.cacheKey;
+
+                    if (this.map_ids.includes(sourceKey)) {
+                        // only keep tile textures we are interested in
+                        this.images[key] = tileTexture;
+                        this.threeCanvasProps.images = this.images;
+                        this.setState({ images: this.threeCanvasProps.images });
+                    }
+                });
             }
         }
 
