@@ -5,6 +5,14 @@ import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
 import ThreeCanvas from './three-canvas';
 import {getImageData, getMinMaxProperty, parseImageURL} from "./helpers";
 
+var DEBUG = true;
+
+function log(message) {
+    if (!DEBUG)
+        return;
+    console.log(message); 
+}
+
 function TorchButton(props) {
     return (
         <div>
@@ -52,8 +60,12 @@ function getMap(annotationBodies, mapType) {
 }
 
 function getTiles(tileData, tileLevel, albedoMap, normalMap) {
+    log("Getting image data for each layer...");
     const albedoImageData = getImageData(albedoMap, tileData, tileLevel);
+    log("albedoImageData: " + albedoImageData);
     const normalImageData = getImageData(normalMap, tileData, tileLevel);
+    log("normalImageData: " + normalImageData);
+
     const length = albedoImageData.urls.length;
     let tiles = [];
 
@@ -122,8 +134,15 @@ class lightNormals extends Component {
         this.threeCanvasProps.contentHeight = this.props.viewer.viewport._contentSize.y;
         this.threeCanvasProps.rendererInstructions = getRendererInstructions(this.props);
         this.threeCanvasProps.zoom = this.props.viewer.world.getItemAt(0).viewportToImageZoom(zoom_level);
+      /*
         this.threeCanvasProps.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
         this.threeCanvasProps.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
+       */   
+        
+        this.threeCanvasProps.albedoMap = "https://cdm21080.contentdm.oclc.org/iiif/2/p21080coll1:4";
+        this.threeCanvasProps.normalMap = "https://cdm21080.contentdm.oclc.org/iiif/2/p21080coll1:5";  
+        
+
         this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
 
         if (this.state.active) {
@@ -147,9 +166,9 @@ class lightNormals extends Component {
             overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
 
             // uncomment code below to enable debug mode in OpenSeaDragon
-            // for (var i = 0; i < this.props.viewer.world.getItemCount(); i++) {
-            //     this.props.viewer.world.getItemAt(i).debugMode = true;
-            // }
+            for (var i = 0; i < this.props.viewer.world.getItemCount(); i++) {
+                 this.props.viewer.world.getItemAt(i).debugMode = true;
+             }
 
             // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
             // glitch and not re-render until we cause the viewport-change event to trigger

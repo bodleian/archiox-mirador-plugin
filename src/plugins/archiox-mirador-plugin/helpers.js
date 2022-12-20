@@ -217,9 +217,9 @@ export function parseImageURL(url, width, height) {
         return null;
     }
 
-    if (!_validateUUID(pathComponents[3])) {
-        return null;
-    }
+    //if (!_validateUUID(pathComponents[3])) {
+    //    return null;
+    //}
 
     imageDetails.uuid = pathComponents[3];
 
@@ -294,8 +294,12 @@ export function getMinMaxProperty(type, property, tiles) {
 }
 
 export const getImageData = (mapURL, data, tilesIndex) => {
+    console.log("mapURL: " + mapURL);
+    console.log("data: " + data);
+    console.log("tilesIndex: " + tilesIndex);
     let imageConfig = {}
     imageConfig.id = mapURL;
+    
     imageConfig.width = parseTiles(data, "width");
     imageConfig.height = parseTiles(data, "height");
     imageConfig.tiles = parseTiles(data, "tiles")[0];  // tiles is index 0 of a singleton?
