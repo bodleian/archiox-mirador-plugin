@@ -67,7 +67,34 @@ function _camera_offset(camera, props) {
     )
 }
 
+function vertexShader() {
+    return `
+    varying vec3 vUv; 
+  
+    void main() {
+        vUv = position; 
+  
+        vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+        gl_Position = projectionMatrix * modelViewPosition; 
+    }
+    `
+}
+
+function fragmentShader()
+{
+    return `
+    uniform vec3 colorA; 
+    uniform vec3 colorB; 
+    varying vec3 vUv;
+
+    void main() {
+        gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
+    }
+    `    
+}
+
 class ThreeCanvas extends React.Component{
+
     constructor(props){
         super(props)
         this.state = {
@@ -119,11 +146,11 @@ class ThreeCanvas extends React.Component{
         _camera_offset(this.camera, this.props)
 
         // this is a cube to help with debugging
-        // this.cubeGeometry = new THREE.CircleGeometry(100, 100);
-        // this.cubeMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.5, depthTest: false});
-        // this.cube = new THREE.Mesh(this.cubeGeometry, this.cubeMaterial);
-        // this.cube.position.set(0, 0, 0);
-        // this.scene.add(this.cube);
+         this.cubeGeometry = new THREE.CircleGeometry(100, 100);
+         this.cubeMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.5, depthTest: false});
+         this.cube = new THREE.Mesh(this.cubeGeometry, this.cubeMaterial);
+         this.cube.position.set(0, 0, 0);
+         this.scene.add(this.cube);
 
         // this is a grid to help with debugging
         // this.divisions = 10;
@@ -157,16 +184,38 @@ class ThreeCanvas extends React.Component{
         // centre the group of planes in the centre of the scene
         new THREE.Box3().setFromObject(this.group).getCenter(this.group.position).multiplyScalar(- 1);
 
-        this.ambientLight = new THREE.AmbientLight( 0xffffff, 0.5);
+        //this.ambientLight = new THREE.AmbientLight( 0xffffff, 0.5);
         this.directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
         this.directionalLight.position.set(0, 0, 1);
-        this.directionalLight.castShadow = true;
+        this.directionalLight.castShadow = false;   
         this.directionalLight.mapSizeWidth = this.width;
         this.directionalLight.mapSizeHeight = this.height;
         this.scene.add(this.group);
         this.scene.add(this.camera);
         this.scene.add(this.directionalLight);
-        this.scene.add(this.ambientLight);
+        //this.scene.add(this.ambientLight);
+
+        // create some geometry to apply our first custom shader
+        console.log("************************************************************************************************");
+        console.log( vertexShader() );
+        console.log( fragmentShader() );
+
+        let uniforms = {
+            colorB: {type: 'vec3', value: new THREE.Color(255,0,0)},
+            colorA: {type: 'vec3', value: new THREE.Color(0,0,255)}
+        }
+          
+        let material =  new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            fragmentShader: fragmentShader(),
+            vertexShader: vertexShader(),
+        })
+          
+        let geometry = new THREE.BoxGeometry(100, 100, 100)
+        let c = new THREE.Mesh(this.cubeGeometry, material);
+        c.position.set(400, 0, 0);
+        this.scene.add(c);
+
     }
 
     animate = () => {
@@ -211,6 +260,7 @@ class ThreeCanvas extends React.Component{
             />
         );
     }
+    
 }
 
 export default ThreeCanvas;
