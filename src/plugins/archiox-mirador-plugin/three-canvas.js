@@ -67,32 +67,6 @@ function _camera_offset(camera, props) {
     )
 }
 
-function vertexShader() {
-    return `
-    varying vec3 vUv; 
-  
-    void main() {
-        vUv = position; 
-  
-        vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-        gl_Position = projectionMatrix * modelViewPosition; 
-    }
-    `
-}
-
-function fragmentShader()
-{
-    return `
-    uniform vec3 colorA; 
-    uniform vec3 colorB; 
-    varying vec3 vUv;
-
-    void main() {
-        gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
-    }
-    `    
-}
-
 class ThreeCanvas extends React.Component{
 
     constructor(props){
@@ -115,7 +89,13 @@ class ThreeCanvas extends React.Component{
         this.manager = new THREE.LoadingManager();
 
         this.manager.onLoad = () => {
-            this.onTexturesLoaded();
+            this.onTexturesLoaded();    
+            console.log( 'Loading complete!');
+
+
+            console.log(this);
+
+            console.log(this.vertexShader);
         }
 
         this.scene = new THREE.Scene();
@@ -163,18 +143,22 @@ class ThreeCanvas extends React.Component{
         // define a group so we can handle all the tiles together
         this.group = new THREE.Group();
 
-        for (let i = 0; i < this.props.tiles.length; i++) {
+        for (let i = 0; i < this.props.tiles.length; i++)
+        {
             this.diffuseMap = new THREE.TextureLoader(this.manager).load(this.state.tiles[i].albedo);
+            console.log("TextureLoader for diffuse map has been created!")
             this.normalMap = new THREE.TextureLoader(this.manager).load(this.state.tiles[i].normal);
-            const plane_material = new THREE.MeshPhongMaterial({
+            console.log("TextureLoader for normal map has been created!")
+            const plane_material = new THREE.MeshPhongMaterial(
+                {
                 map: this.diffuseMap,
                 normalMap: this.normalMap,
                 flatShading: true,
-            });
+                }
+            );
 
             const x = this.state.tiles[i].x + this.state.tiles[i].width / 2
             const y = this.state.tiles[i].y + this.state.tiles[i].height / 2
-
             const plane_geometry = new THREE.PlaneGeometry(this.state.tiles[i].width, this.state.tiles[i].height);
             const mesh = new THREE.Mesh(plane_geometry, plane_material);
             mesh.position.set(x, this.state.height - y, 0);
@@ -195,27 +179,68 @@ class ThreeCanvas extends React.Component{
         this.scene.add(this.directionalLight);
         //this.scene.add(this.ambientLight);
 
-        // create some geometry to apply our first custom shader
-        console.log("************************************************************************************************");
-        console.log( vertexShader() );
-        console.log( fragmentShader() );
+
+        this.vertexShaderLoader = new THREE.FileLoader(this.manager);
+        this.vertexShader = this.vertexShaderLoader.load
+        ('/assets/vertex.glsl', function ( object ) 
+            {
+                console.log("INSIDE vertexShader !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                console.log(object);
+            }
+        )
+
+        this.fragmentShaderLoader = new THREE.FileLoader(this.manager);
+        this.fragmentShader = this.fragmentShaderLoader.load
+        ('/assets/fragment.glsl', function ( object ) 
+            {
+                console.log("INSIDE fragmentShader !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                console.log(object);
+            }
+        )
 
         let uniforms = {
-            colorB: {type: 'vec3', value: new THREE.Color(255,0,0)},
+            colorB: {type: 'vec3', value: new THREE.Color(255,255,0)},
             colorA: {type: 'vec3', value: new THREE.Color(0,0,255)}
         }
           
-        let material =  new THREE.ShaderMaterial({
+        const shaderMaterial =  new THREE.ShaderMaterial({
             uniforms: uniforms,
-            fragmentShader: fragmentShader(),
-            vertexShader: vertexShader(),
+            fragmentShader: this.fragmentShader,
+            vertexShader: this.vertexShader,
         })
           
-        let geometry = new THREE.BoxGeometry(100, 100, 100)
-        let c = new THREE.Mesh(this.cubeGeometry, material);
+        this.cubeGeometry = new THREE.CircleGeometry(200, 200);
+        let c = new THREE.Mesh(this.cubeGeometry, shaderMaterial);
         c.position.set(400, 0, 0);
         this.scene.add(c);
 
+/*
+        // Loading shaders
+        async function init( callback )
+        {
+            let vertex_shader = await (await fetch('/assets/vertex.glsl')).text();
+            console.log("VERTEX SHADER LOADED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");     
+            console.log(vertex_shader);
+
+            let fragment_shader = await (await fetch('/assets/fragment.glsl')).text();
+            console.log("FRAGMENT SHADER LOADED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");     
+            console.log(fragment_shader);
+            callback();
+        }
+        init( this.onShaderLoaded );
+*/
+        console.log("Constructor initialization finished!")
+
+    }
+
+    onShaderLoaded()
+    {
+        console.log("onShaderLoaded!")  
+    }
+
+    onTexturesLoaded() {
+        document.getElementById("loading-overlay").style.display = "none";
+        console.log("onTexturesLoaded!")
     }
 
     animate = () => {
@@ -244,10 +269,6 @@ class ThreeCanvas extends React.Component{
 
     componentWillUnmount() {
         cancelAnimationFrame(this.animate_req);
-    }
-
-    onTexturesLoaded() {
-            document.getElementById("loading-overlay").style.display = "none";
     }
 
     render(){
