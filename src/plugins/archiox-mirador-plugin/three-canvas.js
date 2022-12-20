@@ -1,6 +1,7 @@
 import React from "react";
 import * as THREE from "three";
 import {BallTriangle} from "react-loader-spinner";
+import { ShaderMaterial } from "three";
 
 function  onMouseMove(event, props) {
     event.preventDefault();
@@ -92,11 +93,12 @@ class ThreeCanvas extends React.Component{
             this.onTexturesLoaded();    
             console.log( 'Loading complete!');
 
-
             console.log(this);
 
+            this.group.children[0].material = this.shaderMaterial;
             console.log(this.vertexShader);
         }
+        this.aaaa = "AAAA";
 
         this.scene = new THREE.Scene();
 
@@ -203,14 +205,14 @@ class ThreeCanvas extends React.Component{
             colorA: {type: 'vec3', value: new THREE.Color(0,0,255)}
         }
           
-        const shaderMaterial =  new THREE.ShaderMaterial({
+        this.shaderMaterial =  new THREE.ShaderMaterial({
             uniforms: uniforms,
             fragmentShader: this.fragmentShader,
             vertexShader: this.vertexShader,
         })
           
         this.cubeGeometry = new THREE.CircleGeometry(200, 200);
-        let c = new THREE.Mesh(this.cubeGeometry, shaderMaterial);
+        let c = new THREE.Mesh(this.cubeGeometry, this.shaderMaterial);
         c.position.set(400, 0, 0);
         this.scene.add(c);
 
