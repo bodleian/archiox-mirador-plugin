@@ -495,6 +495,8 @@ class lightNormals extends Component {
                     this.normalMap.split("/").pop()
                 ]
             }
+        } else {
+            return
         }
 
         if (this.props.viewer) {
