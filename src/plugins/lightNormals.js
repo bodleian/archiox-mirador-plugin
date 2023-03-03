@@ -162,7 +162,7 @@ function MenuButton(props) {
 function TorchButton(props) {
     return (
         <MiradorMenuButton
-            aria-label={ props.active ? "Turn On 3D Overlay" : "Turn Off 3D Overlay" }
+            aria-label={ props.active ? "Turn Off 3D Overlay" : "Turn On 3D Overlay" }
             style={{
                 float: "left",
                 clear: "both"
@@ -489,7 +489,7 @@ class lightNormals extends Component {
                 typeof this.normalMap !== 'undefined' &&
                 !this.state.visible
             ) {
-                this.setState(prevState => ({ visible: !prevState.visible }));
+                this.setState(prevState => ({visible: !prevState.visible}));
                 this.map_ids = [
                     this.albedoMap.split("/").pop(),
                     this.normalMap.split("/").pop()
@@ -497,9 +497,10 @@ class lightNormals extends Component {
             }
         }
 
-        if (this.props.viewer) {
+        if (this.props.viewer && typeof this.albedoMap !== 'undefined' &&
+            typeof this.normalMap !== 'undefined') {
 
-            if (!this.state.loaded) {
+            if (!this.state.loaded ) {
                 this.setState({ loaded: true });
 
                 this.props.viewer.addHandler('tile-drawn', (event) => {
