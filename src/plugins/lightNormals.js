@@ -277,6 +277,7 @@ class lightNormals extends Component {
             open: false,
             visible: false,
             loaded: false,
+            loadHandlerAdded: false,
             zoomLevel: 0,
             zoom: 0,
             mouseX: 50,
@@ -500,7 +501,7 @@ class lightNormals extends Component {
         if (this.props.viewer && typeof this.albedoMap !== 'undefined' &&
             typeof this.normalMap !== 'undefined') {
 
-            if (!this.state.loaded ) {
+            if (!this.state.loaded && !this.state.loadHandlerAdded) {
                 this.setState({ loaded: true });
 
                 this.props.viewer.addHandler('tile-drawn', (event) => {
@@ -508,6 +509,7 @@ class lightNormals extends Component {
                 });
 
                 this.props.viewer.addHandler('tile-loaded', (event) => {
+                    this.setState({ loadHandlerAdded: true });
                     const sourceKey = event.image.currentSrc.split("/")[5];
                     const canvas = document.createElement('canvas');
                     canvas.width = event.image.width;
