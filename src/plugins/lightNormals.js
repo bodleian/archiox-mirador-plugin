@@ -379,8 +379,30 @@ class lightNormals extends Component {
         this.setState({ directionalIntensity: this.directionalIntensity });
     }
 
+    // todo: get canvas id as a property, and get the layer ids for those we wish to be invisible,
+    //  then pass these to updateLayer to switch on or off
+
+    updateLayer(value) {
+        console.log(value)
+        const _props2 = this.props,
+            updateLayers = _props2.updateLayers,
+            windowId = _props2.windowId;
+
+        const payload = {
+            ["https://iiif-qa.bodleian.ox.ac.uk/iiif/image/990171c5-34ba-4c9b-b674-9028a554ae50/full/max/0/default.jpg"]: { visibility:  value  },
+        };
+
+        const CanvasID =  "https://iiif-qa.bodleian.ox.ac.uk/iiif/canvas/e62345ab-f367-4c50-ba65-09d098ddf001.json"
+
+
+        updateLayers(windowId, CanvasID, payload);
+
+    };
+
     torchHandler() {
+        this.updateLayer(this.state.active);
         this.threeCanvasProps = {};
+        console.log(this.props);
         let zoom_level = this.props.viewer.viewport.getZoom();
         this.setState( prevState => ({ active: !prevState.active }));
         this.threeCanvasProps.contentWidth = this.props.viewer.viewport._contentSize.x;
@@ -449,7 +471,6 @@ class lightNormals extends Component {
                 this.props.viewer.removeAllHandlers('viewport-change');
             });
         }
-
         // this will need replacing because I think that ReacDOM.render has been depricated
         !this.state.active ? ReactDOM.render(
             Overlay(this.threeCanvasProps),
