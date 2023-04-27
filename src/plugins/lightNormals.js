@@ -195,6 +195,23 @@ function Overlay(props) {
     );
 }
 
+function getLayers(annotationBodies) {
+    let layers = {};
+    annotationBodies.forEach(function(element) {
+        let service = element.getService('http://iiif.io/api/annex/services/lightingmap');
+        if (service === null) {
+            service = element.getService('http://iiif.io/api/extension/lightingmap');
+        }
+
+        const services = element.getServices();
+
+        if (service !== null) {
+            layers[element.id] = service.__jsonld.mapType;
+        };
+    });
+    return layers;
+}
+
 function getMap(annotationBodies, mapType) {
     let map;
 
@@ -251,7 +268,6 @@ function getTileSets(maxTileLevel, source, albedoMap, normalMap) {
             )
         };
     };
-
     return tileLevels;
 }
 
@@ -382,25 +398,34 @@ class lightNormals extends Component {
     // todo: get canvas id as a property, and get the layer ids for those we wish to be invisible,
     //  then pass these to updateLayer to switch on or off
 
-    updateLayer(value) {
-        console.log(value)
+    updateLayer(canvas_id, layers, value) {
+
         const _props2 = this.props,
             updateLayers = _props2.updateLayers,
             windowId = _props2.windowId;
 
-        const payload = {
-            ["https://iiif-qa.bodleian.ox.ac.uk/iiif/image/990171c5-34ba-4c9b-b674-9028a554ae50/full/max/0/default.jpg"]: { visibility:  value  },
-        };
+        const excluded_maps = [
+            'depth',
+            'composite',
+            'shaded'
+        ]
 
-        const CanvasID =  "https://iiif-qa.bodleian.ox.ac.uk/iiif/canvas/e62345ab-f367-4c50-ba65-09d098ddf001.json"
+        Object.keys(layers).forEach(key => {
+            const mapType = layers[key].trim();
 
-
-        updateLayers(windowId, CanvasID, payload);
-
+            if (excluded_maps.includes(mapType)){
+                const payload = {
+                    [key]: { visibility:  value  },
+                };
+                updateLayers(windowId, canvas_id, payload);
+            }
+        });
     };
 
     torchHandler() {
-        this.updateLayer(this.state.active);
+        this.layers = getLayers(this.props.canvas.iiifImageResources);
+        this.canvasID = this.props.canvas.id;
+        this.updateLayer(this.canvasID, this.layers, this.state.active);
         this.threeCanvasProps = {};
         console.log(this.props);
         let zoom_level = this.props.viewer.viewport.getZoom();
