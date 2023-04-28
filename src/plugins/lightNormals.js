@@ -195,6 +195,23 @@ function Overlay(props) {
     );
 }
 
+function getLayers(annotationBodies) {
+    let layers = {};
+    annotationBodies.forEach(function(element) {
+        let service = element.getService('http://iiif.io/api/annex/services/lightingmap');
+        if (service === null) {
+            service = element.getService('http://iiif.io/api/extension/lightingmap');
+        }
+
+        const services = element.getServices();
+
+        if (service !== null) {
+            layers[element.id] = service.__jsonld.mapType;
+        };
+    });
+    return layers;
+}
+
 function getMap(annotationBodies, mapType) {
     let map;
 
@@ -251,7 +268,6 @@ function getTileSets(maxTileLevel, source, albedoMap, normalMap) {
             )
         };
     };
-
     return tileLevels;
 }
 
@@ -277,6 +293,7 @@ class lightNormals extends Component {
             open: false,
             visible: false,
             loaded: false,
+            loadHandlerAdded: false,
             zoomLevel: 0,
             zoom: 0,
             mouseX: 50,
@@ -378,7 +395,30 @@ class lightNormals extends Component {
         this.setState({ directionalIntensity: this.directionalIntensity });
     }
 
+    updateLayer(excluded_maps, canvas_id, layers, value) {
+
+        const _props = this.props,
+            updateLayers = _props.updateLayers,
+            windowId = _props.windowId;
+
+        Object.keys(layers).forEach(key => {
+            const mapType = layers[key].trim();
+
+            if (excluded_maps.includes(mapType)){
+                const payload = {
+                    [key]: { visibility:  value  },
+                };
+                updateLayers(windowId, canvas_id, payload);
+            }
+        });
+    };
+
     torchHandler() {
+        // only turn the composite image back on
+        this.excluded_maps = [
+            'composite',
+        ];
+        this.updateLayer(this.excluded_maps, this.canvasID, this.layers, this.state.active);
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
         this.setState( prevState => ({ active: !prevState.active }));
@@ -392,8 +432,8 @@ class lightNormals extends Component {
         this.threeCanvasProps.lightY = this.lightY;
         this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
         this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
-        this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
-        this.threeCanvasProps.minTileLevel = getMinMaxProperty("min","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+        this.threeCanvasProps.tileLevel = this.tileLevel;
+        this.threeCanvasProps.minTileLevel =  Math.min.apply(this.tileLevels);
         this.threeCanvasProps.tileLevels = this.tileLevels;
 
         if (this.state.active) {
@@ -413,7 +453,6 @@ class lightNormals extends Component {
             this.threeCanvas.id = "three-canvas";
             this.props.viewer.addOverlay(this.threeCanvas);
             this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
-            this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
             this.threeCanvasProps.images = this.images;
             this.threeCanvasProps.tileSets = this.tileSets;
             this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
@@ -435,7 +474,7 @@ class lightNormals extends Component {
                 this.setState( {directionalIntensity: this.threeCanvasProps.directionalIntensity});
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
-                this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+                this.threeCanvasProps.tileLevel = this.tileLevel;
                 this.threeCanvasProps.images = this.images;
                 this.setState({ images: this.threeCanvasProps.images });
                 this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
@@ -448,7 +487,6 @@ class lightNormals extends Component {
                 this.props.viewer.removeAllHandlers('viewport-change');
             });
         }
-
         // this will need replacing because I think that ReacDOM.render has been depricated
         !this.state.active ? ReactDOM.render(
             Overlay(this.threeCanvasProps),
@@ -458,7 +496,7 @@ class lightNormals extends Component {
 
     // this keeps track of values stored in state and compares them to the current values, if any of them change it causes
     // a rerender
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps, prevState) {
         if (
             prevState.zoom !== this.threeCanvasProps.zoom ||
             prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection ||
@@ -500,14 +538,25 @@ class lightNormals extends Component {
         if (this.props.viewer && typeof this.albedoMap !== 'undefined' &&
             typeof this.normalMap !== 'undefined') {
 
-            if (!this.state.loaded ) {
+            if (!this.state.loaded && !this.state.loadHandlerAdded) {
                 this.setState({ loaded: true });
+
+                this.excluded_maps = [
+                    'depth',
+                    'shaded'
+                ];
+                this.layers = getLayers(this.props.canvas.iiifImageResources);
+                this.canvasID = this.props.canvas.id;
+
+                this.updateLayer(this.excluded_maps, this.canvasID, this.layers);
 
                 this.props.viewer.addHandler('tile-drawn', (event) => {
                     this.tileLevels[event.tile.level] = event.tile.level;
+                    this.tileLevel = event.tile.level;
                 });
 
                 this.props.viewer.addHandler('tile-loaded', (event) => {
+                    this.setState({ loadHandlerAdded: true });
                     const sourceKey = event.image.currentSrc.split("/")[5];
                     const canvas = document.createElement('canvas');
                     canvas.width = event.image.width;

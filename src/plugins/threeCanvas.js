@@ -195,6 +195,7 @@ class ThreeCanvas extends React.Component{
     animate = () => {
         this.animate_req = requestAnimationFrame(this.animate);
         this.renderer.render(this.scene, this.camera);
+        this._updateTextures();
     }
 
     rerender(){
@@ -215,10 +216,11 @@ class ThreeCanvas extends React.Component{
         this.animate();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        this._updateTextures();
+    componentDidUpdate(prevProps, prevState) {
+
         if (
-            prevProps.tileLevel !== this.props.tileLevel
+            prevProps.tileLevel !== this.props.tileLevel ||
+            prevProps.images.length !== this.props.images.length
         ) {
             this.groups[this.props.tileLevel].visible = true;
         }
@@ -229,8 +231,7 @@ class ThreeCanvas extends React.Component{
             prevProps.lightX !== this.props.lightX ||
             prevProps.lightY !== this.props.lightY ||
             prevProps.directionalIntensity !== this.props.directionalIntensity ||
-            prevProps.ambientIntensity !== this.props.ambientIntensity ||
-            prevProps.images.length !== this.props.images.length
+            prevProps.ambientIntensity !== this.props.ambientIntensity
         ) {
             this.ambientLight.intensity = this.props.ambientIntensity;
             this.directionalLight.intensity = this.props.directionalIntensity;
