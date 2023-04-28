@@ -395,9 +395,6 @@ class lightNormals extends Component {
         this.setState({ directionalIntensity: this.directionalIntensity });
     }
 
-    // todo: get canvas id as a property, and get the layer ids for those we wish to be invisible,
-    //  then pass these to updateLayer to switch on or off
-
     updateLayer(excluded_maps, canvas_id, layers, value) {
 
         const _props = this.props,
@@ -477,10 +474,6 @@ class lightNormals extends Component {
                 this.setState( {directionalIntensity: this.threeCanvasProps.directionalIntensity});
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
-
-                // todo: bug with tilelevel doesn't get updated if first item was switched off...
-                // with toggling the layers on an off we need to be able to see if an item is switched on or off
-                // need a more resilient method here...
                 this.threeCanvasProps.tileLevel = this.tileLevel;
                 this.threeCanvasProps.images = this.images;
                 this.setState({ images: this.threeCanvasProps.images });
