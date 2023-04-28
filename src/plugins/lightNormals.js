@@ -398,17 +398,11 @@ class lightNormals extends Component {
     // todo: get canvas id as a property, and get the layer ids for those we wish to be invisible,
     //  then pass these to updateLayer to switch on or off
 
-    updateLayer(canvas_id, layers, value) {
+    updateLayer(excluded_maps, canvas_id, layers, value) {
 
-        const _props2 = this.props,
-            updateLayers = _props2.updateLayers,
-            windowId = _props2.windowId;
-
-        const excluded_maps = [
-            'depth',
-            'composite',
-            'shaded'
-        ]
+        const _props = this.props,
+            updateLayers = _props.updateLayers,
+            windowId = _props.windowId;
 
         Object.keys(layers).forEach(key => {
             const mapType = layers[key].trim();
@@ -423,9 +417,11 @@ class lightNormals extends Component {
     };
 
     torchHandler() {
-        this.layers = getLayers(this.props.canvas.iiifImageResources);
-        this.canvasID = this.props.canvas.id;
-        this.updateLayer(this.canvasID, this.layers, this.state.active);
+        // only turn the composite image back on
+        this.excluded_maps = [
+            'composite',
+        ];
+        this.updateLayer(this.excluded_maps, this.canvasID, this.layers, this.state.active);
         this.threeCanvasProps = {};
         let zoom_level = this.props.viewer.viewport.getZoom();
         this.setState( prevState => ({ active: !prevState.active }));
@@ -551,6 +547,15 @@ class lightNormals extends Component {
 
             if (!this.state.loaded && !this.state.loadHandlerAdded) {
                 this.setState({ loaded: true });
+
+                this.excluded_maps = [
+                    'depth',
+                    'shaded'
+                ];
+                this.layers = getLayers(this.props.canvas.iiifImageResources);
+                this.canvasID = this.props.canvas.id;
+
+                this.updateLayer(this.excluded_maps, this.canvasID, this.layers);
 
                 this.props.viewer.addHandler('tile-drawn', (event) => {
                     this.tileLevels[event.tile.level] = event.tile.level;
