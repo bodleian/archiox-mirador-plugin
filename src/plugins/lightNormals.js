@@ -427,7 +427,6 @@ class lightNormals extends Component {
         this.canvasID = this.props.canvas.id;
         this.updateLayer(this.canvasID, this.layers, this.state.active);
         this.threeCanvasProps = {};
-        console.log(this.props);
         let zoom_level = this.props.viewer.viewport.getZoom();
         this.setState( prevState => ({ active: !prevState.active }));
         this.threeCanvasProps.contentWidth = this.props.viewer.viewport._contentSize.x;
@@ -440,8 +439,8 @@ class lightNormals extends Component {
         this.threeCanvasProps.lightY = this.lightY;
         this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
         this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
-        this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
-        this.threeCanvasProps.minTileLevel = getMinMaxProperty("min","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+        this.threeCanvasProps.tileLevel = this.tileLevel;
+        this.threeCanvasProps.minTileLevel =  Math.min.apply(this.tileLevels);
         this.threeCanvasProps.tileLevels = this.tileLevels;
 
         if (this.state.active) {
@@ -461,7 +460,6 @@ class lightNormals extends Component {
             this.threeCanvas.id = "three-canvas";
             this.props.viewer.addOverlay(this.threeCanvas);
             this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
-            this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
             this.threeCanvasProps.images = this.images;
             this.threeCanvasProps.tileSets = this.tileSets;
             this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
@@ -483,7 +481,11 @@ class lightNormals extends Component {
                 this.setState( {directionalIntensity: this.threeCanvasProps.directionalIntensity});
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
                 this.overlay.update(this.threeCanvasProps.rendererInstructions.intersectionTopLeft);
-                this.threeCanvasProps.tileLevel = getMinMaxProperty("max","level", this.props.viewer.world.getItemAt(0).lastDrawn);
+
+                // todo: bug with tilelevel doesn't get updated if first item was switched off...
+                // with toggling the layers on an off we need to be able to see if an item is switched on or off
+                // need a more resilient method here...
+                this.threeCanvasProps.tileLevel = this.tileLevel;
                 this.threeCanvasProps.images = this.images;
                 this.setState({ images: this.threeCanvasProps.images });
                 this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
@@ -505,7 +507,7 @@ class lightNormals extends Component {
 
     // this keeps track of values stored in state and compares them to the current values, if any of them change it causes
     // a rerender
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps, prevState) {
         if (
             prevState.zoom !== this.threeCanvasProps.zoom ||
             prevState.rendererInstructions.intersection !== this.threeCanvasProps.rendererInstructions.intersection ||
@@ -552,6 +554,7 @@ class lightNormals extends Component {
 
                 this.props.viewer.addHandler('tile-drawn', (event) => {
                     this.tileLevels[event.tile.level] = event.tile.level;
+                    this.tileLevel = event.tile.level;
                 });
 
                 this.props.viewer.addHandler('tile-loaded', (event) => {
