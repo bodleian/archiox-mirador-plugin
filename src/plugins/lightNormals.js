@@ -98,6 +98,7 @@ function LightDirection(props) {
                 onMouseDown={ props.onMouseDown }
                 onMouseUp={ props.onMouseUp }
                 onMouseLeave={ props.onMouseLeave }
+                onTouchMove={ props.onMouseMove }
             />
         </Tooltip>
     );
@@ -327,11 +328,23 @@ class lightNormals extends Component {
     }
 
     onMouseMove(event) {
-        event.preventDefault();
+
         const control = document.getElementById("LightDirectionControl");
         const boundingBox = control.getBoundingClientRect();
-        this.mouseX = event.clientX - boundingBox.left;
-        this.mouseY = event.clientY - boundingBox.top;
+
+        console.log(typeof event.type);
+
+        if (event.type==="mousemove") {
+            event.preventDefault();
+            this.mouseX = event.clientX - boundingBox.left;
+            this.mouseY = event.clientY - boundingBox.top;
+
+        } else if (event.type==="touchmove") {
+            this.mouseDown = true;
+            this.mouseX = event.touches[0].clientX - boundingBox.left;
+            this.mouseY = event.touches[0].clientY - boundingBox.top;
+        }
+
 
         if (this.mouseDown) {
             document.getElementById("LightDirectionControl").style.background = `radial-gradient(at ` + this.mouseX + `% ` + this.mouseY + `%, #ffffff, #000000)`;
@@ -602,6 +615,7 @@ class lightNormals extends Component {
                         onMouseDown={ (event) => this.onMouseDown(event) }
                         onMouseUp={ (event) => this.onMouseUp(event) }
                         onMouseLeave={ (event) => this.onMouseLeave(event) }
+                        onTouchMove={ (event) => this.onMouseMove(event) }
                     />
                     <DirectionalLightIntensity
                         directionalIntensity={ this.state.directionalIntensity }
