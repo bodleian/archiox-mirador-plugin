@@ -328,11 +328,8 @@ class lightNormals extends Component {
     }
 
     onMouseMove(event) {
-
         const control = document.getElementById("LightDirectionControl");
         const boundingBox = control.getBoundingClientRect();
-
-        console.log(typeof event.type);
 
         if (event.type==="mousemove") {
             event.preventDefault();
