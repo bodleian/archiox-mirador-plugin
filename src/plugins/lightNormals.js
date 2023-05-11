@@ -127,7 +127,7 @@ function LightControls({ children }) {
 
 function ToolsMenu(props) {
     let leftOffset;
-    console.log(props)
+
     if (props.sideBarOpen) {
         leftOffset = "37px";
     } else {
