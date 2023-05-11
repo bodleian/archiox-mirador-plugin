@@ -432,7 +432,6 @@ class lightNormals extends Component {
 
     torchHandler() {
         // only turn the composite image back on
-        this.sideBarOpen = this.props.window.sideBarOpen;
         this.excluded_maps = [
             'composite',
         ];
@@ -453,6 +452,7 @@ class lightNormals extends Component {
         this.threeCanvasProps.tileLevel = this.tileLevel;
         this.threeCanvasProps.minTileLevel =  Math.min.apply(this.tileLevels);
         this.threeCanvasProps.tileLevels = this.tileLevels;
+        this.sideBarOpen = this.props.window.sideBarOpen;
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
@@ -526,6 +526,7 @@ class lightNormals extends Component {
             prevState.tileLevel !== this.threeCanvasProps.tileLevel ||
             prevState.images !== this.threeCanvasProps.images
         ) {
+            this.sideBarOpen = this.props.window.sideBarOpen;
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
                 this.threeCanvas
