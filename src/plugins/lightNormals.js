@@ -332,7 +332,6 @@ class lightNormals extends Component {
         this.images = {};
         this.tileSets = {};
         this.tileLevels = {};
-        this.sideBarOpen = false;
     }
 
     onMouseMove(event) {
@@ -431,7 +430,6 @@ class lightNormals extends Component {
     };
 
     torchHandler() {
-        this.sideBarOpen = this.props.window.sideBarOpen;
         // only turn the composite image back on
         this.excluded_maps = [
             'composite',
@@ -453,7 +451,6 @@ class lightNormals extends Component {
         this.threeCanvasProps.tileLevel = this.tileLevel;
         this.threeCanvasProps.minTileLevel =  Math.min.apply(this.tileLevels);
         this.threeCanvasProps.tileLevels = this.tileLevels;
-
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
@@ -527,7 +524,6 @@ class lightNormals extends Component {
             prevState.tileLevel !== this.threeCanvasProps.tileLevel ||
             prevState.images !== this.threeCanvasProps.images
         ) {
-            this.sideBarOpen = this.props.window.sideBarOpen;
             this.state.active ? ReactDOM.render(
                 Overlay(this.threeCanvasProps),
                 this.threeCanvas
@@ -600,7 +596,7 @@ class lightNormals extends Component {
         let toolMenu = null;
 
         if (this.state.visible && this.state.open) {
-            toolMenu = <ToolsMenu visible={ this.state.visible } sideBarOpen={ this.sideBarOpen }>
+            toolMenu = <ToolsMenu visible={ this.state.visible } sideBarOpen={ this.props.window.sideBarOpen }>
                 <LightButtons>
                     <MenuButton
                         open={ this.state.open }
@@ -635,7 +631,7 @@ class lightNormals extends Component {
                 </LightControls>
             </ToolsMenu>;
         } else if (this.state.visible && !this.state.open) {
-            toolMenu =  <ToolsMenu visible={ this.state.visible } sideBarOpen={ this.sideBarOpen }>
+            toolMenu =  <ToolsMenu visible={ this.state.visible } sideBarOpen={ this.props.window.sideBarOpen }>
                 <MenuButton
                     open={ this.state.open }
                     onClick={ () => this.menuHandler() }
