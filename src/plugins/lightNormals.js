@@ -129,7 +129,7 @@ function ToolsMenu(props) {
     let leftOffset;
     console.log(props)
     if (props.sideBarOpen) {
-        leftOffset = "32px";
+        leftOffset = "37px";
     } else {
         leftOffset = "8px";
     };
@@ -431,6 +431,7 @@ class lightNormals extends Component {
     };
 
     torchHandler() {
+        this.sideBarOpen = this.props.window.sideBarOpen;
         // only turn the composite image back on
         this.excluded_maps = [
             'composite',
@@ -452,7 +453,7 @@ class lightNormals extends Component {
         this.threeCanvasProps.tileLevel = this.tileLevel;
         this.threeCanvasProps.minTileLevel =  Math.min.apply(this.tileLevels);
         this.threeCanvasProps.tileLevels = this.tileLevels;
-        this.sideBarOpen = this.props.window.sideBarOpen;
+
 
         if (this.state.active) {
             this.props.viewer.removeOverlay(this.threeCanvas);
