@@ -125,14 +125,21 @@ function LightControls({ children }) {
     )
 }
 
-function ToolsMenu({ children }) {
+function ToolsMenu(props) {
+    let leftOffset;
+
+    if (props.sideBarOpen) {
+        leftOffset = "37px";
+    } else {
+        leftOffset = "8px";
+    };
     return (
         <div
             style={{
                 display: "flex",
                 alignItems: "center",
                 position: "absolute",
-                left: "8px",
+                left: leftOffset,
                 top: "8px",
                 borderRadius: "25px",
                 zIndex: 999,
@@ -140,7 +147,7 @@ function ToolsMenu({ children }) {
             }}
             className={ 'MuiPaper-elevation4 '}
         >
-            { children }
+            { props.children }
         </div>
     )
 }
@@ -391,7 +398,6 @@ class lightNormals extends Component {
         this.lightY = 0;
         this.ambientIntensity = 0.1;
         this.directionalIntensity = 1;
-
         this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
         this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
         this.threeCanvasProps.lightX = this.lightX;
@@ -590,7 +596,7 @@ class lightNormals extends Component {
         let toolMenu = null;
 
         if (this.state.visible && this.state.open) {
-            toolMenu = <ToolsMenu visible={ this.state.visible }>
+            toolMenu = <ToolsMenu visible={ this.state.visible } sideBarOpen={ this.props.window.sideBarOpen }>
                 <LightButtons>
                     <MenuButton
                         open={ this.state.open }
@@ -625,7 +631,7 @@ class lightNormals extends Component {
                 </LightControls>
             </ToolsMenu>;
         } else if (this.state.visible && !this.state.open) {
-            toolMenu =  <ToolsMenu visible={ this.state.visible }>
+            toolMenu =  <ToolsMenu visible={ this.state.visible } sideBarOpen={ this.props.window.sideBarOpen }>
                 <MenuButton
                     open={ this.state.open }
                     onClick={ () => this.menuHandler() }
