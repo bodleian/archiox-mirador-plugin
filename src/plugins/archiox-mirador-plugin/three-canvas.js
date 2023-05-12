@@ -95,9 +95,11 @@ class ThreeCanvas extends React.Component{
 
             console.log(this);
 
-            this.group.children[0].material = this.shaderMaterial;
-            console.log(this.vertexShader);
+            //this.group.children[0].material = this.shaderMaterial;
+
+            //this.createMaterialAndObject();
         }
+
         this.aaaa = "AAAA";
 
         this.scene = new THREE.Scene();
@@ -181,60 +183,44 @@ class ThreeCanvas extends React.Component{
         this.scene.add(this.directionalLight);
         //this.scene.add(this.ambientLight);
 
-
         this.vertexShaderLoader = new THREE.FileLoader(this.manager);
-        this.vertexShader = this.vertexShaderLoader.load
-        ('/assets/vertex.glsl', function ( object ) 
-            {
-                console.log("INSIDE vertexShader !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                console.log(object);
-            }
-        )
-
         this.fragmentShaderLoader = new THREE.FileLoader(this.manager);
-        this.fragmentShader = this.fragmentShaderLoader.load
-        ('/assets/fragment.glsl', function ( object ) 
-            {
-                console.log("INSIDE fragmentShader !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                console.log(object);
+
+        this.vertexShaderLoader.load('/assets/vertex.glsl', ( data )  => {
+            console.log("Vertex shader loaded!");
+            this.vertexShader = data;
+            console.log( this.vertexShader )
+            // Check if both shaders are loaded
+            if (this.vertexShader && this.fragmentShader) {
+                //this.createMaterialAndObject();
+                console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             }
-        )
+        });  
+        this.fragmentShaderLoader.load('/assets/fragment.glsl', ( data )  => {
+            console.log("Fragment shader loaded!");
+            this.fragmentShader = data;
+            // Check if both shaders are loaded
+            if (this.vertexShader && this.fragmentShader) {
+                //this.createMaterialAndObject();
+                console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            }
+        }); 
 
-        let uniforms = {
-            colorB: {type: 'vec3', value: new THREE.Color(255,255,0)},
-            colorA: {type: 'vec3', value: new THREE.Color(0,0,255)}
-        }
-          
-        this.shaderMaterial =  new THREE.ShaderMaterial({
-            uniforms: uniforms,
-            fragmentShader: this.fragmentShader,
-            vertexShader: this.vertexShader,
-        })
-          
-        this.cubeGeometry = new THREE.CircleGeometry(200, 200);
-        let c = new THREE.Mesh(this.cubeGeometry, this.shaderMaterial);
-        c.position.set(400, 0, 0);
-        this.scene.add(c);
-
-/*
-        // Loading shaders
-        async function init( callback )
-        {
-            let vertex_shader = await (await fetch('/assets/vertex.glsl')).text();
-            console.log("VERTEX SHADER LOADED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");     
-            console.log(vertex_shader);
-
-            let fragment_shader = await (await fetch('/assets/fragment.glsl')).text();
-            console.log("FRAGMENT SHADER LOADED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");     
-            console.log(fragment_shader);
-            callback();
-        }
-        init( this.onShaderLoaded );
-*/
         console.log("Constructor initialization finished!")
-
     }
 
+    createMaterialAndObject() {
+        this.material = new THREE.ShaderMaterial({
+            vertexShader: this.vertexShader,
+            fragmentShader: this.fragmentShader
+        });
+        this.material.name ="NORMAL_MAP_SHADING"
+        this.cubeGeometry = new THREE.CircleGeometry(200, 200);
+        let c = new THREE.Mesh(this.cubeGeometry, this.material);
+        c.position.set(400, 0, 0);
+        this.scene.add(c);
+    }
+    
     onShaderLoaded()
     {
         console.log("onShaderLoaded!")  
