@@ -93,11 +93,20 @@ class ThreeCanvas extends React.Component{
             this.onTexturesLoaded();    
             console.log( 'Loading complete!');
 
-            console.log(this);
+            this.material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: this.vertexShader,
+                fragmentShader: this.normalMappingShader,
+                lights: true
+            });
+            this.material.name = "NormalMappingMaterial"; 
 
-            //this.group.children[0].material = this.shaderMaterial;
+            this.cubeGeometry = new THREE.CircleGeometry(200, 200);
+            let c = new THREE.Mesh(this.cubeGeometry, this.material);
+            c.position.set(400, 0, 0);
+            this.scene.add(c);
 
-            //this.createMaterialAndObject();
+            this.group.children[0].material = this.material;
         }
 
         this.aaaa = "AAAA";
@@ -135,14 +144,6 @@ class ThreeCanvas extends React.Component{
          this.cube = new THREE.Mesh(this.cubeGeometry, this.cubeMaterial);
          this.cube.position.set(0, 0, 0);
          this.scene.add(this.cube);
-
-        // this is a grid to help with debugging
-        // this.divisions = 10;
-        // this.size = 40000;
-        // this.gridHelper = new THREE.GridHelper(this.size, this.divisions, 0xffffff, 0xffffff);
-        // this.gridHelper.rotation.x=Math.PI/2;
-        // this.gridHelper.position.set(0, 0, 0);
-        // this.scene.add(this.gridHelper);
 
         // define a group so we can handle all the tiles together
         this.group = new THREE.Group();
@@ -183,49 +184,32 @@ class ThreeCanvas extends React.Component{
         this.scene.add(this.directionalLight);
         //this.scene.add(this.ambientLight);
 
-        this.vertexShaderLoader = new THREE.FileLoader(this.manager);
-        this.fragmentShaderLoader = new THREE.FileLoader(this.manager);
 
-        this.vertexShaderLoader.load('/assets/vertex.glsl', ( data )  => {
-            console.log("Vertex shader loaded!");
-            this.vertexShader = data;
-            console.log( this.vertexShader )
-            // Check if both shaders are loaded
-            if (this.vertexShader && this.fragmentShader) {
-                //this.createMaterialAndObject();
-                console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            }
-        });  
-        this.fragmentShaderLoader.load('/assets/fragment.glsl', ( data )  => {
-            console.log("Fragment shader loaded!");
-            this.fragmentShader = data;
-            // Check if both shaders are loaded
-            if (this.vertexShader && this.fragmentShader) {
-                //this.createMaterialAndObject();
-                console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            }
-        }); 
-
+        //this.createGrid();
         console.log("Constructor initialization finished!")
     }
 
-    createMaterialAndObject() {
-        this.material = new THREE.ShaderMaterial({
-            vertexShader: this.vertexShader,
-            fragmentShader: this.fragmentShader
-        });
-        this.material.name ="NORMAL_MAP_SHADING"
-        this.cubeGeometry = new THREE.CircleGeometry(200, 200);
-        let c = new THREE.Mesh(this.cubeGeometry, this.material);
-        c.position.set(400, 0, 0);
-        this.scene.add(c);
-    }
-    
-    onShaderLoaded()
-    {
-        console.log("onShaderLoaded!")  
+    loadShaders() {
+        this.vertexShaderLoader = new THREE.FileLoader(this.manager);
+        this.normalShaderLoader = new THREE.FileLoader(this.manager);
+        this.vertexShaderLoader.load('/assets/vertex.glsl', ( data )  => {
+            console.log("Vertex shader loaded!");
+            this.vertexShader = data;
+        });  
+        this.normalMappingShaderLoader.load('/assets/normalMapping.glsl', ( data )  => {
+            console.log("NormalShader shader loaded!");
+            this.normalMappingShader = data;
+        }); 
     }
 
+    createGrid() {
+        this.divisions = 10;
+        this.size = 40000;
+        this.gridHelper = new THREE.GridHelper(this.size, this.divisions, 0xffffff, 0xffffff);
+        this.gridHelper.rotation.x=Math.PI/2;
+        this.gridHelper.position.set(0, 0, 0);
+        this.scene.add(this.gridHelper);
+    }
     onTexturesLoaded() {
         document.getElementById("loading-overlay").style.display = "none";
         console.log("onTexturesLoaded!")
