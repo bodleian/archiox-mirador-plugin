@@ -12,8 +12,6 @@ function  onMouseMove(event, props) {
     let distance = -props.camera.position.z / dir.z;
     let pos = props.camera.position.clone().add(dir.multiplyScalar(distance));
     props.directionalLight.position.set(pos.x*1.5, pos.y*1.5, 0.5);
-
-    //console.log(props.directionalLight.position.x,props.directionalLight.position.y)
 }
 
 function Loader(props) {
@@ -91,12 +89,12 @@ class ThreeCanvas extends React.Component{
 
         this.materialCreated = false
         this.secondLightDirection = new THREE.Vector3(0.5, 0.7, 1.0).normalize();
-
         this.manager = new THREE.LoadingManager();
 
         this.manager.onLoad = () => {
             this.onTexturesLoaded();    
             console.log( 'Loading complete!');
+            
             this.uniforms = THREE.UniformsUtils.merge([
                 THREE.UniformsLib.lights,
                 {
@@ -104,20 +102,19 @@ class ThreeCanvas extends React.Component{
                   normalMap: { value: this.normalMap_NMT },
                   lightDirection: { value: new THREE.Vector3(0.5, 0.7, 1.0).normalize() } 
                 }
-            ]);
+            ]);  
             this.material = new THREE.ShaderMaterial({
                 uniforms: this.uniforms,
                 vertexShader: this.vertexShader,
                 fragmentShader: this.normalMappingShader,
                 lights: true
             });
-            this.material.name = "NormalMappingMaterial"; 
+        this.material.name = "NormalMappingMaterial"; 
 
             //this.cubeGeometry = new THREE.CircleGeometry(400, 400);
             //let c = new THREE.Mesh(this.cubeGeometry, this.material);
             //c.position.set(400, 0, 0);
             //this.scene.add(c);
-
             //this.group.children[0].material = this.material;
 
             for (let i = 0; i < this.group.children.length; i++)
@@ -222,7 +219,7 @@ class ThreeCanvas extends React.Component{
         this.loadNormalMappingTest();
 
         //this.createGrid();
-        console.log("Constructor initialization finished!")
+    console.log("Constructor initialization finished!")
     }
 
     loadNormalMappingTest() {
@@ -234,14 +231,22 @@ class ThreeCanvas extends React.Component{
     loadShaders() {
         this.vertexShaderLoader = new THREE.FileLoader(this.manager);
         this.normalMappingShaderLoader = new THREE.FileLoader(this.manager);
-        this.vertexShaderLoader.load('/assets/vertex.glsl', ( data )  => {
+        
+        //this.vertexShaderLoader.load('/assets/vertex.glsl', ( data )  => {
+        this.vertexShaderLoader.load('/assets/vertexBitangent.glsl', ( data )  => {
             console.log("Vertex shader loaded!");
             this.vertexShader = data;
         });  
         this.normalMappingShaderLoader.load('/assets/normalMapping.glsl', ( data )  => {
+        //this.normalMappingShaderLoader.load('/assets/normalMappingTan.glsl', ( data )  => {
             console.log("NormalShader shader loaded!");
             this.normalMappingShader = data;
         }); 
+    }
+
+    addAxesToScene(scene) {
+        const axesHelper = new THREE.AxesHelper(5);
+        scene.add(axesHelper);
     }
 
     createGrid() {
@@ -252,6 +257,8 @@ class ThreeCanvas extends React.Component{
         this.gridHelper.position.set(0, 0, 0);
         this.scene.add(this.gridHelper);
     }
+
+
     onTexturesLoaded() {
         document.getElementById("loading-overlay").style.display = "none";
         console.log("onTexturesLoaded!")
@@ -269,8 +276,17 @@ class ThreeCanvas extends React.Component{
             for (let i = 0; i < this.group.children.length; i++)
             {
                 this.group.children[i].material.uniforms.lightDirection.value = this.secondLightDirection;
+                  
+                /*
+                // TODO : We should move the camera and the zoom to allow this calculation...
+                // Update tangents
+                let modelViewMatrix = new THREE.Matrix4();
+                modelViewMatrix.multiplyMatrices(scene.camera.matrixWorldInverse, this.group.children[i].matrixWorld);
+                let normalMatrix = new THREE.Matrix3().getNormalMatrix(modelViewMatrix);
+                this.group.children[i].material.uniforms.normalMatrix.value = normalMatrix;
+                */
             }
-        }
+        }  
 
         this.animate_req = requestAnimationFrame(this.animate);
         this.renderer.render(this.scene, this.camera);
