@@ -5,13 +5,15 @@ import { ShaderMaterial } from "three";
 
 function  onMouseMove(event, props) {
     event.preventDefault();
-    let x = (event.clientX / window.innerWidth) * 2 - 1;
-    let y = -(event.clientY / window.innerHeight) * 2 + 1;
+    let x = -(event.clientX / window.innerWidth) * 2 + 1;
+    let y = +(event.clientY / window.innerHeight) * 2 - 1;
     let vector = new THREE.Vector3(x, y, 0);
     let dir = vector.sub(props.camera.position).normalize();
     let distance = -props.camera.position.z / dir.z;
     let pos = props.camera.position.clone().add(dir.multiplyScalar(distance));
-    props.directionalLight.position.set(pos.x, pos.y, 0.5);
+    props.directionalLight.position.set(pos.x*1.5, pos.y*1.5, 0.5);
+
+    //console.log(props.directionalLight.position.x,props.directionalLight.position.y)
 }
 
 function Loader(props) {
@@ -84,29 +86,61 @@ class ThreeCanvas extends React.Component{
             topLeft: this.props.topLeft,
             bottomLeft: this.props.bottomLeft,
             diffusemap: this.props.diffusemap,
-            normalmap: this.props.normalmap
+            normalmap: this.props.normalmap,
         }
+
+        this.materialCreated = false
+        this.secondLightDirection = new THREE.Vector3(0.5, 0.7, 1.0).normalize();
 
         this.manager = new THREE.LoadingManager();
 
         this.manager.onLoad = () => {
             this.onTexturesLoaded();    
             console.log( 'Loading complete!');
-
+            this.uniforms = THREE.UniformsUtils.merge([
+                THREE.UniformsLib.lights,
+                {
+                  diffuseMap: { value: this.diffuseMap_NMT },
+                  normalMap: { value: this.normalMap_NMT },
+                  lightDirection: { value: new THREE.Vector3(0.5, 0.7, 1.0).normalize() } 
+                }
+            ]);
             this.material = new THREE.ShaderMaterial({
-                uniforms: uniforms,
+                uniforms: this.uniforms,
                 vertexShader: this.vertexShader,
                 fragmentShader: this.normalMappingShader,
                 lights: true
             });
             this.material.name = "NormalMappingMaterial"; 
 
-            this.cubeGeometry = new THREE.CircleGeometry(200, 200);
-            let c = new THREE.Mesh(this.cubeGeometry, this.material);
-            c.position.set(400, 0, 0);
-            this.scene.add(c);
+            //this.cubeGeometry = new THREE.CircleGeometry(400, 400);
+            //let c = new THREE.Mesh(this.cubeGeometry, this.material);
+            //c.position.set(400, 0, 0);
+            //this.scene.add(c);
 
-            this.group.children[0].material = this.material;
+            //this.group.children[0].material = this.material;
+
+            for (let i = 0; i < this.group.children.length; i++)
+            {
+                const uniforms = THREE.UniformsUtils.merge([
+                    THREE.UniformsLib.lights,
+                    {
+                      diffuseMap: { value: this.group.children[i].material.map },
+                      normalMap: { value: this.group.children[i].material.normalMap },
+                      lightDirection: { value: new THREE.Vector3(0.5, 0.7, 1.0).normalize() } 
+                    }
+                ]);
+                const newMaterial = new THREE.ShaderMaterial({
+                    uniforms: uniforms,
+                    vertexShader: this.vertexShader,
+                    fragmentShader: this.normalMappingShader,
+                    lights: true
+                });
+                newMaterial.name = "NormalMappingMaterial"; 
+                this.group.children[i].material = newMaterial
+            }
+
+            this.materialCreated = true
         }
 
         this.aaaa = "AAAA";
@@ -184,14 +218,22 @@ class ThreeCanvas extends React.Component{
         this.scene.add(this.directionalLight);
         //this.scene.add(this.ambientLight);
 
+        this.loadShaders();
+        this.loadNormalMappingTest();
 
         //this.createGrid();
         console.log("Constructor initialization finished!")
     }
 
+    loadNormalMappingTest() {
+        this.textureLoader_NMT = new THREE.TextureLoader(this.manager);
+        this.diffuseMap_NMT  = this.textureLoader_NMT.load('/assets/diffuseMap.jpg');
+        this.normalMap_NMT  = this.textureLoader_NMT.load('/assets/normalMap.jpg');
+    }
+
     loadShaders() {
         this.vertexShaderLoader = new THREE.FileLoader(this.manager);
-        this.normalShaderLoader = new THREE.FileLoader(this.manager);
+        this.normalMappingShaderLoader = new THREE.FileLoader(this.manager);
         this.vertexShaderLoader.load('/assets/vertex.glsl', ( data )  => {
             console.log("Vertex shader loaded!");
             this.vertexShader = data;
@@ -216,8 +258,24 @@ class ThreeCanvas extends React.Component{
     }
 
     animate = () => {
+        // TODO: Improve the light direction control
+        this.secondLightDirection.x = this.directionalLight.position.x;
+        this.secondLightDirection.y = this.directionalLight.position.y;
+        this.secondLightDirection.normalize();
+
+        if (this.materialCreated == true){
+            this.material.uniforms.lightDirection.value = this.secondLightDirection;
+
+            for (let i = 0; i < this.group.children.length; i++)
+            {
+                this.group.children[i].material.uniforms.lightDirection.value = this.secondLightDirection;
+            }
+        }
+
         this.animate_req = requestAnimationFrame(this.animate);
         this.renderer.render(this.scene, this.camera);
+ 
+
     }
 
     rerender(){
