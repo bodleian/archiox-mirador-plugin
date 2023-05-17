@@ -87,7 +87,7 @@ class ThreeCanvas extends React.Component{
             normalmap: this.props.normalmap,
         }
 
-        this.materialCreated = false
+        this.materialCreated = false;
         this.secondLightDirection = new THREE.Vector3(0.5, 0.7, 1.0).normalize();
         this.manager = new THREE.LoadingManager();
 
@@ -228,7 +228,7 @@ class ThreeCanvas extends React.Component{
         this.normalMap_NMT  = this.textureLoader_NMT.load('/assets/normalMap.jpg');
     }
 
-    loadShaders() {
+    loadShaders() { 
         this.vertexShaderLoader = new THREE.FileLoader(this.manager);
         this.normalMappingShaderLoader = new THREE.FileLoader(this.manager);
         
@@ -237,8 +237,8 @@ class ThreeCanvas extends React.Component{
             console.log("Vertex shader loaded!");
             this.vertexShader = data;
         });  
-        this.normalMappingShaderLoader.load('/assets/normalMapping.glsl', ( data )  => {
-        //this.normalMappingShaderLoader.load('/assets/normalMappingTan.glsl', ( data )  => {
+        //this.normalMappingShaderLoader.load('/assets/normalMapping.glsl', ( data )  => {
+        this.normalMappingShaderLoader.load('/assets/normalMappingTan.glsl', ( data )  => {
             console.log("NormalShader shader loaded!");
             this.normalMappingShader = data;
         }); 
@@ -276,7 +276,7 @@ class ThreeCanvas extends React.Component{
             for (let i = 0; i < this.group.children.length; i++)
             {
                 this.group.children[i].material.uniforms.lightDirection.value = this.secondLightDirection;
-                  
+          
                 /*
                 // TODO : We should move the camera and the zoom to allow this calculation...
                 // Update tangents

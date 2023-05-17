@@ -39,8 +39,8 @@ module.exports = function(env, argv) {
     ],
     resolve: {
       fallback: {
-        "url": false
-      }
+        "url": require.resolve("url")
+      },
     },
   }
 };
