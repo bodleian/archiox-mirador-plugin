@@ -128,7 +128,7 @@ class Relight extends React.Component {
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.lightX = this.lightX;
-    this.threeCanvasProps.lightY = this.lighY;
+    this.threeCanvasProps.lightY = this.lightY;
 
     this.setState({ mouseX: this.mouseX });
     this.setState({ mouseY: this.mouseY });
