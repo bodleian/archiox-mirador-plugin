@@ -138,35 +138,9 @@ class Relight extends React.Component {
     this.setState({ directionalIntensity: this.directionalIntensity });
   }
 
-  updateLayer(excluded_maps, canvas_id, layers, value) {
-    const _props = this.props,
-      updateLayers = _props.updateLayers,
-      windowId = _props.windowId;
-
-    Object.keys(layers).forEach((key) => {
-      const mapType = layers[key].trim();
-
-      if (excluded_maps.includes(mapType)) {
-        const payload = {
-          [key]: { visibility: value },
-        };
-        updateLayers(windowId, canvas_id, payload);
-      }
-    });
-  }
-
-  torchHandler() {
-    // only turn the composite image back on
-    this.excluded_maps = ['composite'];
-    this.updateLayer(
-      this.excluded_maps,
-      this.canvasID,
-      this.layers,
-      this.state.active
-    );
+  updateThreeCanvasProps() {
+    const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps = {};
-    let zoom_level = this.props.viewer.viewport.getZoom();
-    this.setState((prevState) => ({ active: !prevState.active }));
     this.threeCanvasProps.contentWidth =
       this.props.viewer.viewport._contentSize.x;
     this.threeCanvasProps.contentHeight =
@@ -186,26 +160,59 @@ class Relight extends React.Component {
     this.threeCanvasProps.tileLevel = this.tileLevel;
     this.threeCanvasProps.minTileLevel = Math.min.apply(this.tileLevels);
     this.threeCanvasProps.tileLevels = this.tileLevels;
+    this.threeCanvasProps.maxTileLevel =
+      this.props.viewer.source.scale_factors.length - 1;
+    this.tileSets = getTileSets(
+      this.threeCanvasProps.maxTileLevel,
+      this.props.viewer.source,
+      this.threeCanvasProps.albedoMap,
+      this.threeCanvasProps.normalMap
+    );
+    this.threeCanvasProps.images = this.images;
+    this.threeCanvasProps.tileSets = this.tileSets;
+  }
+
+  updateLayer(excluded_maps, canvas_id, layers, value) {
+    const _props = this.props,
+      updateLayers = _props.updateLayers,
+      windowId = _props.windowId;
+
+    Object.keys(layers).forEach((key) => {
+      const mapType = layers[key].trim();
+
+      if (excluded_maps.includes(mapType)) {
+        const payload = {
+          [key]: { visibility: value },
+        };
+        updateLayers(windowId, canvas_id, payload);
+      }
+    });
+  }
+
+  torchHandler() {
+    // only turn the composite image back on
+    this.setState((prevState) => ({ active: !prevState.active }));
+
+    this.excluded_maps = ['composite'];
+    this.updateLayer(
+      this.excluded_maps,
+      this.canvasID,
+      this.layers,
+      this.state.active
+    );
 
     if (this.state.active) {
       this.props.viewer.removeOverlay(this.threeCanvas);
       this.props.viewer.removeAllHandlers('viewport-change');
     } else {
-      this.threeCanvasProps.maxTileLevel =
-        this.props.viewer.source.scale_factors.length - 1;
-      this.tileSets = getTileSets(
-        this.threeCanvasProps.maxTileLevel,
-        this.props.viewer.source,
-        this.threeCanvasProps.albedoMap,
-        this.threeCanvasProps.normalMap
-      );
+      // call update threeCanasProps
+      this.updateThreeCanvasProps();
 
       this.threeCanvas = document.createElement('div');
       this.threeCanvas.id = 'three-canvas';
       this.props.viewer.addOverlay(this.threeCanvas);
       this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
-      this.threeCanvasProps.images = this.images;
-      this.threeCanvasProps.tileSets = this.tileSets;
+
       this.overlay.update(
         this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
@@ -219,13 +226,9 @@ class Relight extends React.Component {
       // glitch and not re-render until we cause the viewport-change event to trigger
       this.props.viewer.forceRedraw();
       this.props.viewer.addHandler('viewport-change', () => {
-        const zoom_level = this.props.viewer.viewport.getZoom(true);
-        this.threeCanvasProps.rendererInstructions = getRendererInstructions(
-          this.props
-        );
-        this.threeCanvasProps.zoom = this.props.viewer.world
-          .getItemAt(0)
-          .viewportToImageZoom(zoom_level);
+        // call update threeCanvasrops
+        this.updateThreeCanvasProps();
+
         this.setState({ zoom: this.threeCanvasProps.zoom });
         this.setState({
           rendererInstructions: this.threeCanvasProps.rendererInstructions,
@@ -236,11 +239,6 @@ class Relight extends React.Component {
         this.overlay.update(
           this.threeCanvasProps.rendererInstructions.intersectionTopLeft
         );
-        this.overlay.update(
-          this.threeCanvasProps.rendererInstructions.intersectionTopLeft
-        );
-        this.threeCanvasProps.tileLevel = this.tileLevel;
-        this.threeCanvasProps.images = this.images;
         this.setState({ images: this.threeCanvasProps.images });
         this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
       });
