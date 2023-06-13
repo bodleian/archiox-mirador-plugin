@@ -121,22 +121,16 @@ class RelightThreeCanvas extends React.Component {
         this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
       ].needsUpdate = true;
 
-      if (
+      this.threeResources[this.props.tileLevel]['meshes'][
+        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+      ].visible = !(
         this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
         ].map === null ||
         this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
         ].normalMap === null
-      ) {
-        this.threeResources[this.props.tileLevel]['meshes'][
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].visible = false;
-      } else {
-        this.threeResources[this.props.tileLevel]['meshes'][
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].visible = true;
-      }
+      );
     }
   }
 
@@ -213,7 +207,7 @@ class RelightThreeCanvas extends React.Component {
     this.animate_req = requestAnimationFrame(this.animate);
     this.renderer.render(this.scene, this.camera);
     this._updateTextures();
-  }
+  };
 
   rerender() {
     this.renderer.setSize(
@@ -278,19 +272,10 @@ class RelightThreeCanvas extends React.Component {
       left: '0',
     };
     return (
-        <div 
-            id="container" 
-            style={container}
-        >
-        <div 
-            id="canvas-container" 
-            style={canvas} 
-            width={this.props.intersection.width * this.props.zoom}
-            height={this.props.intersection.height * this.props.zoom}
-            camera={this.camera}
-            directionalLight={this.directionalLight}
-        />
-      </div>);
+      <div id="container" style={container}>
+        <div id="canvas-container" style={canvas} />
+      </div>
+    );
   }
 }
 

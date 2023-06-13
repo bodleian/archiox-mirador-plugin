@@ -10,8 +10,8 @@ class RelightMenuButton extends React.Component {
   }
   render() {
     const { open, onClick } = this.props;
-    return ( 
-        <MiradorMenuButton
+    return (
+      <MiradorMenuButton
         aria-label={
           open ? 'Collapse Relighting Tools' : 'Expand Relighting Tools'
         }
@@ -22,7 +22,8 @@ class RelightMenuButton extends React.Component {
         onClick={onClick}
       >
         {open ? <CloseSharpIcon /> : <HighlightIcon />}
-      </MiradorMenuButton>);
+      </MiradorMenuButton>
+    );
   }
 }
 

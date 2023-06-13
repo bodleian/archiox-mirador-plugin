@@ -11,7 +11,7 @@ class RelightResetLightPositions extends React.Component {
   render() {
     const { onClick } = this.props;
     return (
-        <MiradorMenuButton
+      <MiradorMenuButton
         aria-label={'Reset Lighting Settings'}
         style={{
           float: 'left',
@@ -20,7 +20,8 @@ class RelightResetLightPositions extends React.Component {
         onClick={onClick}
       >
         <ReplaySharpIcon />
-      </MiradorMenuButton>);
+      </MiradorMenuButton>
+    );
   }
 }
 

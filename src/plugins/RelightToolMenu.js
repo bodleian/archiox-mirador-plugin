@@ -17,7 +17,7 @@ class RelightToolMenu extends React.Component {
     }
 
     return (
-        <div
+      <div
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -31,7 +31,8 @@ class RelightToolMenu extends React.Component {
         className={'MuiPaper-elevation4 '}
       >
         {children}
-      </div>);
+      </div>
+    );
   }
 }
 

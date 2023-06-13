@@ -26,7 +26,7 @@ class RelightThreeOverlay extends React.Component {
       tileLevels,
     } = this.props.threeCanvasProps;
     return (
-        <RelightThreeCanvas
+      <RelightThreeCanvas
         images={images}
         zoom={zoom}
         intersection={rendererInstructions.intersection}
@@ -41,7 +41,8 @@ class RelightThreeOverlay extends React.Component {
         maxTileLevel={maxTileLevel}
         tileSets={tileSets}
         tileLevels={tileLevels}
-      />);
+      />
+    );
   }
 }
 
@@ -49,14 +50,14 @@ RelightThreeOverlay.propTypes = {
   threeCanvasProps: shape({
     images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
     zoom: PropTypes.number.isRequired,
-      intersection: PropTypes.shape({
-        height: PropTypes.number.isRequired,
-        width: PropTypes.number.isRequired,
-        x: PropTypes.number.isRequired,
-        y: PropTypes.number.isRequired,
-        topLeft: PropTypes.number.isRequired,
-        bottomLeft: PropTypes.number.isRequired,
-      }).isRequired,
+    intersection: PropTypes.shape({
+      height: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+      x: PropTypes.number.isRequired,
+      y: PropTypes.number.isRequired,
+      topLeft: PropTypes.number.isRequired,
+      bottomLeft: PropTypes.number.isRequired,
+    }).isRequired,
     contentWidth: PropTypes.number.isRequired,
     contentHeight: PropTypes.number.isRequired,
     lightX: PropTypes.number.isRequired,

@@ -7,8 +7,7 @@ class RelightLightControls extends React.Component {
   }
   render() {
     const { children } = this.props;
-    return (<div style={{ float: 'left',
-      display: 'flex', }}>{children}</div>);
+    return <div style={{ float: 'left', display: 'flex' }}>{children}</div>;
   }
 }
 

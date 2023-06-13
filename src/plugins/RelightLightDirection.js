@@ -17,7 +17,7 @@ class RelightLightDirection extends React.Component {
       onMouseLeave,
     } = this.props;
     return (
-        <>
+      <>
         <Tooltip title={tooltipTitle}>
           <div
             id={id}
@@ -43,7 +43,8 @@ class RelightLightDirection extends React.Component {
             onTouchMove={onMouseMove}
           />
         </Tooltip>
-      </>);
+      </>
+    );
   }
 }
 
