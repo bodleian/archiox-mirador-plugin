@@ -32,7 +32,7 @@ RelightTorchButton.propTypes = {
   onClick: PropTypes.func.isRequired,
 };
 
-RelightTorchButton.defaultPropTypes = {
+RelightTorchButton.defaultProps = {
   active: false,
 };
 

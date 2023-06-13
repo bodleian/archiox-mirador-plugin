@@ -66,7 +66,7 @@ RelightLightIntensity.propTypes = {
   size: PropTypes.string,
 };
 
-RelightLightIntensity.defaultPropTypes = {
+RelightLightIntensity.defaultProps = {
   defaultIntensity: 1.0,
   step: 0.1,
   min: 0.1,

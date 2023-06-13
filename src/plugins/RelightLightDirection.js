@@ -66,7 +66,7 @@ RelightLightDirection.propTypes = {
   mouseY: PropTypes.number,
 };
 
-RelightLightDirection.defaultPropTypes = {
+RelightLightDirection.defaultProps = {
   mouseX: 50,
   mouseY: 50,
 };
