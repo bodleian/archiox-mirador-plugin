@@ -1,63 +1,22 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import HighlightIcon from '@material-ui/icons/Highlight';
-import CloseSharpIcon from '@material-ui/icons/CloseSharp';
-import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
+import * as THREE from 'three';
+import {
+  getLayers,
+  getMap,
+  getRendererInstructions,
+  getTileSets,
+} from './RelightHelpers';
 import RelightLightIntensity from './RelightLightIntensity';
 import RelightLightDirection from './RelightLightDirection';
-import RelightThreeCanvas from './RelightThreeCanvas';
-import * as THREE from 'three';
-import { getLayers, getMap, getTileSets } from './RelightHelpers';
 import RelightLightControls from './RelightLightControls';
+import RelightToolMenu from './RelightToolMenu';
 import RelightResetLightPositions from './RelightResetLightPositions';
 import RelightLightButtons from './RelightLightButtons';
 import RelightTorchButton from './RelightTorchButton';
-import RelightThreeOverlay from "./RelightThreeOverlay";
-
-function ToolsMenu(props) {
-  let leftOffset;
-
-  if (props.sideBarOpen) {
-    leftOffset = '37px';
-  } else {
-    leftOffset = '8px';
-  }
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        position: 'absolute',
-        left: leftOffset,
-        top: '8px',
-        borderRadius: '25px',
-        zIndex: 999,
-        backgroundColor: `rgba(255, 255, 255, 0.8)`,
-      }}
-      className={'MuiPaper-elevation4 '}
-    >
-      {props.children}
-    </div>
-  );
-}
-
-function MenuButton(props) {
-  return (
-    <MiradorMenuButton
-      aria-label={
-        props.open ? 'Collapse Relighting Tools' : 'Expand Relighting Tools'
-      }
-      style={{
-        float: 'left',
-        clear: 'both',
-      }}
-      onClick={props.onClick}
-    >
-      {props.open ? <CloseSharpIcon /> : <HighlightIcon />}
-    </MiradorMenuButton>
-  );
-}
+import RelightThreeOverlay from './RelightThreeOverlay';
+import RelightMenuButton from './RelightMenuButton';
 
 class relight extends Component {
   constructor(props) {
@@ -131,15 +90,15 @@ class relight extends Component {
     }
   }
 
-  onMouseDown(event) {
+  onMouseDown() {
     this.mouseDown = true;
   }
 
-  onMouseUp(event) {
+  onMouseUp() {
     this.mouseDown = false;
   }
 
-  onMouseLeave(event) {
+  onMouseLeave() {
     this.mouseDown = false;
   }
 
@@ -259,7 +218,7 @@ class relight extends Component {
       // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
       // glitch and not re-render until we cause the viewport-change event to trigger
       this.props.viewer.forceRedraw();
-      this.props.viewer.addHandler('viewport-change', (event) => {
+      this.props.viewer.addHandler('viewport-change', () => {
         const zoom_level = this.props.viewer.viewport.getZoom(true);
         this.threeCanvasProps.rendererInstructions = getRendererInstructions(
           this.props
@@ -286,7 +245,7 @@ class relight extends Component {
         this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
       });
 
-      this.props.viewer.addHandler('close', (event) => {
+      this.props.viewer.addHandler('close', () => {
         this.setState({ active: false });
         this.setState({ visible: false });
         // remove all handlers so viewport-change isn't activated!
@@ -295,7 +254,10 @@ class relight extends Component {
     }
     // this will need replacing because I think that ReacDOM.render has been depricated
     !this.state.active
-      ? ReactDOM.render(RelightThreeOverlay(this.threeCanvasProps), this.threeCanvas)
+      ? ReactDOM.render(
+          <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
+          this.threeCanvas
+        )
       : ReactDOM.unmountComponentAtNode(this.threeCanvas);
   }
 
@@ -315,7 +277,10 @@ class relight extends Component {
       prevState.images !== this.threeCanvasProps.images
     ) {
       this.state.active
-        ? ReactDOM.render(Overlay(this.threeCanvasProps), this.threeCanvas)
+        ? ReactDOM.render(
+            <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
+            this.threeCanvas
+          )
         : null;
     }
   }
@@ -383,12 +348,12 @@ class relight extends Component {
 
     if (this.state.visible && this.state.open) {
       toolMenu = (
-        <ToolsMenu
+        <RelightToolMenu
           visible={this.state.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
           <RelightLightButtons>
-            <MenuButton
+            <RelightMenuButton
               open={this.state.open}
               onClick={() => this.menuHandler()}
             />
@@ -428,19 +393,19 @@ class relight extends Component {
               }
             />
           </RelightLightControls>
-        </ToolsMenu>
+        </RelightToolMenu>
       );
     } else if (this.state.visible && !this.state.open) {
       toolMenu = (
-        <ToolsMenu
+        <RelightToolMenu
           visible={this.state.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
-          <MenuButton
+          <RelightMenuButton
             open={this.state.open}
             onClick={() => this.menuHandler()}
           />
-        </ToolsMenu>
+        </RelightToolMenu>
       );
     } else if (!this.state.visible) {
       toolMenu = null;
@@ -453,6 +418,11 @@ class relight extends Component {
 relight.propTypes = {
   onClick: PropTypes.func.isRequired,
   ambientIntensity: PropTypes.number.isRequired,
+  updateLayers: PropTypes.func,
+  windowId: PropTypes.number,
+  viewer: PropTypes.object,
+  window: PropTypes.object,
+  canvas: PropTypes.object,
 };
 
 export default relight;
