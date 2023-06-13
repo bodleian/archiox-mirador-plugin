@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import compose from 'lodash/flowRight';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 
-const styles = () => ({
+class RelightLightControls extends React.Component {
   div: {
     float: 'left',
     display: 'flex',
   },
 });
-class RelightLightControls extends Component {
   constructor(props) {
     super(props);
   }

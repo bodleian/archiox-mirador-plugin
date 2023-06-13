@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import compose from 'lodash/flowRight';
 import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 
-const styles = () => ({
+class RelightLightIntensity extends React.Component {
   slider: {
     marginTop: '20px',
     marginBottom: '20px',
@@ -14,7 +14,6 @@ const styles = () => ({
     height: '87px',
   },
 });
-class RelightLightIntensity extends Component {
   constructor(props) {
     super(props);
   }

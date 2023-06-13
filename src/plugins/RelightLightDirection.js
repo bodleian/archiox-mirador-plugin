@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import compose from 'lodash/flowRight';
 import Tooltip from '@material-ui/core/Tooltip';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 const styles = () => ({
-  div: {
+class RelightLightDirection extends React.Component {
     border: '#000000',
     width: '100px',
     height: '100px',
@@ -12,7 +12,6 @@ const styles = () => ({
     margin: '13px',
   },
 });
-class RelightLightDirection extends Component {
   constructor(props) {
     super(props);
   }

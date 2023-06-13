@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import HighlightIcon from '@material-ui/icons/Highlight';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import PropTypes from 'prop-types';
 
-class RelightMenuButton extends Component {
+class RelightMenuButton extends React.Component {
   constructor(props) {
     super(props);
   }

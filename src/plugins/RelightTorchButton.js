@@ -1,12 +1,12 @@
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
-import React, { Component } from 'react';
+import React from 'react';
 
 import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
 import WbIncandescentOutlinedIcon from '@material-ui/icons/WbIncandescentOutlined';
 
 import PropTypes from 'prop-types';
 
-class RelightTorchButton extends Component {
+class RelightTorchButton extends React.Component {
   constructor(props) {
     super(props);
   }

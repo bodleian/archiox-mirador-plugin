@@ -1,10 +1,10 @@
 import RelightThreeCanvas from './RelightThreeCanvas';
-import React, { Component } from 'react';
+import React from 'react';
 
 import * as THREE from 'three';
 
 import PropTypes, { shape } from 'prop-types';
-class RelightThreeOverlay extends Component {
+class RelightThreeOverlay extends React.Component {
   constructor(props) {
     super(props);
   }

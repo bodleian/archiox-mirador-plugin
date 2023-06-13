@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import compose from 'lodash/flowRight';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 const styles = () => ({
-  div: {
+class RelightToolMenu extends React.Component {
     display: 'flex',
     alignItems: 'center',
     position: 'absolute',
