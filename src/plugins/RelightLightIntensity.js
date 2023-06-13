@@ -1,8 +1,6 @@
 import React from 'react';
-import compose from 'lodash/flowRight';
 import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
-import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 
 class RelightLightIntensity extends React.Component {

@@ -1,6 +1,4 @@
 import React from 'react';
-import compose from 'lodash/flowRight';
-import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 
 class RelightLightControls extends React.Component {
