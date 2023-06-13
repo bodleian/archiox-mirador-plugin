@@ -1,35 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
-
-function Canvas(props) {
-  const container = {
-    position: 'relative',
-  };
-  const canvas = {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    top: '0',
-    left: '0',
-  };
-
-  return (
-    <div id="container" style={container}>
-      <div id="canvas-container" style={canvas} />
-    </div>
-  );
-}
-
-function _camera_offset(camera, props) {
-  camera.setViewOffset(
-    props.contentWidth * props.zoom,
-    props.contentHeight * props.zoom,
-    props.intersection.x * props.zoom,
-    props.intersection.y * props.zoom,
-    props.intersection.width * props.zoom,
-    props.intersection.height * props.zoom
-  );
-}
+import PropTypes from 'prop-types';
 
 class RelightThreeCanvas extends React.Component {
   constructor(props) {
@@ -51,9 +22,7 @@ class RelightThreeCanvas extends React.Component {
     };
     this.threeResources = {};
     this.groups = {};
-
     this.scene = new THREE.Scene();
-
     this.renderer = new THREE.WebGLRenderer({ alpha: true });
     this.renderer.setSize(
       this.state.width * this.state.zoom,
@@ -62,17 +31,16 @@ class RelightThreeCanvas extends React.Component {
 
     // define an orthographic camera
     this.camera = new THREE.OrthographicCamera(
-      this.state.contentWidth / -2,
-      this.state.contentWidth / 2,
-      this.state.contentHeight / 2,
-      this.state.contentHeight / -2,
+      this.props.contentWidth / -2,
+      this.props.contentWidth / 2,
+      this.props.contentHeight / 2,
+      this.props.contentHeight / -2,
       -1,
       1
     );
 
     this.camera.position.set(0, 0, 1);
-
-    _camera_offset(this.camera, this.props);
+    this._camera_offset(this.camera, this.props);
 
     // this is a cube to help with debugging
     // this.cubeGeometry = new THREE.CircleGeometry(100, 100);
@@ -113,6 +81,17 @@ class RelightThreeCanvas extends React.Component {
     this.scene.add(this.camera);
     this.scene.add(this.directionalLight);
     this.scene.add(this.ambientLight);
+  }
+
+  _camera_offset(camera, props) {
+    camera.setViewOffset(
+      props.contentWidth * props.zoom,
+      props.contentHeight * props.zoom,
+      props.intersection.x * props.zoom,
+      props.intersection.y * props.zoom,
+      props.intersection.width * props.zoom,
+      props.intersection.height * props.zoom
+    );
   }
 
   /**
@@ -241,7 +220,7 @@ class RelightThreeCanvas extends React.Component {
       this.props.intersection.width * this.props.zoom,
       this.props.intersection.height * this.props.zoom
     );
-    _camera_offset(this.camera, this.props);
+    this._camera_offset(this.camera, this.props);
   }
 
   moveLight() {
@@ -259,7 +238,7 @@ class RelightThreeCanvas extends React.Component {
     this.animate();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (
       prevProps.tileLevel !== this.props.tileLevel ||
       prevProps.images.length !== this.props.images.length
@@ -288,15 +267,44 @@ class RelightThreeCanvas extends React.Component {
   }
 
   render() {
+    const container = {
+      position: 'relative',
+    };
+    const canvas = {
+      width: '100%',
+      height: '100%',
+      position: 'absolute',
+      top: '0',
+      left: '0',
+    };
     return (
-      <Canvas
-        width={this.props.intersection.width * this.props.zoom}
-        height={this.props.intersection.height * this.props.zoom}
-        camera={this.camera}
-        directionalLight={this.directionalLight}
-      />
+      <div id="container" style={container}>
+        <div id="canvas-container" style={canvas} />
+      </div>
     );
   }
 }
+
+RelightThreeCanvas.propTypes = {
+  contentWidth: PropTypes.number.isRequired,
+  contentHeight: PropTypes.number.isRequired,
+  tileLevel: PropTypes.number.isRequired,
+  maxTileLevel: PropTypes.number.isRequired,
+  lightX: PropTypes.number.isRequired,
+  lightY: PropTypes.number.isRequired,
+  zoom: PropTypes.number.isRequired,
+  ambientIntensity: PropTypes.number.isRequired,
+  directionalIntensity: PropTypes.number.isRequired,
+  intersection: PropTypes.shape({
+    height: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    topLeft: PropTypes.number.isRequired,
+    bottomLeft: PropTypes.number.isRequired,
+  }),
+  images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
+  tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
+};
 
 export default RelightThreeCanvas;
