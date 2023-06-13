@@ -1,25 +1,5 @@
 /**
  *
- * @param canvas
- * @returns {boolean}
- */
-export function resizeCanvas(canvas) {
-  const { width, height } = canvas.getBoundingClientRect();
-
-  if (canvas.width !== width || canvas.height !== height) {
-    const { devicePixelRation: ratio = 1 } = window;
-    const context = canvas.getContext('2d');
-    canvas.width = width * ratio;
-    canvas.height = height * ratio;
-    context.scale(ratio, ratio);
-    return true;
-  }
-
-  return false;
-}
-
-/**
- *
  * @param id
  * @param width
  * @param height
@@ -92,31 +72,6 @@ export function parseTiles(data, type) {
   } else {
     return data[type];
   }
-}
-
-/**
- *
- * @param type
- * @param property
- * @param tiles
- * @returns {*}
- */
-export function getMinMaxProperty(type, property, tiles) {
-  const coordinates = tiles.map((item) => {
-    const container = [];
-    container.push(parseInt(item[property]));
-    return container;
-  });
-
-  if (type === 'min') {
-    return Math.min.apply(null, coordinates);
-  }
-
-  if (type === 'max') {
-    return Math.max.apply(null, coordinates);
-  }
-
-  return null;
 }
 
 /**
