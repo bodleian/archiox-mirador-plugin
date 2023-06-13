@@ -18,7 +18,7 @@ import RelightTorchButton from './RelightTorchButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
 
-class relight extends Component {
+class Relight extends Component {
   constructor(props) {
     super(props);
     this.state = {
