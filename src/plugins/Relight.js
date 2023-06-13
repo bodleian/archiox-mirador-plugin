@@ -326,13 +326,15 @@ class Relight extends React.Component {
           this.setState({ loadHandlerAdded: true });
           const sourceKey = event.image.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
+          const tileTexture = new THREE.Texture(event.image);
+          const key = event.tile.cacheKey;
+
           canvas.width = event.image.width;
           canvas.height = event.image.height;
           event.tile.context2D = canvas.getContext('2d');
-          const tileTexture = new THREE.Texture(event.image);
-          tileTexture.needsUpdate = true;
           event.tile.context2D.drawImage(event.image, 0, 0);
-          const key = event.tile.cacheKey;
+
+          tileTexture.needsUpdate = true;
 
           if (this.map_ids.includes(sourceKey)) {
             // only keep tile textures we are interested in
