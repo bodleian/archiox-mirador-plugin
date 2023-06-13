@@ -415,14 +415,14 @@ class Relight extends Component {
   }
 }
 
-relight.propTypes = {
+Relight.propTypes = {
   onClick: PropTypes.func.isRequired,
   ambientIntensity: PropTypes.number.isRequired,
-  updateLayers: PropTypes.func,
-  windowId: PropTypes.number,
-  viewer: PropTypes.object,
-  window: PropTypes.object,
-  canvas: PropTypes.object,
+  updateLayers: PropTypes.func.isRequired,
+  windowId: PropTypes.number.isRequired,
+  viewer: PropTypes.object.isRequired,
+  window: PropTypes.object.isRequired,
+  canvas: PropTypes.object.isRequired,
 };
 
 export default relight;

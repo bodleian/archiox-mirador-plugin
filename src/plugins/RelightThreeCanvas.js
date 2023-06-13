@@ -302,7 +302,7 @@ RelightThreeCanvas.propTypes = {
     y: PropTypes.number.isRequired,
     topLeft: PropTypes.number.isRequired,
     bottomLeft: PropTypes.number.isRequired,
-  }),
+  }).isRequired,
   images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
   tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
 };
