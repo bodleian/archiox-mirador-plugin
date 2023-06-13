@@ -278,10 +278,19 @@ class RelightThreeCanvas extends React.Component {
       left: '0',
     };
     return (
-      <div id="container" style={container}>
-        <div id="canvas-container" style={canvas} />
-      </div>
-    );
+        <div 
+            id="container" 
+            style={container}
+        >
+        <div 
+            id="canvas-container" 
+            style={canvas} 
+            width={this.props.intersection.width * this.props.zoom}
+            height={this.props.intersection.height * this.props.zoom}
+            camera={this.camera}
+            directionalLight={this.directionalLight}
+        />
+      </div>);
   }
 }
 

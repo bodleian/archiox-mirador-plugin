@@ -1,19 +1,7 @@
 import React from 'react';
-import compose from 'lodash/flowRight';
-import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
-const styles = () => ({
+
 class RelightToolMenu extends React.Component {
-    display: 'flex',
-    alignItems: 'center',
-    position: 'absolute',
-    top: '8px',
-    borderRadius: '25px',
-    zIndex: 999,
-    backgroundColor: `rgba(255, 255, 255, 0.8)`,
-  },
-});
-class RelightToolMenu extends Component {
   constructor(props) {
     super(props);
   }
@@ -29,15 +17,21 @@ class RelightToolMenu extends Component {
     }
 
     return (
-      <div
+        <div
         style={{
+          display: 'flex',
+          alignItems: 'center',
+          position: 'absolute',
+          top: '8px',
+          borderRadius: '25px',
+          zIndex: 999,
+          backgroundColor: `rgba(255, 255, 255, 0.8)`,
           left: leftOffset,
         }}
         className={'MuiPaper-elevation4 '}
       >
         {children}
-      </div>
-    );
+      </div>);
   }
 }
 
@@ -48,4 +42,4 @@ RelightToolMenu.propTypes = {
     PropTypes.node,
   ]).isRequired,
 };
-export default compose(withStyles(styles), RelightToolMenu);
+export default RelightToolMenu;

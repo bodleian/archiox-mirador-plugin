@@ -3,15 +3,8 @@ import compose from 'lodash/flowRight';
 import Tooltip from '@material-ui/core/Tooltip';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
-const styles = () => ({
+
 class RelightLightDirection extends React.Component {
-    border: '#000000',
-    width: '100px',
-    height: '100px',
-    borderRadius: '50px',
-    margin: '13px',
-  },
-});
   constructor(props) {
     super(props);
   }
@@ -27,11 +20,16 @@ class RelightLightDirection extends React.Component {
       onMouseLeave,
     } = this.props;
     return (
-      <>
+        <>
         <Tooltip title={tooltipTitle}>
           <div
             id={id}
             style={{
+              border: '#000000',
+              width: '100px',
+              height: '100px',
+              borderRadius: '50px',
+              margin: '13px',
               background:
                 `radial-gradient(at ` +
                 mouseX +
@@ -48,8 +46,7 @@ class RelightLightDirection extends React.Component {
             onTouchMove={onMouseMove}
           />
         </Tooltip>
-      </>
-    );
+      </>);
   }
 }
 
@@ -69,4 +66,4 @@ RelightLightDirection.defaultProps = {
   mouseX: 50,
   mouseY: 50,
 };
-export default compose(withStyles(styles), RelightLightDirection);
+export default RelightLightDirection;

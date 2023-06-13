@@ -6,14 +6,6 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 
 class RelightLightIntensity extends React.Component {
-  slider: {
-    marginTop: '20px',
-    marginBottom: '20px',
-    marginLeft: '8px',
-    marginRight: '8px',
-    height: '87px',
-  },
-});
   constructor(props) {
     super(props);
   }
@@ -32,10 +24,16 @@ class RelightLightIntensity extends React.Component {
       size,
     } = this.props;
     return (
-      <>
         <Tooltip title={tooltipTitle}>
-          <Slider
-            id={id}
+          <Slider 
+              id={id}
+              style={{
+                marginTop: '20px',
+                marginBottom: '20px',
+                marginLeft: '8px',
+                marginRight: '8px',
+                height: '87px',
+              }}
             size={size}
             orientation={orientation}
             marks
@@ -47,7 +45,6 @@ class RelightLightIntensity extends React.Component {
             onChange={onChange}
           />
         </Tooltip>
-      </>
     );
   }
 }
@@ -73,4 +70,4 @@ RelightLightIntensity.defaultProps = {
   orientation: 'vertical',
   size: 'small',
 };
-export default compose(withStyles(styles), RelightLightIntensity);
+export default RelightLightIntensity;

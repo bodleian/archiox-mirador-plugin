@@ -26,10 +26,10 @@ class RelightThreeOverlay extends React.Component {
       tileLevels,
     } = this.props.threeCanvasProps;
     return (
-      <RelightThreeCanvas
+        <RelightThreeCanvas
         images={images}
         zoom={zoom}
-        rendererInstructions={rendererInstructions.intersection}
+        intersection={rendererInstructions.intersection}
         contentWidth={contentWidth}
         contentHeight={contentHeight}
         lightX={lightX}
@@ -41,8 +41,7 @@ class RelightThreeOverlay extends React.Component {
         maxTileLevel={maxTileLevel}
         tileSets={tileSets}
         tileLevels={tileLevels}
-      />
-    );
+      />);
   }
 }
 

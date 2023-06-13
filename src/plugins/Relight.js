@@ -411,7 +411,7 @@ class Relight extends React.Component {
       toolMenu = null;
     }
 
-    return <>{toolMenu}</>;
+    return (<>{toolMenu}</>);
   }
 }
 
@@ -425,4 +425,4 @@ Relight.propTypes = {
   canvas: PropTypes.object.isRequired,
 };
 
-export default relight;
+export default Relight;

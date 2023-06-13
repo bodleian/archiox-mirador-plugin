@@ -4,17 +4,13 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 
 class RelightLightControls extends React.Component {
-  div: {
-    float: 'left',
-    display: 'flex',
-  },
-});
   constructor(props) {
     super(props);
   }
   render() {
     const { children } = this.props;
-    return <div>{children}</div>;
+    return (<div style={{ float: 'left',
+      display: 'flex', }}>{children}</div>);
   }
 }
 
@@ -25,4 +21,4 @@ RelightLightControls.propTypes = {
   ]).isRequired,
 };
 
-export default compose(withStyles(styles), RelightLightControls);
+export default RelightLightControls;
