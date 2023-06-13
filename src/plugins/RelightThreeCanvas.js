@@ -209,7 +209,7 @@ class RelightThreeCanvas extends React.Component {
     }
   }
 
-  animate() {
+  animate = () => {
     this.animate_req = requestAnimationFrame(this.animate);
     this.renderer.render(this.scene, this.camera);
     this._updateTextures();
