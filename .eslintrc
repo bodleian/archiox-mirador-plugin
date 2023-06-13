@@ -9,10 +9,18 @@
     "react",
     "react-hooks"
   ],
+  "parser": "@babel/eslint-parser",
   "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:prettier/recommended"],
   "parserOptions": {
+    "requireConfigFile": false,
     "sourceType": "module",
-    "ecmaVersion": 2018
+    "ecmaVersion": 2018,
+    "babelOptions": {
+      "babelrc": false,
+      "configFile": false,
+      // your babel options
+     "presets": ["@babel/preset-react"]
+    }
   },
   "settings": {
     "react": {
