@@ -6,7 +6,8 @@
   "scripts": {
     "webpack": "webpack --config webpack.config.js --mode=production",
     "lint": "eslint --fix . && echo 'Lint complete.'",
-    "watch": "watch 'clear && npm run -s test | tap-nirvana && npm run -s lint' src"
+    "watch": "watch 'clear && npm run -s test | tap-nirvana && npm run -s lint' src",
+    "test": "mocha --require @babel/register"
   },
   "repository": {
     "type": "git",
@@ -35,10 +36,12 @@
     "three": "^0.146.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.22.5",
     "@babel/core": "^7.22.5",
     "@babel/eslint-parser": "^7.22.5",
     "@babel/preset-env": "^7.19.4",
     "@babel/preset-react": "^7.12.5",
+    "@babel/register": "^7.22.5",
     "babel-loader": "^8.2.1",
     "clean-webpack-plugin": "^3.0.0",
     "eslint": "^8.42.0",
@@ -46,7 +49,9 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "expect.js": "^0.3.1",
     "mirador": "^3.0.0-rc.4",
+    "mocha": "^10.2.0",
     "prettier": "^2.8.8",
     "react": "16.x",
     "react-dom": "16.x",
