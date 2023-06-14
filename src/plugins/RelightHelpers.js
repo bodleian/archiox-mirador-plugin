@@ -1,11 +1,13 @@
 /**
- *
- * @param id
- * @param width
- * @param height
- * @param tileSource
- * @param scaleFactor
- * @returns {{}}
+ * Generates an object containing a full tile pyramid. Mirador only generates the parts that are needed
+ * as they are loaded in, so you cannot access the full pyramid until all the tiles have loaded.  We need the
+ * full data structure earlier so here we calculate it.  The algorithm is based on Tom Crane's tile-exploder
+ * @param {string} id IIIF image resource id
+ * @param {number} width width of the image resource at a particular scale factor
+ * @param {number} height height of the image resource at a particular scale factor
+ * @param {object} tileSource object containing information parsed out from the image info.json in the manifest
+ * @param {number} scaleFactor the scaleFactor you want to generate tiles for
+ * @returns {{}} an array of objects containing IIIF image tile URLs with tile dimensions
  */
 export function generateTiles(id, width, height, tileSource, scaleFactor) {
   let tiles = [];
@@ -51,22 +53,20 @@ export function generateTiles(id, width, height, tileSource, scaleFactor) {
           y: parseInt(y),
         },
       });
-
       x += regionWidth;
     }
     y += regionHeight;
   }
-
   return tiles;
 }
 
 /**
- *
- * @param data
- * @param type
- * @returns {null|*}
+ * Returns data from an object by using type as the key.  In this case we use it only for tiles
+ * @param {object} data the object containing key: value pairs
+ * @param {string} type the key of the data you wish to return
+ * @returns {null|*} null if type is not present in the object | any value with type as the key
  */
-export function parseTiles(data, type) {
+export function _parseTiles(data, type) {
   if (!data[type]) {
     return null;
   } else {
@@ -75,17 +75,22 @@ export function parseTiles(data, type) {
 }
 
 /**
- *
- * @param property
- * @param tiles
- * @returns {null|*}
+ * Loops through an array of objects to return an array of values from a specified property
+ * @param {string} property name of property to get values for
+ * @param {array} data array of objects containing key: value pairs
+ * @returns {null|*} null if tiles is not an array or the requested property does not exist | array containing the
+ *    values of the requested property e.g. a list of url properties from every object in the array
  */
-export function getProperty(property, tiles) {
-  const items = tiles.map((item) => {
+export function _getProperty(property, data) {
+  if (!Array.isArray(data)) {
+    return null;
+  }
+
+  const items = data.map((item) => {
     return item[property];
   });
-
-  if (!items) {
+  // map will return [undefined, undefined] if it cannot find a property
+  if (items[0] === undefined) {
     return null;
   }
 
@@ -93,18 +98,18 @@ export function getProperty(property, tiles) {
 }
 
 /**
- *
- * @param mapURL
- * @param data
- * @param tilesIndex
- * @returns {{}}
+ * Builds an array containing a list of tile dimensions and accompanying URLs in matching order
+ * @param {string} mapURL IIIF image URL for a particular map type
+ * @param {object} data object containing the IIIFTileSource data from Mirador
+ * @param {number} tilesIndex tile level index e.g. 1 for top, 5 for bottom
+ * @returns {{}} an object that contains the properties URLs and tiles, tiles are objects containing w, h, x, y
  */
-export const getImageData = (mapURL, data, tilesIndex) => {
+export const getTiles = (mapURL, data, tilesIndex) => {
   let imageData = {};
   const id = mapURL;
-  imageData.width = parseTiles(data, 'width');
-  imageData.height = parseTiles(data, 'height');
-  const tiles = parseTiles(data, 'tiles')[0]; // tiles is index 0 of a singleton?
+  imageData.width = _parseTiles(data, 'width');
+  imageData.height = _parseTiles(data, 'height');
+  const tiles = _parseTiles(data, 'tiles')[0]; // tiles is index 0 of a singleton
 
   const tileData = generateTiles(
     id,
@@ -113,12 +118,17 @@ export const getImageData = (mapURL, data, tilesIndex) => {
     tiles,
     tilesIndex
   );
-  imageData.urls = getProperty('url', tileData);
-  imageData.tiles = getProperty('tile', tileData);
+  imageData.urls = _getProperty('url', tileData);
+  imageData.tiles = _getProperty('tile', tileData);
 
   return imageData;
 };
 
+/**
+ * Parses IIIF annotationBodies to get an array of the layers, we get these ids so that we can toggle their visibility
+ * @param {object} annotationBodies IIIF annotationBodies from Mirador
+ * @returns {{}} an array of ids for all the lighting maps
+ */
 export function getLayers(annotationBodies) {
   let layers = {};
   annotationBodies.forEach(function (element) {
@@ -136,6 +146,12 @@ export function getLayers(annotationBodies) {
   return layers;
 }
 
+/**
+ * Parses IIIF annotationBodies to get the URL of a particular mapType
+ * @param {object} annotationBodies IIIF annotationBodies from Mirador
+ * @param {string} mapType the requested mapType e.g. albedo or normal
+ * @returns {string} the URL of the requested mapType
+ */
 export function getMap(annotationBodies, mapType) {
   let map;
 
@@ -170,22 +186,33 @@ export function getMap(annotationBodies, mapType) {
   return map;
 }
 
-export function getTiles(tileData, tileLevel, map) {
-  return getImageData(map, tileData, tileLevel);
-}
-
-export function getTileSets(maxTileLevel, source, albedoMap, normalMap) {
+/**
+ * Builds an array of all the tile information for every possible tile level for the albedo and normal maps
+ * @param {number} maxTileLevel maximum tile level in the manifest
+ * @param {object} data object containing the IIIFTileSource data from Mirador
+ * @param {string} albedoMap URL of the albedoMap
+ * @param {string} normalMap URL of the normalMap
+ * @returns {{}}
+ */
+export function getTileSets(maxTileLevel, data, albedoMap, normalMap) {
   let tileLevels = {};
 
   for (let i = 1; i < maxTileLevel + 1; i++) {
     tileLevels[i] = {
-      albedoTiles: getTiles(source, i, albedoMap),
-      normalTiles: getTiles(source, i, normalMap),
+      albedoTiles: getTiles(albedoMap, data, i),
+      normalTiles: getTiles(normalMap, data, i),
     };
   }
   return tileLevels;
 }
 
+/**
+ * Parses OpenSeaDragon viewer properties to build an object describing the intersection of the image as it appears
+ * currently on the screen, so if one is zoomed in, the rendererInstructions will only describe that intersection
+ * @param {object} props the class props for the Relight class
+ * @returns {{}} a nested object containing the rendererInstructions describing the part of the image showing in the
+ * view port
+ */
 export function getRendererInstructions(props) {
   let rendererInstructions = {};
   const viewportBounds = props.viewer.viewport.getBounds(true);
