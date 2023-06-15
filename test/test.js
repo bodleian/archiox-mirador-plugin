@@ -1,12 +1,11 @@
 import * as _ from 'lodash';
-import {_getProperty, _parseTiles, _parsetTiles} from '../src/plugins/RelightHelpers';
+import { _getProperty, _parseTiles } from '../src/plugins/RelightHelpers';
 
 const expect = require('expect.js');
 
-
 const testInfoJSON = {
-  '@context': 'https://iiif.io/api/image/2/context.json',
-  protocol: 'https://iiif.io/api/image',
+  '@context': 'http://iiif.io/api/image/2/context.json',
+  protocol: 'http://iiif.io/api/image',
   width: 3208,
   height: 4260,
   sizes: [
@@ -41,7 +40,7 @@ const testInfoJSON = {
   '@id':
     'https://iiif.bodleian.ox.ac.uk/iiif/image/a469e838-9448-4d99-bcac-d35868cb5e1f',
   profile: [
-    'https://iiif.io/api/image/2/level2.json',
+    'http://iiif.io/api/image/2/level2.json',
     {
       formats: ['jpg', 'png', 'webp'],
       qualities: ['native', 'color', 'gray', 'bitonal'],
@@ -102,7 +101,7 @@ describe('Tests _getProperty function against various cases', function () {
   });
 });
 
-describe('Tests _parseTiles function again various cases', function() {
+describe('Tests _parseTiles function against various cases', function () {
   it('should return a value from specified property', function () {
     const isValid = _parseTiles(testInfoJSON, 'width');
     expect(isValid).to.be(3208);
