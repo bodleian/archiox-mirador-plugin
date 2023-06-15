@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import * as THREE from 'three';
-import * as _ from 'lodash';
 import {
   getLayers,
   getMap,
