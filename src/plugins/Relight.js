@@ -117,8 +117,6 @@ class Relight extends React.Component {
     this.threeCanvasProps.mouseX = 50;
     this.threeCanvasProps.mouseY = 50;
 
-    console.log(this.threeCanvasProps);
-
     this.setState({
       threeCanvasProps: this.threeCanvasProps,
     });
@@ -206,8 +204,6 @@ class Relight extends React.Component {
     } else {
       // call update threeCanasProps
       this.initialiseThreeCanvasProps();
-
-      console.log(this.threeCanvasProps);
 
       this.threeCanvas = document.createElement('div');
       this.threeCanvas.id = 'three-canvas';
