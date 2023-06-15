@@ -30,6 +30,8 @@
     "react-dom": "16.x"
   },
   "dependencies": {
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
     "react-loader-spinner": "^5.3.4",
