@@ -3,7 +3,7 @@ import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
 import PropTypes from 'prop-types';
 
-class RelightLightIntensity extends React.Component {
+class RelightAmbientLightIntensity extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -47,11 +47,11 @@ class RelightLightIntensity extends React.Component {
   }
 }
 
-RelightLightIntensity.propTypes = {
+RelightAmbientLightIntensity.propTypes = {
   id: PropTypes.string.isRequired,
   tooltipTitle: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  intensity: PropTypes.number.isRequired,
+  intensity: PropTypes.number,
   defaultIntensity: PropTypes.number,
   step: PropTypes.number,
   min: PropTypes.number,
@@ -60,12 +60,13 @@ RelightLightIntensity.propTypes = {
   size: PropTypes.string,
 };
 
-RelightLightIntensity.defaultProps = {
-  defaultIntensity: 1.0,
+RelightAmbientLightIntensity.defaultProps = {
+  intensity: 0.1,
+  defaultIntensity: 0.1,
   step: 0.1,
-  min: 0.1,
+  min: 0.0,
   max: 1.0,
   orientation: 'vertical',
   size: 'small',
 };
-export default RelightLightIntensity;
+export default RelightAmbientLightIntensity;
