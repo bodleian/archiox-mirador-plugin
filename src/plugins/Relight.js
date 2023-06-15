@@ -261,7 +261,8 @@ class Relight extends React.Component {
 
   // this keeps track of values stored in state and compares them to the current values, if any of them change it causes
   // a rerender
-  componentDidUpdate(prevProps, prevState) {
+  // eslint-disable-next-line no-unused-vars
+  componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       prevState.zoom !== this.threeCanvasProps.zoom ||
       prevState.rendererInstructions.intersection !==

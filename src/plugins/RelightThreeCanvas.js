@@ -232,7 +232,8 @@ class RelightThreeCanvas extends React.Component {
     this.animate();
   }
 
-  componentDidUpdate(prevProps) {
+  // eslint-disable-next-line no-unused-vars
+  componentDidUpdate(prevProps, prevState, snapshot) {
     if (
       prevProps.tileLevel !== this.props.tileLevel ||
       prevProps.images.length !== this.props.images.length
