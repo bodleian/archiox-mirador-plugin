@@ -70,8 +70,8 @@ class Relight extends React.Component {
       this.threeCanvasProps.mouseY = this.mouseY;
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
-      // this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
-      // this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
+      this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
+      this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
 
       this.setState({
         threeCanvasProps: this.threeCanvasProps,
@@ -117,6 +117,8 @@ class Relight extends React.Component {
     this.threeCanvasProps.mouseX = 50;
     this.threeCanvasProps.mouseY = 50;
 
+    console.log(this.threeCanvasProps);
+
     this.setState({
       threeCanvasProps: this.threeCanvasProps,
     });
@@ -137,8 +139,8 @@ class Relight extends React.Component {
       .viewportToImageZoom(zoom_level);
     this.threeCanvasProps.albedoMap = this.albedoMap;
     this.threeCanvasProps.normalMap = this.normalMap;
-    this.threeCanvasProps.lightX = this.lightX;
-    this.threeCanvasProps.lightY = this.lightY;
+    this.threeCanvasProps.lightX = 0;
+    this.threeCanvasProps.lightY = 0;
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
     this.threeCanvasProps.tileLevel = this.tileLevel;
@@ -204,6 +206,8 @@ class Relight extends React.Component {
     } else {
       // call update threeCanasProps
       this.initialiseThreeCanvasProps();
+
+      console.log(this.threeCanvasProps);
 
       this.threeCanvas = document.createElement('div');
       this.threeCanvas.id = 'three-canvas';
