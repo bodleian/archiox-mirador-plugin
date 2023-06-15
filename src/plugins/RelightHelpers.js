@@ -49,8 +49,8 @@ export function generateTiles(id, width, height, tileSource, scaleFactor) {
         tile: {
           w: parseInt(rw),
           h: parseInt(rh),
-          x: parseInt(x),
-          y: parseInt(y),
+          x: x,
+          y: y,
         },
       });
       x += regionWidth;
