@@ -2,13 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import * as THREE from 'three';
+import * as _ from 'lodash';
 import {
   getLayers,
   getMap,
   getRendererInstructions,
   getTileSets,
 } from './RelightHelpers';
-import RelightLightIntensity from './RelightLightIntensity';
+import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
+import RelightDirectionalLightIntensity from './RelightDirectionalLightIntensity';
 import RelightLightDirection from './RelightLightDirection';
 import RelightLightControls from './RelightLightControls';
 import RelightToolMenu from './RelightToolMenu';
@@ -27,24 +29,7 @@ class Relight extends React.Component {
       visible: false,
       loaded: false,
       loadHandlerAdded: false,
-      zoomLevel: 0,
-      zoom: 0,
-      mouseX: 50,
-      mouseY: 50,
-      lightX: 0,
-      lightY: 0,
-      directionalIntensity: 1,
-      ambientIntensity: 0.1,
-      rendererInstructions: {
-        intersection: {
-          width: 0,
-          height: 0,
-          x: 0,
-          y: 0,
-        },
-      },
-      images: {},
-      tileLevel: 0,
+      threeCanvasProps: {},
     };
     this.threeCanvasProps = {};
     this.mouseDown = false;
@@ -52,7 +37,7 @@ class Relight extends React.Component {
     this.mouseY = 0;
     this.lightX = 0;
     this.lightY = 0;
-    this.directionalIntensity = 1;
+    this.directionalIntensity = 1.0;
     this.ambientIntensity = 0.1;
     this.images = {};
     this.tileSets = {};
@@ -81,12 +66,16 @@ class Relight extends React.Component {
         `%, #ffffff, #000000)`;
       this.lightX = (this.mouseX / 100) * 2 - 1;
       this.lightY = (this.mouseY / 100) * 2 - 1;
+      this.threeCanvasProps.mouseX = this.mouseX;
+      this.threeCanvasProps.mouseY = this.mouseY;
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
-      this.setState({ mouseX: this.mouseX });
-      this.setState({ mouseY: this.mouseY });
-      this.setState({ lightX: this.threeCanvasProps.lightX });
-      this.setState({ lightY: this.threeCanvasProps.lightY });
+      // this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
+      // this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
+
+      this.setState({
+        threeCanvasProps: this.threeCanvasProps,
+      });
     }
   }
 
@@ -103,15 +92,17 @@ class Relight extends React.Component {
   }
 
   onDirectionalLightChange(event, value) {
-    this.directionalIntensity = value;
-    this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
-    this.setState({ directionalIntensity: value });
+    this.threeCanvasProps.directionalIntensity = value;
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
   }
 
   onAmbientLightChange(event, value) {
-    this.ambientIntensity = value;
-    this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
-    this.setState({ ambientIntensity: value });
+    this.threeCanvasProps.ambientIntensity = value;
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
   }
 
   menuHandler() {
@@ -119,23 +110,16 @@ class Relight extends React.Component {
   }
 
   resetHandler() {
-    this.mouseX = 50;
-    this.mouseY = 50;
-    this.lightX = 0;
-    this.lightY = 0;
-    this.ambientIntensity = 0.1;
-    this.directionalIntensity = 1;
-    this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
-    this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
-    this.threeCanvasProps.lightX = this.lightX;
-    this.threeCanvasProps.lightY = this.lightY;
+    this.threeCanvasProps.ambientIntensity = 0.1;
+    this.threeCanvasProps.directionalIntensity = 1.0;
+    this.threeCanvasProps.lightX = 0;
+    this.threeCanvasProps.lightY = 0;
+    this.threeCanvasProps.mouseX = 50;
+    this.threeCanvasProps.mouseY = 50;
 
-    this.setState({ mouseX: this.mouseX });
-    this.setState({ mouseY: this.mouseY });
-    this.setState({ lightX: this.lightX });
-    this.setState({ lightY: this.lightY });
-    this.setState({ ambientIntensity: this.ambientIntensity });
-    this.setState({ directionalIntensity: this.directionalIntensity });
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
   }
 
   initialiseThreeCanvasProps() {
@@ -192,6 +176,8 @@ class Relight extends React.Component {
       const mapType = layers[key].trim();
 
       if (excluded_maps.includes(mapType)) {
+        // todo: if normalmap and albedo are off turn them on again!
+
         const payload = {
           [key]: { visibility: value },
         };
@@ -228,11 +214,6 @@ class Relight extends React.Component {
         this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
 
-      // uncomment code below to enable debug mode in OpenSeaDragon
-      // for (var i = 0; i < this.props.viewer.world.getItemCount(); i++) {
-      //     this.props.viewer.world.getItemAt(i).debugMode = true;
-      // }
-
       // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
       // glitch and not re-render until we cause the viewport-change event to trigger
       this.props.viewer.forceRedraw();
@@ -240,23 +221,17 @@ class Relight extends React.Component {
         // call update threeCanvasrops
         this.updateThreeCanvasProps();
 
-        this.setState({ zoom: this.threeCanvasProps.zoom });
         this.setState({
-          rendererInstructions: this.threeCanvasProps.rendererInstructions,
+          threeCanvasProps: this.threeCanvasProps,
         });
-        this.setState({
-          directionalIntensity: this.threeCanvasProps.directionalIntensity,
-        });
+
         this.overlay.update(
           this.threeCanvasProps.rendererInstructions.intersectionTopLeft
         );
-        this.setState({ images: this.threeCanvasProps.images });
-        this.setState({ tileLevel: this.threeCanvasProps.tileLevel });
       });
 
       this.props.viewer.addHandler('close', () => {
-        this.setState({ active: false });
-        this.setState({ visible: false });
+        this.setState({ active: false, visible: false });
         // remove all handlers so viewport-change isn't activated!
         this.props.viewer.removeAllHandlers('viewport-change');
       });
@@ -274,25 +249,12 @@ class Relight extends React.Component {
   // a rerender
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      prevState.zoom !== this.threeCanvasProps.zoom ||
-      prevState.rendererInstructions.intersection !==
-        this.threeCanvasProps.rendererInstructions.intersection ||
-      prevState.active !== this.state.active ||
-      prevState.lightX !== this.threeCanvasProps.lightX ||
-      prevState.lightY !== this.threeCanvasProps.lightY ||
-      prevState.directionalIntensity !== this.state.directionalIntensity ||
-      prevState.ambientIntensity !== this.state.ambientIntensity ||
-      prevState.tileLevel !== this.threeCanvasProps.tileLevel ||
-      prevState.images !== this.threeCanvasProps.images
-    ) {
-      this.state.active
-        ? ReactDOM.render(
-            <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
-            this.threeCanvas
-          )
-        : null;
-    }
+    this.state.active
+      ? ReactDOM.render(
+          <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
+          this.threeCanvas
+        )
+      : null;
   }
 
   render() {
@@ -350,7 +312,10 @@ class Relight extends React.Component {
             // only keep tile textures we are interested in
             this.images[key] = tileTexture;
             this.threeCanvasProps.images = this.images;
-            this.setState({ images: this.threeCanvasProps.images });
+
+            this.setState({
+              threeCanvasProps: this.threeCanvasProps,
+            });
           }
         });
       }
@@ -379,27 +344,26 @@ class Relight extends React.Component {
             <RelightLightDirection
               id={'LightDirectionControl'}
               tooltipTitle={'Change Light Direction'}
-              mouseX={this.state.mouseX}
-              mouseY={this.state.mouseY}
+              mouseX={this.state.threeCanvasProps.mouseX}
+              mouseY={this.state.threeCanvasProps.mouseY}
               onMouseMove={(event) => this.onMouseMove(event)}
               onMouseDown={(event) => this.onMouseDown(event)}
               onMouseUp={(event) => this.onMouseUp(event)}
               onMouseLeave={(event) => this.onMouseLeave(event)}
               onTouchMove={(event) => this.onMouseMove(event)}
             />
-            <RelightLightIntensity
+            <RelightDirectionalLightIntensity
               id={'DirectionalLightIntensity'}
               tooltipTitle={'Change Directional Light Intensity'}
-              intensity={this.state.directionalIntensity}
+              intensity={this.state.threeCanvasProps.directionalIntensity}
               onChange={(event, value) =>
                 this.onDirectionalLightChange(event, value)
               }
             />
-            <RelightLightIntensity
+            <RelightAmbientLightIntensity
               id={'AmbientLightIntensity'}
-              min={0}
               tooltipTitle={'Change Ambient Light Intensity'}
-              intensity={this.state.ambientIntensity}
+              intensity={this.state.threeCanvasProps.ambientIntensity}
               onChange={(event, value) =>
                 this.onAmbientLightChange(event, value)
               }
