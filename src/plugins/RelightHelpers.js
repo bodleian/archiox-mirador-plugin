@@ -77,7 +77,7 @@ export function _parseTiles(data, type) {
 /**
  * Loops through an array of objects to return an array of values from a specified property
  * @param {string} property name of property to get values for
- * @param {array} data array of objects containing key: value pairs
+ * @param {object} data array of objects containing key: value pairs
  * @returns {null|*} null if tiles is not an array or the requested property does not exist | array containing the
  *    values of the requested property e.g. a list of url properties from every object in the array
  */
