@@ -138,7 +138,7 @@ class Relight extends React.Component {
     this.setState({ directionalIntensity: this.directionalIntensity });
   }
 
-  updateThreeCanvasProps() {
+  initialiseThreeCanvasProps() {
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps = {};
     this.threeCanvasProps.contentWidth =
@@ -170,6 +170,17 @@ class Relight extends React.Component {
     );
     this.threeCanvasProps.images = this.images;
     this.threeCanvasProps.tileSets = this.tileSets;
+  }
+  updateThreeCanvasProps() {
+    const zoom_level = this.props.viewer.viewport.getZoom(true);
+    this.threeCanvasProps.rendererInstructions = getRendererInstructions(
+      this.props
+    );
+    this.threeCanvasProps.zoom = this.props.viewer.world
+      .getItemAt(0)
+      .viewportToImageZoom(zoom_level);
+    this.threeCanvasProps.tileLevel = this.tileLevel;
+    this.threeCanvasProps.images = this.images;
   }
 
   updateLayer(excluded_maps, canvas_id, layers, value) {
@@ -206,7 +217,7 @@ class Relight extends React.Component {
       this.props.viewer.removeAllHandlers('viewport-change');
     } else {
       // call update threeCanasProps
-      this.updateThreeCanvasProps();
+      this.initialiseThreeCanvasProps();
 
       this.threeCanvas = document.createElement('div');
       this.threeCanvas.id = 'three-canvas';
