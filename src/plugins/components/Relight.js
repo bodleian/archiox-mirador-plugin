@@ -19,6 +19,9 @@ import RelightTorchButton from './RelightTorchButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
 
+/**
+ * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
+ * */
 class Relight extends React.Component {
   constructor(props) {
     super(props);
@@ -42,6 +45,12 @@ class Relight extends React.Component {
     this.tileSets = {};
     this.tileLevels = {};
   }
+  /**
+   * The onMouseMove method tracks the mouse coordinates over the RelightLightDirectionControl component to allow the
+   * style of the component to change and indicate to the user which direction the light should be shining from.
+   * The threeCanvasProps are updated in state to cause a re-render each time the mouse is moved whilst the button
+   * is pressed over the component, this updates the props passed to the Three canvas.
+   * */
   onMouseMove(event) {
     const control = document.getElementById('LightDirectionControl');
     const boundingBox = control.getBoundingClientRect();
@@ -78,18 +87,36 @@ class Relight extends React.Component {
     }
   }
 
+  /**
+   * The onMouseDown method sets the class variable `mouseDown` to true when the mouse button is held down over its
+   * target component.
+   */
   onMouseDown() {
     this.mouseDown = true;
   }
 
+  /**
+   * The onMouseUp method sets the class variable `mouseDown` to false when the mouse button is let go over its
+   * target component.
+   */
   onMouseUp() {
     this.mouseDown = false;
   }
 
+  /**
+   * The onMouseLeave method sets the class variable `mouseDown` to false when the mouse button leaves its target
+   * component.
+   */
   onMouseLeave() {
     this.mouseDown = false;
   }
 
+  /**
+   * The onDirectionalLightChange method updates the directionalIntensity threeCanvasProp in state when the target
+   * component is changed, causing a re-render and updating the props sent to the Three canvas.
+   * @param {event} event event being emitted by the RelightDirectionalLightChange component.
+   * @param {number} value new lightIntensity value from the component to add to state.
+   */
   onDirectionalLightChange(event, value) {
     this.threeCanvasProps.directionalIntensity = value;
     this.setState({
@@ -97,6 +124,12 @@ class Relight extends React.Component {
     });
   }
 
+  /**
+   * The onAmbientLightChange method updates the ambientIntensity threeCanvasProp in state when the target
+   * component is changed, causing a re-render and updating the props sent to the Three canvas.
+   * @param {event} event event being emitted by the RelightAmbientLightChange component.
+   * @param {number} value new lightIntensity value from the component to add to state.
+   */
   onAmbientLightChange(event, value) {
     this.threeCanvasProps.ambientIntensity = value;
     this.setState({
@@ -104,10 +137,18 @@ class Relight extends React.Component {
     });
   }
 
+  /**
+   * The menuHandler method updates open in state to keep track of if the Mirador sidebar is expanded or contracted.
+   */
   menuHandler() {
     this.setState((prevState) => ({ open: !prevState.open }));
   }
 
+  /**
+   * The resetHandler method resets the values of the light control components when the RelightResetLights component
+   * is pressed.  It updates the threeCanvasProps to state causing a re-render; the appearance and values of the light
+   * controls to return to their default values; and the light positions and intensities in the Three canvas to reset.
+   */
   resetHandler() {
     this.threeCanvasProps.ambientIntensity = 0.1;
     this.threeCanvasProps.directionalIntensity = 1.0;
@@ -121,6 +162,12 @@ class Relight extends React.Component {
     });
   }
 
+  /**
+   * The initialiseThreeCanvasProps method sets the threeCanvasProps object with the current lighting positions,
+   * zoom level, tile levels, image intersection dimensions, and maps so that the Three canvas overlay has everything
+   * is need to start rendering.  It will capture the current values of the light positions and intensities even if the
+   * overlay is currently switched off.
+   */
   initialiseThreeCanvasProps() {
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps = {};
@@ -154,6 +201,11 @@ class Relight extends React.Component {
     this.threeCanvasProps.images = this.images;
     this.threeCanvasProps.tileSets = this.tileSets;
   }
+
+  /**
+   * The updateThreeCanvasProps method is used by the viewport-change event handler to keep the overlay dimensions and
+   * Three camera view in sync with OpenSeaDragon and make sure the updated Three textures are sent to Three canvas.
+   */
   updateThreeCanvasProps() {
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
@@ -166,6 +218,16 @@ class Relight extends React.Component {
     this.threeCanvasProps.images = this.images;
   }
 
+  /**
+   * The updateLayer method is used to turn on or off any set of layers present in the viewer that you want to,
+   * it can be used to turn off a set of or a singular layer by specifying the layer mapTypes in excluded_maps
+   * and providing a list of the layers currently in the viewer.  You can send a boolean value to turn these on
+   * or off, which means you can toggle the state of a control e.g. active: false or true to control this too.
+   * @param {array} excluded_maps an array containing the mapTypes you wish to toggle visibility on
+   * @param {string} canvas_id the id of the current canvas in the viewer
+   * @param {object} layers an object containing all the layer ids (urls) in viewer
+   * @param {bool} value a boolean value indicating whether you want the excluded layers on or off
+   */
   updateLayer(excluded_maps, canvas_id, layers, value) {
     const _props = this.props,
       updateLayers = _props.updateLayers,
@@ -185,10 +247,16 @@ class Relight extends React.Component {
     });
   }
 
+  /**
+   * The torchHandler method is used to update the active state of the RelightTorchButton component; initialise and
+   * update the threeCanvasProps, track changes to the OpenSeaDragon viewer and add or remove the Three canvas overlay
+   * to the view port.
+   */
   torchHandler() {
-    // only turn the composite image back on
+    // toggle the active state of the torchButton
     this.setState((prevState) => ({ active: !prevState.active }));
 
+    // only turn the composite image back on
     this.excluded_maps = ['composite'];
     this.updateLayer(
       this.excluded_maps,
@@ -203,12 +271,12 @@ class Relight extends React.Component {
     } else {
       // here we populate the required props for the Three canvas
       this.initialiseThreeCanvasProps();
-
+      // create the overlay html element and add in the Three canvas component
       this.threeCanvas = document.createElement('div');
       this.threeCanvas.id = 'three-canvas';
       this.props.viewer.addOverlay(this.threeCanvas);
       this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
-
+      // this tells the overlay where to begin in terms of x, y coordinates
       this.overlay.update(
         this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
@@ -216,26 +284,27 @@ class Relight extends React.Component {
       // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
       // glitch and not re-render until we cause the viewport-change event to trigger
       this.props.viewer.forceRedraw();
+      // add a custom event handler that listens for emission of the OpenSeaDragon viewport-change event
       this.props.viewer.addHandler('viewport-change', () => {
         // here we update a selection of the props for the Three canvas
         this.updateThreeCanvasProps();
-
+        // update the threeCanvasProps state to cause a re-render and update the overlay
         this.setState({
           threeCanvasProps: this.threeCanvasProps,
         });
-
+        // this tells the overlay where to begin in terms of x, y coordinates
         this.overlay.update(
           this.threeCanvasProps.rendererInstructions.intersectionTopLeft
         );
       });
-
+      // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
       this.props.viewer.addHandler('close', () => {
         this.setState({ active: false, visible: false });
         // remove all handlers so viewport-change isn't activated!
         this.props.viewer.removeAllHandlers('viewport-change');
       });
     }
-    // this will need replacing because I think that ReacDOM.render has been depricated
+    // if the torchButton state is active render the overlay over OpenSeaDragon
     !this.state.active
       ? ReactDOM.render(
           <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
@@ -244,8 +313,15 @@ class Relight extends React.Component {
       : ReactDOM.unmountComponentAtNode(this.threeCanvas);
   }
 
-  // this keeps track of values stored in state and compares them to the current values, if any of them change it causes
-  // a rerender
+  /**
+   * The compentDidUpdate method is a standard React class method that we use here to re-render the overlay if there is
+   * ever and update of state.
+   * @param prevProps the previous props sent to the Relight component
+   * @param prevState the previous state set in the Relight component
+   * @param snapshot a snapshot of the component before the next render cycle, you can use the React class method
+   * getSnapShotBeforeUpdate to create this
+   */
+  //  track of values stored in state and if they change if runs
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.state.active
@@ -256,6 +332,11 @@ class Relight extends React.Component {
       : null;
   }
 
+  /**
+   * Render the Relight component and all it's children, here we have a custom OpenSeaDragon event handler that allows
+   * use to capture the tile images and make textures from them
+   * @returns {JSX.Element}
+   */
   render() {
     if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
       this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
@@ -286,13 +367,13 @@ class Relight extends React.Component {
         this.layers = getLayers(this.props.canvas.iiifImageResources);
         this.canvasID = this.props.canvas.id;
 
-        this.updateLayer(this.excluded_maps, this.canvasID, this.layers);
+        this.updateLayer(this.excluded_maps, this.canvasID, this.layers, false);
 
         this.props.viewer.addHandler('tile-drawn', (event) => {
           this.tileLevels[event.tile.level] = event.tile.level;
           this.tileLevel = event.tile.level;
         });
-
+        // this is where the tile loading magic happens with a custom event handler
         this.props.viewer.addHandler('tile-loaded', (event) => {
           this.setState({ loadHandlerAdded: true });
           const sourceKey = event.image.currentSrc.split('/')[5];
@@ -337,7 +418,7 @@ class Relight extends React.Component {
               onClick={() => this.torchHandler()}
               active={this.state.active}
             />
-            <RelightResetLightPositions onClick={() => this.resetHandler()} />
+            <RelightResetLights onClick={() => this.resetHandler()} />
           </RelightLightButtons>
           <RelightLightControls>
             <RelightLightDirection
