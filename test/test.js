@@ -1,5 +1,8 @@
 import * as _ from 'lodash';
-import { _getProperty, _parseTiles } from '../src/plugins/RelightHelpers';
+import {
+  _getProperty,
+  _parseTiles,
+} from '../src/plugins/utilities/RelightHelpers';
 
 const expect = require('expect.js');
 

@@ -1,4 +1,4 @@
-import Relight from './Relight';
+import Relight from 'components/Relight';
 import { getCurrentCanvas } from 'mirador/dist/es/src/state/selectors';
 import { getWindow } from 'mirador/dist/es/src/state/selectors';
 

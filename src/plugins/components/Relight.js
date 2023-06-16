@@ -7,13 +7,13 @@ import {
   getMap,
   getRendererInstructions,
   getTileSets,
-} from './RelightHelpers';
+} from '../utilities/RelightHelpers';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
 import RelightDirectionalLightIntensity from './RelightDirectionalLightIntensity';
 import RelightLightDirection from './RelightLightDirection';
 import RelightLightControls from './RelightLightControls';
 import RelightToolMenu from './RelightToolMenu';
-import RelightResetLightPositions from './RelightResetLightPositions';
+import RelightResetLights from './RelightResetLights';
 import RelightLightButtons from './RelightLightButtons';
 import RelightTorchButton from './RelightTorchButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
