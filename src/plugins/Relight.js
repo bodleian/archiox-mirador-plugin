@@ -201,7 +201,7 @@ class Relight extends React.Component {
       this.props.viewer.removeOverlay(this.threeCanvas);
       this.props.viewer.removeAllHandlers('viewport-change');
     } else {
-      // call update threeCanvasProps
+      // here we populate the required props for the Three canvas
       this.initialiseThreeCanvasProps();
 
       this.threeCanvas = document.createElement('div');
@@ -217,7 +217,7 @@ class Relight extends React.Component {
       // glitch and not re-render until we cause the viewport-change event to trigger
       this.props.viewer.forceRedraw();
       this.props.viewer.addHandler('viewport-change', () => {
-        // call update threeCanvasProps
+        // here we update a selection of the props for the Three canvas
         this.updateThreeCanvasProps();
 
         this.setState({
