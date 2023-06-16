@@ -3,7 +3,7 @@ import ReplaySharpIcon from '@material-ui/icons/ReplaySharp';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
-class RelightResetLightPositions extends React.Component {
+class RelightResetLights extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -25,8 +25,8 @@ class RelightResetLightPositions extends React.Component {
   }
 }
 
-RelightResetLightPositions.propTypes = {
+RelightResetLights.propTypes = {
   onClick: PropTypes.func.isRequired,
 };
 
-export default RelightResetLightPositions;
+export default RelightResetLights;
