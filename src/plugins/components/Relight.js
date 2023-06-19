@@ -21,6 +21,7 @@ import RelightMenuButton from './RelightMenuButton';
 
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
+ * It is composed of a group of buttons and a group of controls that make up the relighting plug-in.
  * */
 class Relight extends React.Component {
   constructor(props) {
@@ -226,7 +227,7 @@ class Relight extends React.Component {
    * @param {array} excluded_maps an array containing the mapTypes you wish to toggle visibility on
    * @param {string} canvas_id the id of the current canvas in the viewer
    * @param {object} layers an object containing all the layer ids (urls) in viewer
-   * @param {bool} value a boolean value indicating whether you want the excluded layers on or off
+   * @param {boolean} value a boolean value indicating whether you want the excluded layers on or off
    */
   updateLayer(excluded_maps, canvas_id, layers, value) {
     const _props = this.props,
@@ -314,8 +315,9 @@ class Relight extends React.Component {
   }
 
   /**
-   * The compentDidUpdate method is a standard React class method that we use here to re-render the overlay if there is
-   * ever and update of state.
+   * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
+   * props are updated.  Here we used it to re-render the overlay if there is a change in state detected.
+   * ever an update of state.  Here we use it to keep th
    * @param prevProps the previous props sent to the Relight component
    * @param prevState the previous state set in the Relight component
    * @param snapshot a snapshot of the component before the next render cycle, you can use the React class method
@@ -334,14 +336,17 @@ class Relight extends React.Component {
 
   /**
    * Render the Relight component and all it's children, here we have a custom OpenSeaDragon event handler that allows
-   * use to capture the tile images and make textures from them
+   * us to capture the tile images and make textures from them.
    * @returns {JSX.Element}
    */
   render() {
+    // if the canvas object is available then grab define the albedo and normal maps and set them to state
     if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
       this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
       this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
 
+      // if albedo or normal maps are not present set visible state to false, this will prevent the plug-in from
+      // rendering at all, which is what we want.
       if (
         typeof this.albedoMap !== 'undefined' &&
         typeof this.normalMap !== 'undefined' &&
@@ -355,11 +360,14 @@ class Relight extends React.Component {
       }
     }
 
+    // if the viewer object, albedoMap and normalMap URLs are not available, do not render
     if (
       this.props.viewer &&
       typeof this.albedoMap !== 'undefined' &&
       typeof this.normalMap !== 'undefined'
     ) {
+      // if the loaded in state is false and the loadHandlerAdded state is false then add the tile-loaded event
+      // handler, and update state this prevents the handler being added each time there is a re-render
       if (!this.state.loaded && !this.state.loadHandlerAdded) {
         this.setState({ loaded: true });
 
@@ -369,11 +377,14 @@ class Relight extends React.Component {
 
         this.updateLayer(this.excluded_maps, this.canvasID, this.layers, false);
 
+        // add an event handler to keep track of the tile levels being drawn, no point getting all of them
         this.props.viewer.addHandler('tile-drawn', (event) => {
           this.tileLevels[event.tile.level] = event.tile.level;
           this.tileLevel = event.tile.level;
         });
-        // this is where the tile loading magic happens with a custom event handler
+
+        // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
+        // reused and sent to the Three canvas.
         this.props.viewer.addHandler('tile-loaded', (event) => {
           this.setState({ loadHandlerAdded: true });
           const sourceKey = event.image.currentSrc.split('/')[5];
@@ -472,12 +483,19 @@ class Relight extends React.Component {
 }
 
 Relight.propTypes = {
+  /** The onClick prop is a method passed to clickable child components to handle the click event **/
   onClick: PropTypes.func.isRequired,
+  /** The ambientIntensity prop is the intensity level currently set for the ambient light source **/
   ambientIntensity: PropTypes.number.isRequired,
+  /** The updateLayers prop is the Mirador updateLayers action to be able to set the state of layer objects **/
   updateLayers: PropTypes.func.isRequired,
+  /** The windowId prop is the Mirador window ID of the current instance of Mirador **/
   windowId: PropTypes.number.isRequired,
+  /** The viewer prop is the OpenSeaDragon viewer instance in the current instance of Mirador **/
   viewer: PropTypes.object.isRequired,
+  /** The window prop is the Mirador window instance in the current instance of Mirador **/
   window: PropTypes.object.isRequired,
+  /** The canvas prop is the Mirador canvas instance in the current instance of Mirador **/
   canvas: PropTypes.object.isRequired,
 };
 
