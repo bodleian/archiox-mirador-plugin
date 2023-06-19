@@ -40,22 +40,9 @@ class RelightThreeCanvas extends React.Component {
     );
 
     this.camera.position.set(0, 0, 1);
-    this._camera_offset(this.camera, this.props);
 
-    // this is a cube to help with debugging
-    // this.cubeGeometry = new THREE.CircleGeometry(100, 100);
-    // this.cubeMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.5, depthTest: false});
-    // this.cube = new THREE.Mesh(this.cubeGeometry, this.cubeMaterial);
-    // this.cube.position.set(0, 0, 0);
-    // this.scene.add(this.cube);
-
-    // this is a grid to help with debugging
-    // this.divisions = 10;
-    // this.size = 40000;
-    // this.gridHelper = new THREE.GridHelper(this.size, this.divisions, 0xffffff, 0xffffff);
-    // this.gridHelper.rotation.x=Math.PI/2;
-    // this.gridHelper.position.set(0, 0, 0);
-    // this.scene.add(this.gridHelper);
+    // only show a part of the orthographic camera that matches the zoom and intersection of OpenSeaDragon
+    this._cameraOffset(this.camera, this.props);
 
     for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
       this.threeResources[i] = {};
@@ -64,7 +51,7 @@ class RelightThreeCanvas extends React.Component {
       this.threeResources[i]['meshes'] = {};
     }
 
-    // define a group so we can handle all the tiles together
+    // define a group so that we can handle all the tiles together
     this.generateTiles();
 
     this.ambientLight = new THREE.AmbientLight(
@@ -83,7 +70,8 @@ class RelightThreeCanvas extends React.Component {
     this.scene.add(this.ambientLight);
   }
 
-  _camera_offset(camera, props) {
+  /**
+  _cameraOffset(camera, props) {
     camera.setViewOffset(
       props.contentWidth * props.zoom,
       props.contentHeight * props.zoom,
@@ -214,7 +202,7 @@ class RelightThreeCanvas extends React.Component {
       this.props.intersection.width * this.props.zoom,
       this.props.intersection.height * this.props.zoom
     );
-    this._camera_offset(this.camera, this.props);
+    this._cameraOffset(this.camera, this.props);
   }
 
   moveLight() {
