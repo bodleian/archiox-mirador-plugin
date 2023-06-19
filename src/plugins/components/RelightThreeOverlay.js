@@ -4,6 +4,12 @@ import React from 'react';
 import * as THREE from 'three';
 
 import PropTypes, { shape } from 'prop-types';
+
+/**
+ * The RelightThreeOverlay component is the parent component of the RelightThreeCanvas component.  It allows for us to
+ * simplify passing in a bunch of props to the Three canvas via the ReactDom.render() method which would otherwise be
+ * more difficult to read due to the high number of props being passed into it.
+ */
 class RelightThreeOverlay extends React.Component {
   constructor(props) {
     super(props);
@@ -47,6 +53,7 @@ class RelightThreeOverlay extends React.Component {
 }
 
 RelightThreeOverlay.propTypes = {
+  /** The threeCanvasProps object containing all the information we need to send to the Three canvas from Relight **/
   threeCanvasProps: shape({
     images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
     zoom: PropTypes.number.isRequired,
