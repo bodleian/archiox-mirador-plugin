@@ -7,7 +7,7 @@ import {
   getMap,
   getRendererInstructions,
   getTileSets,
-} from '../utilities/RelightHelpers';
+} from './RelightHelpers';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
 import RelightDirectionalLightIntensity from './RelightDirectionalLightIntensity';
 import RelightLightDirection from './RelightLightDirection';
