@@ -2,6 +2,13 @@ import React from 'react';
 import * as THREE from 'three';
 import PropTypes from 'prop-types';
 
+/**
+ * The RelightThreeCanvas component is a Three canvas object containing a scene with orthographic camera, ambient and
+ * directional lights, and a series of tiled planes rendering the albedo and normal texture tiles.  The scene will
+ * match the image intersection, zoom, and pan of the OpenSeaDragon viewer so that the rendered scene is directly
+ * overlaid.  Moving the mouse over the RelightLightDirection component will cause the directional light to change
+ * position in the Three scene and therefore change what is being seen in the render thanks to the normal mapping.
+ */
 class RelightThreeCanvas extends React.Component {
   constructor(props) {
     super(props);
@@ -71,6 +78,13 @@ class RelightThreeCanvas extends React.Component {
   }
 
   /**
+   * The _cameraOffset method uses the camera.setViewOffset method provided by Three to only show a part of the camera
+   * view by setting an offset in a larger frustum.  This allows us to fake moving things in the scene, when in fact
+   * the objects in the scene are static except for the directionalLight.
+   * @param {object} camera an object containing an instance of a Three camera.
+   * @param {object} props an object containing props passed to RelightThreeCanvas.
+   * @private
+   */
   _cameraOffset(camera, props) {
     camera.setViewOffset(
       props.contentWidth * props.zoom,
@@ -83,7 +97,8 @@ class RelightThreeCanvas extends React.Component {
   }
 
   /**
-   * Here we will update the textures of the pre-generated meshes, this gets called each time new textures are added
+   * The updateTextures method updates the textures of the pre-generated meshes, this gets called each time new
+   * textures are added.
    * @private
    */
   _updateTextures() {
@@ -123,9 +138,10 @@ class RelightThreeCanvas extends React.Component {
   }
 
   /**
-   * Here we generate all the geometry we will use in our scene, we pre-build all the geometries, materials, and
-   * meshes so they can be added or removed from the scene, updated when loading in more tiles, and removed when the
-   * component is unmounted.  This will only be run onece.  Another helper function will update the textures.
+   * The generateTiles method generates all the geometry we will use in our scene, we pre-build all the geometries,
+   * materials, and meshes so that they can be added or removed from the scene, updated when loading in more tiles, and
+   * removed when the component is unmounted.  This will only be run onece.  Another helper function will update the
+   * textures.
    */
   generateTiles() {
     for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
@@ -191,12 +207,19 @@ class RelightThreeCanvas extends React.Component {
     }
   }
 
+  /**
+   * The animate method requests the next animation frame from itself but updates the renderer and textures each frame.
+   */
   animate = () => {
     this.animate_req = requestAnimationFrame(this.animate);
     this.renderer.render(this.scene, this.camera);
     this._updateTextures();
   };
 
+  /**
+   * The rerender method resizes the WebGL renderer to follow the intersection and zoom props and changes the camera
+   * offsets to keep the OpenSeaDragon intersection matched to that of the Three canvas.
+   */
   rerender() {
     this.renderer.setSize(
       this.props.intersection.width * this.props.zoom,
@@ -205,6 +228,9 @@ class RelightThreeCanvas extends React.Component {
     this._cameraOffset(this.camera, this.props);
   }
 
+  /**
+   * The moveLight method updates the direction the directionalLight is pointing.
+   */
   moveLight() {
     let vector = new THREE.Vector3(this.props.lightX, this.props.lightY, 0);
     let dir = vector.sub(this.camera.position).normalize();
@@ -213,6 +239,11 @@ class RelightThreeCanvas extends React.Component {
     this.directionalLight.position.set(pos.x, pos.y, 1);
   }
 
+  /**
+   * The componentDidMount method is a standard React class method that is used to run other methods when the
+   * component is mounted.  Here we use it to apply the WebGL to the canvas-container html element and initiate
+   * animation.
+   */
   componentDidMount() {
     document
       .getElementById('canvas-container')
@@ -220,6 +251,15 @@ class RelightThreeCanvas extends React.Component {
     this.animate();
   }
 
+  /**
+   * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
+   * props are updated.  Here we use it to change the part of the tiled mesh being shown on screen, the tile level of
+   * the tile mesh,  and the light direction and intensities being used in the scene.
+   * @param prevProps the previous props sent to the Relight component
+   * @param prevState the previous state set in the Relight component
+   * @param snapshot a snapshot of the component before the next render cycle, you can use the React class method
+   * getSnapShotBeforeUpdate to create this
+   */
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
@@ -245,10 +285,19 @@ class RelightThreeCanvas extends React.Component {
     }
   }
 
+  /**
+   * The componentWillUnmount method is a standard React class method that we use here to call other methods when the
+   * component is unmounted.  Here we use it to cancel our animation when the RelightTorchButton is toggled off and
+   * the RelightThreeOverlay is removed.
+   */
   componentWillUnmount() {
     cancelAnimationFrame(this.animate_req);
   }
 
+  /**
+   * Render the RelightThreeCanvas component
+   * @returns {JSX.Element}
+   */
   render() {
     const container = {
       position: 'relative',
@@ -269,15 +318,25 @@ class RelightThreeCanvas extends React.Component {
 }
 
 RelightThreeCanvas.propTypes = {
+  /** The contentWidth prop is the total width of the OpenSeaDragon tiled image **/
   contentWidth: PropTypes.number.isRequired,
+  /** The contentHeight prop is the total height of the OpenSeaDragon tiled image **/
   contentHeight: PropTypes.number.isRequired,
+  /** The tileLevel prop is the current tile level that is being rendered in OpenSeaDragon **/
   tileLevel: PropTypes.number.isRequired,
+  /** The maxTileLevel prop is the maximum possible tile level achievable in the IIIF manifest **/
   maxTileLevel: PropTypes.number.isRequired,
+  /** The lightX prop is the mapping of mouseX over the RelightLightDirection component **/
   lightX: PropTypes.number.isRequired,
+  /** The lightY prop is the mapping of mouseY over the RelightLightDirection component **/
   lightY: PropTypes.number.isRequired,
+  /** The zoom prop is the current OpenSeaDragon zoom ratio **/
   zoom: PropTypes.number.isRequired,
+  /** The ambientIntensity prop is the current value set in the RelightAmbientLightIntensity control **/
   ambientIntensity: PropTypes.number.isRequired,
+  /** The directionalIntensity prop is the current value set in the RelightDirectionalLightIntensity control **/
   directionalIntensity: PropTypes.number.isRequired,
+  /** The intersection prop is the descriptor of the current OpenSeaDragon image intersection on screen **/
   intersection: PropTypes.shape({
     height: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
@@ -286,7 +345,9 @@ RelightThreeCanvas.propTypes = {
     topLeft: PropTypes.number.isRequired,
     bottomLeft: PropTypes.number.isRequired,
   }).isRequired,
+  /** The images prop is an array of all the required tile images that have been loaded from OpenSeaDragon **/
   images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
+  /** The tileSets prop is an array of all the albedo/normal tile levels, image tile dimensions, and tile image urls **/
   tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
 };
 
