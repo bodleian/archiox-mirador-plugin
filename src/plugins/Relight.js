@@ -257,7 +257,11 @@ class Relight extends React.Component {
     // toggle the active state of the torchButton
     this.setState((prevState) => ({ active: !prevState.active }));
 
-    // only turn the composite image back on
+    // always turn on albedo and normal regardless
+    this.excluded_maps = ['albedo', 'normal'];
+    this.updateLayer(this.excluded_maps, this.canvasID, this.layers, true);
+
+    // toggle on or off composite
     this.excluded_maps = ['composite'];
     this.updateLayer(
       this.excluded_maps,
