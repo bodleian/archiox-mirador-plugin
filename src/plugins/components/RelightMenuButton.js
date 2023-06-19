@@ -4,6 +4,10 @@ import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import PropTypes from 'prop-types';
 
+/**
+ * The RelightMenuButton component is the main plug-in button used to collapse or expand the RelightToolMenu component.
+ * The icon used by the component toggles with its open state.
+ */
 class RelightMenuButton extends React.Component {
   constructor(props) {
     super(props);
@@ -28,7 +32,9 @@ class RelightMenuButton extends React.Component {
 }
 
 RelightMenuButton.propTypes = {
+  /** The open prop tells the button to render as if the tool menu is expanded or closed **/
   open: PropTypes.bool.isRequired,
+  /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,
 };
 
