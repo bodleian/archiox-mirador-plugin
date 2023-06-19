@@ -6,6 +6,9 @@ import WbIncandescentOutlinedIcon from '@material-ui/icons/WbIncandescentOutline
 
 import PropTypes from 'prop-types';
 
+/** The RelightTorchButton component is a button that controls the adding or removal of the Three canvas overlay
+ * and so acts as an on/off switch for the relighting.  The icon used by the component toggles with its active state.
+ * **/
 class RelightTorchButton extends React.Component {
   constructor(props) {
     super(props);
@@ -28,7 +31,9 @@ class RelightTorchButton extends React.Component {
 }
 
 RelightTorchButton.propTypes = {
+  /** The open prop tells the button to render as if the Three canvas layer is active or not **/
   active: PropTypes.bool,
+  /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,
 };
 

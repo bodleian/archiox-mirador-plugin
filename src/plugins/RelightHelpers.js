@@ -127,7 +127,7 @@ export const getTiles = (mapURL, data, tilesIndex) => {
 /**
  * Parses IIIF annotationBodies to get an array of the layers, we get these ids so that we can toggle their visibility
  * @param {object} annotationBodies IIIF annotationBodies from Mirador
- * @returns {{}} an array of ids for all the lighting maps
+ * @returns {{}} an object containing the ids for all the lighting maps
  */
 export function getLayers(annotationBodies) {
   let layers = {};

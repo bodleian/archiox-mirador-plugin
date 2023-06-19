@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/** The RelightToolMenu is a wrapper for all the child components of the Relight component to simplify their
+ * positioning and insertion into Mirador **/
 class RelightToolMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -37,7 +39,9 @@ class RelightToolMenu extends React.Component {
 }
 
 RelightToolMenu.propTypes = {
+  /** The sideBarOpen prop tells the component to render more to the right if the sidebar is open or not **/
   sideBarOpen: PropTypes.bool,
+  /** The children prop carries all the props passed to the parent component **/
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
