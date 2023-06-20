@@ -36,6 +36,9 @@ class RelightThreeCanvas extends React.Component {
       this.state.height * this.state.zoom
     );
 
+    this.vertexShader = this.props.vertexShader;
+    this.fragmentShader = this.props.fragmentShader;
+
     // define an orthographic camera
     this.camera = new THREE.OrthographicCamera(
       this.props.contentWidth / -2,
@@ -75,6 +78,49 @@ class RelightThreeCanvas extends React.Component {
     this.scene.add(this.camera);
     this.scene.add(this.directionalLight);
     this.scene.add(this.ambientLight);
+  }
+
+  generateMaterial(albedo, normal) {
+    const uniforms = THREE.UniformsUtils.merge([
+      THREE.UniformsLib.lights,
+      {
+        iResolution: { value: new THREE.Vector2(1.0, 1.0) },
+        iTime: { type: 'f', value: 0.0 },
+
+        texDiffuse: { value: albedo },
+        texNormal: { value: normal },
+
+        useDiffuseTexture: { type: 'b', value: true },
+
+        lightPosition: { value: new THREE.Vector3(0.0, 0.0, 10.0).normalize() },
+        lightColor: { value: new THREE.Color(1, 1, 1) },
+
+        ambientColor: { value: new THREE.Color(1, 1, 1) },
+
+        lightDirection: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
+
+        material_param_1: { type: 'f', value: 32.0 }, // 1.00 - Range (0.0 - 40.0)
+        material_param_2: { type: 'f', value: 0.65 }, // 0.65 - Range (0.0 - 2.0)
+        material_param_3: { type: 'f', value: 0.5 }, // 0.50 - Range (0.0, 1.0)
+
+        material_param_4: { type: 'f', value: 1.0 }, // 0.50 - Range (0.0, 4.0)
+
+        param_2: { type: 'f', value: 0.95 },
+        param_3: { type: 'f', value: 0.19 },
+        param_4: { type: 'f', value: 0.025 },
+        param_5: { type: 'f', value: 5.0 },
+        param_6: { type: 'f', value: 0.001 },
+        param_7: { type: 'f', value: 5.0 },
+      },
+    ]);
+    return new THREE.ShaderMaterial({
+      uniforms: uniforms,
+      vertexShader: this.vertexShader,
+      fragmentShader: this.fragmentShader,
+      lights: true,
+      name: 'ARCHIOxCustomShader',
+      //blending: NoBlending
+    });
   }
 
   /**
@@ -123,7 +169,9 @@ class RelightThreeCanvas extends React.Component {
       this.threeResources[this.props.tileLevel]['materials'][
         this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
       ].needsUpdate = true;
-
+      this.threeResources[this.props.tileLevel]['materials'][
+        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+      ].uniforms.lightPosition.value = this.directionalLight.position;
       this.threeResources[this.props.tileLevel]['meshes'][
         this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
       ].visible = !(
@@ -158,14 +206,9 @@ class RelightThreeCanvas extends React.Component {
         if (albedoMap && normalMap) {
           albedoMap.needsUpdate = true;
           normalMap.needsUpdate = true;
-          plane_material = new THREE.MeshPhongMaterial({
-            map: albedoMap,
-            normalMap: normalMap,
-            flatShading: true,
-            normalScale: new THREE.Vector3(1, 1),
-          });
+          plane_material = this.generateMaterial(albedoMap, normalMap);
         } else {
-          plane_material = new THREE.MeshPhongMaterial();
+          plane_material = this.generateMaterial();
         }
         const x =
           this.props.tileSets[i].albedoTiles.tiles[j].x +
@@ -349,6 +392,10 @@ RelightThreeCanvas.propTypes = {
   images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
   /** The tileSets prop is an array of all the albedo/normal tile levels, image tile dimensions, and tile image urls **/
   tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
+  /** The fragmentShader prop is a string containing glsl shader code for a fragment shader **/
+  fragmentShader: PropTypes.string,
+  /** The vertexShader prop is a string containing glsl shader code for a vertex shader **/
+  vertexShader: PropTypes.string,
 };
 
 export default RelightThreeCanvas;

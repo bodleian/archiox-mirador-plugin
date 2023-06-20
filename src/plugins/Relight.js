@@ -7,6 +7,8 @@ import {
   getMap,
   getRendererInstructions,
   getTileSets,
+  fragmentShader,
+  vertexShader,
 } from './RelightHelpers';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
 import RelightDirectionalLightIntensity from './RelightDirectionalLightIntensity';
@@ -201,6 +203,8 @@ class Relight extends React.Component {
     );
     this.threeCanvasProps.images = this.images;
     this.threeCanvasProps.tileSets = this.tileSets;
+    this.threeCanvasProps.fragmentShader = fragmentShader;
+    this.threeCanvasProps.vertexShader = vertexShader;
   }
 
   /**

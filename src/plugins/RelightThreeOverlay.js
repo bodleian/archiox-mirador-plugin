@@ -30,6 +30,8 @@ class RelightThreeOverlay extends React.Component {
       maxTileLevel,
       tileSets,
       tileLevels,
+      fragmentShader,
+      vertexShader,
     } = this.props.threeCanvasProps;
     return (
       <RelightThreeCanvas
@@ -47,6 +49,8 @@ class RelightThreeOverlay extends React.Component {
         maxTileLevel={maxTileLevel}
         tileSets={tileSets}
         tileLevels={tileLevels}
+        fragmentShader={fragmentShader}
+        vertexShader={vertexShader}
       />
     );
   }
@@ -76,6 +80,8 @@ RelightThreeOverlay.propTypes = {
     maxTileLevel: PropTypes.number.isRequired,
     tileSets: PropTypes.arrayOf(PropTypes.any).isRequired, // might need to go into this in more detail as to what this is composed of
     tileLevels: PropTypes.arrayOf(PropTypes.number).isRequired,
+    fragmentShader: PropTypes.string,
+    vertexShader: PropTypes.string,
   }),
 };
 export default RelightThreeOverlay;
