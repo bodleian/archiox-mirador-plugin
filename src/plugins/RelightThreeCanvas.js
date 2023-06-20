@@ -32,8 +32,8 @@ class RelightThreeCanvas extends React.Component {
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer({ alpha: true });
     this.renderer.setSize(
-        this.state.width * this.state.zoom,
-        this.state.height * this.state.zoom
+      this.state.width * this.state.zoom,
+      this.state.height * this.state.zoom
     );
 
     this.vertexShader = this.props.vertexShader;
@@ -41,12 +41,12 @@ class RelightThreeCanvas extends React.Component {
 
     // define an orthographic camera
     this.camera = new THREE.OrthographicCamera(
-        this.props.contentWidth / -2,
-        this.props.contentWidth / 2,
-        this.props.contentHeight / 2,
-        this.props.contentHeight / -2,
-        -1,
-        1
+      this.props.contentWidth / -2,
+      this.props.contentWidth / 2,
+      this.props.contentHeight / 2,
+      this.props.contentHeight / -2,
+      -1,
+      1
     );
 
     this.camera.position.set(0, 0, 1);
@@ -65,12 +65,12 @@ class RelightThreeCanvas extends React.Component {
     this.generateTiles();
 
     this.ambientLight = new THREE.AmbientLight(
-        0xffffff,
-        this.state.ambientIntensity
+      0xffffff,
+      this.state.ambientIntensity
     );
     this.directionalLight = new THREE.DirectionalLight(
-        0xffffff,
-        this.state.directionalIntensity
+      0xffffff,
+      this.state.directionalIntensity
     );
     this.directionalLight.position.set(0, 0, 1);
     this.directionalLight.castShadow = true;
@@ -80,40 +80,38 @@ class RelightThreeCanvas extends React.Component {
     this.scene.add(this.ambientLight);
   }
 
-  generateMaterial(albedo, normal){
+  generateMaterial(albedo, normal) {
     const uniforms = THREE.UniformsUtils.merge([
       THREE.UniformsLib.lights,
       {
-        iResolution: {value: new THREE.Vector2(1.0, 1.0)},
-        iTime: {type: 'f', value: 0.0},
+        iResolution: { value: new THREE.Vector2(1.0, 1.0) },
+        iTime: { type: 'f', value: 0.0 },
 
-        texDiffuse: {value: albedo},
-        texNormal: {value: normal},
+        texDiffuse: { value: albedo },
+        texNormal: { value: normal },
 
-        useDiffuseTexture: {type: 'b', value: true},
+        useDiffuseTexture: { type: 'b', value: true },
 
-        lightPosition: {value: new THREE.Vector3(0.0, 0.0, 10.0).normalize()},
-        lightColor: {value: new THREE.Color(1, 1, 1)},
+        lightPosition: { value: new THREE.Vector3(0.0, 0.0, 10.0).normalize() },
+        lightColor: { value: new THREE.Color(1, 1, 1) },
 
+        ambientColor: { value: new THREE.Color(1, 1, 1) },
 
-        ambientColor: {value: new THREE.Color(1, 1, 1)},
+        lightDirection: { value: new THREE.Vector3(0.0, 0.0, 1.0).normalize() },
 
-        lightDirection: {value: new THREE.Vector3(0.0, 0.0, 1.0).normalize()},
+        material_param_1: { type: 'f', value: 32.0 }, // 1.00 - Range (0.0 - 40.0)
+        material_param_2: { type: 'f', value: 0.65 }, // 0.65 - Range (0.0 - 2.0)
+        material_param_3: { type: 'f', value: 0.5 }, // 0.50 - Range (0.0, 1.0)
 
+        material_param_4: { type: 'f', value: 1.0 }, // 0.50 - Range (0.0, 4.0)
 
-        material_param_1: {type: 'f', value: 32.0},// 1.00 - Range (0.0 - 40.0)
-        material_param_2: {type: 'f', value: 0.65},// 0.65 - Range (0.0 - 2.0)
-        material_param_3: {type: 'f', value: 0.50},// 0.50 - Range (0.0, 1.0)
-
-        material_param_4: {type: 'f', value: 1.00},// 0.50 - Range (0.0, 4.0)
-
-        param_2: {type: 'f', value: 0.95},
-        param_3: {type: 'f', value: 0.19},
-        param_4: {type: 'f', value: 0.025},
-        param_5: {type: 'f', value: 5.0},
-        param_6: {type: 'f', value: 0.001},
-        param_7: {type: 'f', value: 5.0}
-      }
+        param_2: { type: 'f', value: 0.95 },
+        param_3: { type: 'f', value: 0.19 },
+        param_4: { type: 'f', value: 0.025 },
+        param_5: { type: 'f', value: 5.0 },
+        param_6: { type: 'f', value: 0.001 },
+        param_7: { type: 'f', value: 5.0 },
+      },
     ]);
     return new THREE.ShaderMaterial({
       uniforms: uniforms,
@@ -122,7 +120,7 @@ class RelightThreeCanvas extends React.Component {
       lights: true,
       name: 'ARCHIOxCustomShader',
       //blending: NoBlending
-    })
+    });
   }
 
   /**
@@ -135,12 +133,12 @@ class RelightThreeCanvas extends React.Component {
    */
   _cameraOffset(camera, props) {
     camera.setViewOffset(
-        props.contentWidth * props.zoom,
-        props.contentHeight * props.zoom,
-        props.intersection.x * props.zoom,
-        props.intersection.y * props.zoom,
-        props.intersection.width * props.zoom,
-        props.intersection.height * props.zoom
+      props.contentWidth * props.zoom,
+      props.contentHeight * props.zoom,
+      props.intersection.x * props.zoom,
+      props.intersection.y * props.zoom,
+      props.intersection.width * props.zoom,
+      props.intersection.height * props.zoom
     );
   }
 
@@ -150,39 +148,45 @@ class RelightThreeCanvas extends React.Component {
    * @private
    */
   _updateTextures() {
-    // loop through the materials and update with new textures
-    for (
-        let i = 0;
-        i < this.props.tileSets[this.props.tileLevel].albedoTiles.urls.length;
-        i++
-    ) {
-      // here we tell the uniforms to change their textures for that material
-      this.threeResources[this.props.tileLevel]['materials'][
+    // loop through the materials and update with new textures but only for the current tile level
+    const tileCount =
+      this.props.tileSets[this.props.tileLevel].albedoTiles.urls.length;
+
+    // adding the outer loop actually makes tiles load in faster because it covers tiles across multiple zoom levels
+    // loading in.
+    for (let z = 0; z < this.props.maxTileLevel; z++) {
+      for (let i = 0; i < tileCount; i++) {
+        // here we tell the uniforms to change their textures for that material
+        this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-          ].uniforms.texDiffuse.value =
+        ].uniforms.texDiffuse.value =
           this.props.images[
-              this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-              ] || null;
-      // here we tell the uniforms to change their textures for that material
-      this.threeResources[this.props.tileLevel]['materials'][
+            this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+          ] || null;
+
+        // here we tell the uniforms to change their textures for that material
+        this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-          ].uniforms.texNormal.value =
+        ].uniforms.texNormal.value =
           this.props.images[
-              this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]
-              ] || null;
-      this.threeResources[this.props.tileLevel]['materials'][
+            this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]
+          ] || null;
+
+        this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-          ].needsUpdate = true;
-      this.threeResources[this.props.tileLevel]['meshes'][
+        ].needsUpdate = true;
+
+        this.threeResources[this.props.tileLevel]['meshes'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-          ].visible = !(
+        ].visible = !(
           this.threeResources[this.props.tileLevel]['materials'][
-              this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-              ].map === null ||
+            this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+          ].uniforms.texDiffuse === null ||
           this.threeResources[this.props.tileLevel]['materials'][
-              this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-              ].normalMap === null
-      );
+            this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+          ].uniforms.texNormal === null
+        );
+      }
     }
   }
 
@@ -198,29 +202,29 @@ class RelightThreeCanvas extends React.Component {
 
       for (let j = 0; j < this.props.tileSets[i].albedoTiles.urls.length; j++) {
         const albedoMap =
-            this.props.images[this.props.tileSets[i].albedoTiles.urls[j]] || null;
+          this.props.images[this.props.tileSets[i].albedoTiles.urls[j]] || null;
         const normalMap =
-            this.props.images[this.props.tileSets[i].normalTiles.urls[j]] || null;
+          this.props.images[this.props.tileSets[i].normalTiles.urls[j]] || null;
 
         let plane_material;
 
         if (albedoMap && normalMap) {
           albedoMap.needsUpdate = true;
           normalMap.needsUpdate = true;
-          plane_material = this.generateMaterial(albedoMap, normalMap)
+          plane_material = this.generateMaterial(albedoMap, normalMap);
         } else {
           plane_material = this.generateMaterial();
         }
         const x =
-            this.props.tileSets[i].albedoTiles.tiles[j].x +
-            this.props.tileSets[i].albedoTiles.tiles[j].w / 2;
+          this.props.tileSets[i].albedoTiles.tiles[j].x +
+          this.props.tileSets[i].albedoTiles.tiles[j].w / 2;
         const y =
-            this.props.tileSets[i].albedoTiles.tiles[j].y +
-            this.props.tileSets[i].albedoTiles.tiles[j].h / 2;
+          this.props.tileSets[i].albedoTiles.tiles[j].y +
+          this.props.tileSets[i].albedoTiles.tiles[j].h / 2;
 
         const plane_geometry = new THREE.PlaneGeometry(
-            this.props.tileSets[i].albedoTiles.tiles[j].w,
-            this.props.tileSets[i].albedoTiles.tiles[j].h
+          this.props.tileSets[i].albedoTiles.tiles[j].w,
+          this.props.tileSets[i].albedoTiles.tiles[j].h
         );
 
         const mesh = new THREE.Mesh(plane_geometry, plane_material);
@@ -232,21 +236,21 @@ class RelightThreeCanvas extends React.Component {
 
         // store these items so we can dispose of them correctly later
         this.threeResources[i]['geometries'][
-            this.props.tileSets[i].albedoTiles.urls[j]
-            ] = plane_geometry;
+          this.props.tileSets[i].albedoTiles.urls[j]
+        ] = plane_geometry;
         this.threeResources[i]['materials'][
-            this.props.tileSets[i].albedoTiles.urls[j]
-            ] = plane_material;
+          this.props.tileSets[i].albedoTiles.urls[j]
+        ] = plane_material;
         this.threeResources[i]['meshes'][
-            this.props.tileSets[i].albedoTiles.urls[j]
-            ] = mesh;
+          this.props.tileSets[i].albedoTiles.urls[j]
+        ] = mesh;
         this.groups[i].add(mesh);
       }
 
       new THREE.Box3()
-          .setFromObject(this.groups[i])
-          .getCenter(this.groups[i].position)
-          .multiplyScalar(-1);
+        .setFromObject(this.groups[i])
+        .getCenter(this.groups[i].position)
+        .multiplyScalar(-1);
       this.scene.add(this.groups[i]);
     }
   }
@@ -266,8 +270,8 @@ class RelightThreeCanvas extends React.Component {
    */
   rerender() {
     this.renderer.setSize(
-        this.props.intersection.width * this.props.zoom,
-        this.props.intersection.height * this.props.zoom
+      this.props.intersection.width * this.props.zoom,
+      this.props.intersection.height * this.props.zoom
     );
     this._cameraOffset(this.camera, this.props);
   }
@@ -290,8 +294,8 @@ class RelightThreeCanvas extends React.Component {
    */
   componentDidMount() {
     document
-        .getElementById('canvas-container')
-        .appendChild(this.renderer.domElement);
+      .getElementById('canvas-container')
+      .appendChild(this.renderer.domElement);
     this.animate();
   }
 
@@ -307,19 +311,19 @@ class RelightThreeCanvas extends React.Component {
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (
-        prevProps.tileLevel !== this.props.tileLevel ||
-        prevProps.images.length !== this.props.images.length
+      prevProps.tileLevel !== this.props.tileLevel ||
+      prevProps.images.length !== this.props.images.length
     ) {
       this.groups[this.props.tileLevel].visible = true;
     }
 
     if (
-        prevProps.zoom !== this.props.zoom ||
-        prevProps.intersection !== this.props.intersection ||
-        prevProps.lightX !== this.props.lightX ||
-        prevProps.lightY !== this.props.lightY ||
-        prevProps.directionalIntensity !== this.props.directionalIntensity ||
-        prevProps.ambientIntensity !== this.props.ambientIntensity
+      prevProps.zoom !== this.props.zoom ||
+      prevProps.intersection !== this.props.intersection ||
+      prevProps.lightX !== this.props.lightX ||
+      prevProps.lightY !== this.props.lightY ||
+      prevProps.directionalIntensity !== this.props.directionalIntensity ||
+      prevProps.ambientIntensity !== this.props.ambientIntensity
     ) {
       this.ambientLight.intensity = this.props.ambientIntensity;
       this.directionalLight.intensity = this.props.directionalIntensity;
@@ -354,9 +358,9 @@ class RelightThreeCanvas extends React.Component {
       left: '0',
     };
     return (
-        <div id="container" style={container}>
-          <div id="canvas-container" style={canvas} />
-        </div>
+      <div id="container" style={container}>
+        <div id="canvas-container" style={canvas} />
+      </div>
     );
   }
 }
