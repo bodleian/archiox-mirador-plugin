@@ -291,7 +291,7 @@ void main() {
     vUv = uv;
     vViewPosition = -vertexPositionCameraSpace.xyz;
 }
-`
+`;
 
 export const fragmentShader = `// -----------------------------------------------------------------------------------------------------------------------------
 // Built-in uniforms and attributes
@@ -486,4 +486,4 @@ void main() {
     vec3 d = Kd * lambertian * diffuseColor;
     vec3 s = Ks * specular * specularColor;
 */
-`
+`;
