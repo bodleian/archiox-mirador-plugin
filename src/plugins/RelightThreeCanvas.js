@@ -27,7 +27,6 @@ class RelightThreeCanvas extends React.Component {
       topLeft: this.props.intersection.topLeft,
       bottomLeft: this.props.intersection.bottomLeft,
     };
-    this.lightDirection = new THREE.Vector3(0.0);
     this.threeResources = {};
     this.groups = {};
     this.scene = new THREE.Scene();
@@ -157,23 +156,23 @@ class RelightThreeCanvas extends React.Component {
         i < this.props.tileSets[this.props.tileLevel].albedoTiles.urls.length;
         i++
     ) {
+      // here we tell the uniforms to change their textures for that material
       this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
           ].uniforms.texDiffuse.value =
           this.props.images[
               this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
               ] || null;
+      // here we tell the uniforms to change their textures for that material
       this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
           ].uniforms.texNormal.value =
           this.props.images[
               this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]
               ] || null;
-
       this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
           ].needsUpdate = true;
-
       this.threeResources[this.props.tileLevel]['meshes'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
           ].visible = !(
@@ -401,3 +400,8 @@ RelightThreeCanvas.propTypes = {
 };
 
 export default RelightThreeCanvas;
+
+// todo:
+//  * We need to add some way to change the lights in uniforms using the existing LightX, LightY values.
+//  * Shader code needs changing so that an empty shader is transparent rather than black, so that low res tiles
+//    can be seen.
