@@ -50,7 +50,6 @@ class RelightThreeCanvas extends React.Component {
     );
 
     this.camera.position.set(0, 0, 1);
-
     // only show a part of the orthographic camera that matches the zoom and intersection of OpenSeaDragon
     this._cameraOffset(this.camera, this.props);
 
@@ -154,38 +153,41 @@ class RelightThreeCanvas extends React.Component {
 
     // adding the outer loop actually makes tiles load in faster because it covers tiles across multiple zoom levels
     // loading in.
-    for (let z = 0; z < this.props.maxTileLevel; z++) {
-      for (let i = 0; i < tileCount; i++) {
-        // here we tell the uniforms to change their textures for that material
+    for (let i = 0; i < tileCount; i++) {
+      // here we tell the uniforms to change their textures for that material
+      this.threeResources[this.props.tileLevel]['materials'][
+        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+      ].uniforms.texDiffuse.value =
+        this.props.images[
+          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+        ] || null;
+
+      // here we tell the uniforms to change their textures for that material
+      this.threeResources[this.props.tileLevel]['materials'][
+        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+      ].uniforms.texNormal.value =
+        this.props.images[
+          this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]
+        ] || null;
+
+      this.threeResources[this.props.tileLevel]['materials'][
+        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+      ].needsUpdate = true;
+      if (
         this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].uniforms.texDiffuse.value =
-          this.props.images[
-            this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-          ] || null;
-
-        // here we tell the uniforms to change their textures for that material
+        ].uniforms.texDiffuse.value === null ||
         this.threeResources[this.props.tileLevel]['materials'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].uniforms.texNormal.value =
-          this.props.images[
-            this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]
-          ] || null;
-
-        this.threeResources[this.props.tileLevel]['materials'][
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].needsUpdate = true;
-
+        ].uniforms.texNormal.value === null
+      ) {
         this.threeResources[this.props.tileLevel]['meshes'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].visible = !(
-          this.threeResources[this.props.tileLevel]['materials'][
-            this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-          ].uniforms.texDiffuse === null ||
-          this.threeResources[this.props.tileLevel]['materials'][
-            this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-          ].uniforms.texNormal === null
-        );
+        ].visible = false;
+      } else {
+        this.threeResources[this.props.tileLevel]['meshes'][
+          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+        ].visible = true;
       }
     }
   }
@@ -213,7 +215,7 @@ class RelightThreeCanvas extends React.Component {
           normalMap.needsUpdate = true;
           plane_material = this.generateMaterial(albedoMap, normalMap);
         } else {
-          plane_material = this.generateMaterial();
+          plane_material = this.generateMaterial(null, null);
         }
         const x =
           this.props.tileSets[i].albedoTiles.tiles[j].x +
