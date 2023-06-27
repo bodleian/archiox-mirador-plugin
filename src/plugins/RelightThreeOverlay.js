@@ -26,7 +26,6 @@ class RelightThreeOverlay extends React.Component {
       directionalIntensity,
       ambientIntensity,
       tileLevel,
-      minTileLevel,
       maxTileLevel,
       tileSets,
       tileLevels,
@@ -34,24 +33,23 @@ class RelightThreeOverlay extends React.Component {
       vertexShader,
     } = this.props.threeCanvasProps;
     return (
-      <RelightThreeCanvas
-        images={images}
-        zoom={zoom}
-        intersection={rendererInstructions.intersection}
-        contentWidth={contentWidth}
-        contentHeight={contentHeight}
-        lightX={lightX}
-        lightY={lightY}
-        directionalIntensity={directionalIntensity}
-        ambientIntensity={ambientIntensity}
-        tileLevel={tileLevel}
-        minTileLevel={minTileLevel}
-        maxTileLevel={maxTileLevel}
-        tileSets={tileSets}
-        tileLevels={tileLevels}
-        fragmentShader={fragmentShader}
-        vertexShader={vertexShader}
-      />
+        <RelightThreeCanvas
+            images={images}
+            zoom={zoom}
+            intersection={rendererInstructions.intersection}
+            contentWidth={contentWidth}
+            contentHeight={contentHeight}
+            lightX={lightX}
+            lightY={lightY}
+            directionalIntensity={directionalIntensity}
+            ambientIntensity={ambientIntensity}
+            tileLevel={tileLevel}
+            maxTileLevel={maxTileLevel}
+            tileSets={tileSets}
+            tileLevels={tileLevels}
+            fragmentShader={fragmentShader}
+            vertexShader={vertexShader}
+        />
     );
   }
 }
@@ -76,7 +74,6 @@ RelightThreeOverlay.propTypes = {
     directionalIntensity: PropTypes.number.isRequired,
     ambientIntensity: PropTypes.number.isRequired,
     tileLevel: PropTypes.number.isRequired,
-    minTileLevel: PropTypes.number.isRequired,
     maxTileLevel: PropTypes.number.isRequired,
     tileSets: PropTypes.arrayOf(PropTypes.any).isRequired, // might need to go into this in more detail as to what this is composed of
     tileLevels: PropTypes.arrayOf(PropTypes.number).isRequired,
