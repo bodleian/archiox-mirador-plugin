@@ -27,8 +27,11 @@ class RelightThreeCanvas extends React.Component {
       topLeft: this.props.intersection.topLeft,
       bottomLeft: this.props.intersection.bottomLeft,
     };
+    this.debug = false;
     this.threeResources = {};
+    this.helperResources = {};
     this.groups = {};
+    this.helpers = {};
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer({ alpha: true });
     this.renderer.setSize(
@@ -58,6 +61,11 @@ class RelightThreeCanvas extends React.Component {
       this.threeResources[i]['geometries'] = {};
       this.threeResources[i]['materials'] = {};
       this.threeResources[i]['meshes'] = {};
+
+      if (this.debug) {
+        this.helperResources[i] = {};
+        this.helperResources[i]['meshes'] = {};
+      }
     }
 
     // define a group so that we can handle all the tiles together
@@ -91,7 +99,7 @@ class RelightThreeCanvas extends React.Component {
 
         useDiffuseTexture: { type: 'b', value: true },
 
-        lightPosition: { value: new THREE.Vector3(0.0, 0.0, 10.0).normalize() },
+        lightPosition: { value: new THREE.Vector3(0, 0, 500).normalize() },
         lightColor: { value: new THREE.Color(1, 1, 1) },
 
         ambientColor: { value: new THREE.Color(1, 1, 1) },
@@ -184,10 +192,22 @@ class RelightThreeCanvas extends React.Component {
         this.threeResources[this.props.tileLevel]['meshes'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
         ].visible = false;
+
+        if (this.debug) {
+          this.helperResources[this.props.tileLevel]['meshes'][
+            this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+          ].visible = false;
+        }
       } else {
         this.threeResources[this.props.tileLevel]['meshes'][
           this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
         ].visible = true;
+
+        if (this.debug) {
+          this.helperResources[this.props.tileLevel]['meshes'][
+            this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+          ].visible = true;
+        }
       }
     }
   }
@@ -201,6 +221,7 @@ class RelightThreeCanvas extends React.Component {
   generateTiles() {
     for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
       this.groups[i] = new THREE.Group();
+      this.helpers[i] = new THREE.Group();
 
       for (let j = 0; j < this.props.tileSets[i].albedoTiles.urls.length; j++) {
         const albedoMap =
@@ -232,8 +253,16 @@ class RelightThreeCanvas extends React.Component {
         const mesh = new THREE.Mesh(plane_geometry, plane_material);
         mesh.position.set(x, this.props.intersection.height - y, 0);
 
+        const helper_material = new THREE.MeshBasicMaterial({
+          color: 0xff0000,
+          wireframe: true,
+        });
+        const helper_mesh = new THREE.Mesh(plane_geometry, helper_material);
+        helper_mesh.position.set(x, this.props.intersection.height - y, 0);
+
         if (!albedoMap && !normalMap) {
           mesh.visible = false;
+          helper_mesh.visible = false;
         }
 
         // store these items so we can dispose of them correctly later
@@ -246,6 +275,13 @@ class RelightThreeCanvas extends React.Component {
         this.threeResources[i]['meshes'][
           this.props.tileSets[i].albedoTiles.urls[j]
         ] = mesh;
+
+        if (this.debug) {
+          this.helperResources[i]['meshes'][
+            this.props.tileSets[i].albedoTiles.urls[j]
+          ] = helper_mesh;
+          this.helpers[i].add(helper_mesh);
+        }
         this.groups[i].add(mesh);
       }
 
@@ -253,7 +289,16 @@ class RelightThreeCanvas extends React.Component {
         .setFromObject(this.groups[i])
         .getCenter(this.groups[i].position)
         .multiplyScalar(-1);
+
+      new THREE.Box3()
+        .setFromObject(this.helpers[i])
+        .getCenter(this.helpers[i].position)
+        .multiplyScalar(-1);
+
+      this.helpers.visible = false;
+
       this.scene.add(this.groups[i]);
+      this.scene.add(this.helpers[i]);
     }
   }
 
@@ -312,13 +357,6 @@ class RelightThreeCanvas extends React.Component {
    */
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      prevProps.tileLevel !== this.props.tileLevel ||
-      prevProps.images.length !== this.props.images.length
-    ) {
-      this.groups[this.props.tileLevel].visible = true;
-    }
-
     if (
       prevProps.zoom !== this.props.zoom ||
       prevProps.intersection !== this.props.intersection ||
@@ -409,5 +447,3 @@ export default RelightThreeCanvas;
 
 // todo:
 //  * We need to add some way to change the lights in uniforms using the existing LightX, LightY values.
-//  * Shader code needs changing so that an empty shader is transparent rather than black, so that low res tiles
-//    can be seen.

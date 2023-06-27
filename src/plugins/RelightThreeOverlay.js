@@ -33,23 +33,23 @@ class RelightThreeOverlay extends React.Component {
       vertexShader,
     } = this.props.threeCanvasProps;
     return (
-        <RelightThreeCanvas
-            images={images}
-            zoom={zoom}
-            intersection={rendererInstructions.intersection}
-            contentWidth={contentWidth}
-            contentHeight={contentHeight}
-            lightX={lightX}
-            lightY={lightY}
-            directionalIntensity={directionalIntensity}
-            ambientIntensity={ambientIntensity}
-            tileLevel={tileLevel}
-            maxTileLevel={maxTileLevel}
-            tileSets={tileSets}
-            tileLevels={tileLevels}
-            fragmentShader={fragmentShader}
-            vertexShader={vertexShader}
-        />
+      <RelightThreeCanvas
+        images={images}
+        zoom={zoom}
+        intersection={rendererInstructions.intersection}
+        contentWidth={contentWidth}
+        contentHeight={contentHeight}
+        lightX={lightX}
+        lightY={lightY}
+        directionalIntensity={directionalIntensity}
+        ambientIntensity={ambientIntensity}
+        tileLevel={tileLevel}
+        maxTileLevel={maxTileLevel}
+        tileSets={tileSets}
+        tileLevels={tileLevels}
+        fragmentShader={fragmentShader}
+        vertexShader={vertexShader}
+      />
     );
   }
 }
