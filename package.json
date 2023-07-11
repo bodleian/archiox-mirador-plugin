@@ -4,7 +4,10 @@
   "description": "A workshop on working with Mirador",
   "private": true,
   "scripts": {
-    "webpack": "webpack --config webpack.config.js --mode=production"
+    "webpack": "webpack --config webpack.config.js --mode=production",
+    "lint": "eslint --fix . && echo 'Lint complete.'",
+    "watch": "watch 'clear && npm run -s test | tap-nirvana && npm run -s lint' src",
+    "test": "mocha --require @babel/register"
   },
   "repository": {
     "type": "git",
@@ -27,21 +30,36 @@
     "react-dom": "16.x"
   },
   "dependencies": {
-    "react-loader-spinner": "^5.3.4",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
+    "lodash": "^4.17.21",
+    "prop-types": "^15.8.1",
     "three": "^0.146.0"
   },
   "devDependencies": {
-    "mirador": "^3.0.0-rc.4",
-    "react": "16.x",
-    "react-dom": "16.x",
-    "@babel/core": "^7.12.3",
-    "@babel/preset-react": "^7.12.5",
+    "@babel/cli": "^7.22.5",
+    "@babel/core": "^7.22.5",
+    "@babel/eslint-parser": "^7.22.5",
     "@babel/preset-env": "^7.19.4",
+    "@babel/preset-react": "^7.12.5",
+    "@babel/register": "^7.22.5",
     "babel-loader": "^8.2.1",
     "clean-webpack-plugin": "^3.0.0",
-    "react-loader-spinner": "^5.1.5",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "expect.js": "^0.3.1",
+    "mirador": "^3.0.0-rc.4",
+    "mocha": "^10.2.0",
+    "prettier": "^2.8.8",
+    "react": "16.x",
+    "react-dom": "16.x",
     "reselect": "^4.1.5",
+    "tap-nirvana": "^1.1.0",
     "three": "^0.139.2",
+    "watch": "^1.0.2",
     "webpack": "^5.5.1",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.11.1"

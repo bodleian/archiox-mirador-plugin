@@ -1,2 +1,2 @@
-import _archioxMiradorPlugin from './plugins/archioxMiradorPlugin';
-export { _archioxMiradorPlugin as archioxMiradorPlugin };
+import _relightMiradorPlugin from './plugins/relightMiradorPlugin';
+export { _relightMiradorPlugin as relightMiradorPlugin };
