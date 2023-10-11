@@ -1,7 +1,7 @@
 {
   "name": "archiox-mirador-plugin",
-  "version": "0.0.1",
-  "description": "A workshop on working with Mirador",
+  "version": "1.1.1",
+  "description": "An experimental plugin to display depth information captured with Lucida or Selene scanners from FactumARTE. However, the plug-in can present any normal map/albedo map combination produced from any technique.\n\nTopics\n",
   "private": true,
   "scripts": {
     "webpack": "webpack --config webpack.config.js --mode=production",
@@ -18,7 +18,7 @@
     "Threejs"
   ],
   "author": "Richard Benjamin Allen",
-  "license": "N/A",
+  "license": "MIT License",
   "module": "src/index.js",
   "bugs": {
     "url": "https://gitlab.bodleian.ox.ac.uk/arch0396/archiox-mirador-plugin/-/issues"
@@ -29,12 +29,19 @@
     "react": "16.x",
     "react-dom": "16.x"
   },
+  "resolutions": {
+    "word-wrap": "npm:@aashutoshrathi/word-wrap",
+    "merge": "^2.1.1"
+  },
+  "overrides": {
+    "tap-out": "git+https://github.com/scottcorgan/tap-out.git"
+  },
   "dependencies": {
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
-    "three": "^0.146.0"
+    "three": "^0.139.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.22.5",
@@ -59,13 +66,9 @@
     "reselect": "^4.1.5",
     "tap-nirvana": "^1.1.0",
     "three": "^0.139.2",
-    "watch": "^1.0.2",
-    "webpack": "^5.5.1",
+    "watch": "^0.13.0",
+    "webpack": "^5.76.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.11.1"
-  },
-  "engines": {
-    "node": "^16.17.0",
-    "npm": "^8.15.0"
   }
 }
