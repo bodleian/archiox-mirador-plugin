@@ -75,12 +75,8 @@ class Relight extends React.Component {
         `%, #ffffff, #000000)`;
       this.lightX = (this.mouseX / 100) * 2 - 1;
       this.lightY = (this.mouseY / 100) * 2 - 1;
-      this.threeCanvasProps.mouseX = this.mouseX;
-      this.threeCanvasProps.mouseY = this.mouseY;
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
-      this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
-      this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
 
       this.setState({
         threeCanvasProps: this.threeCanvasProps,
@@ -119,6 +115,7 @@ class Relight extends React.Component {
    * @param {number} value new lightIntensity value from the component to add to state.
    */
   onDirectionalLightChange(event, value) {
+    this.directionalIntensity = value;
     this.threeCanvasProps.directionalIntensity = value;
     this.setState({
       threeCanvasProps: this.threeCanvasProps,
@@ -132,6 +129,7 @@ class Relight extends React.Component {
    * @param {number} value new lightIntensity value from the component to add to state.
    */
   onAmbientLightChange(event, value) {
+    this.ambientIntensity = value;
     this.threeCanvasProps.ambientIntensity = value;
     this.setState({
       threeCanvasProps: this.threeCanvasProps,
@@ -151,12 +149,15 @@ class Relight extends React.Component {
    * controls to return to their default values; and the light positions and intensities in the Three canvas to reset.
    */
   resetHandler() {
-    this.threeCanvasProps.ambientIntensity = 0.1;
-    this.threeCanvasProps.directionalIntensity = 1.0;
-    this.threeCanvasProps.lightX = 0;
-    this.threeCanvasProps.lightY = 0;
-    this.threeCanvasProps.mouseX = 50;
-    this.threeCanvasProps.mouseY = 50;
+    this.ambientIntensity = 0.1;
+    this.directionalIntensity = 1.0;
+    this.lightX = 0;
+    this.lightY = 0;
+
+    document.getElementById('LightDirectionControl').style.background =
+      `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
+
+    this.initialiseThreeCanvasProps();
 
     this.setState({
       threeCanvasProps: this.threeCanvasProps,
@@ -184,8 +185,8 @@ class Relight extends React.Component {
       .viewportToImageZoom(zoom_level);
     this.threeCanvasProps.albedoMap = this.albedoMap;
     this.threeCanvasProps.normalMap = this.normalMap;
-    this.threeCanvasProps.lightX = 0;
-    this.threeCanvasProps.lightY = 0;
+    this.threeCanvasProps.lightX = this.lightX;
+    this.threeCanvasProps.lightY = this.lightY;
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
     this.threeCanvasProps.tileLevel = this.tileLevel;
@@ -330,6 +331,7 @@ class Relight extends React.Component {
   //  track of values stored in state and if they change if runs
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log(this.state.threeCanvasProps);
     this.state.active
       ? ReactDOM.render(
           <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
@@ -451,16 +453,16 @@ class Relight extends React.Component {
               id={'DirectionalLightIntensity'}
               tooltipTitle={'Change Directional Light Intensity'}
               intensity={this.state.threeCanvasProps.directionalIntensity}
-              onChange={(event, value) =>
-                this.onDirectionalLightChange(event, value)
+              onChange={(event, intensity) =>
+                this.onDirectionalLightChange(event, intensity)
               }
             />
             <RelightAmbientLightIntensity
               id={'AmbientLightIntensity'}
               tooltipTitle={'Change Ambient Light Intensity'}
               intensity={this.state.threeCanvasProps.ambientIntensity}
-              onChange={(event, value) =>
-                this.onAmbientLightChange(event, value)
+              onChange={(event, intensity) =>
+                this.onAmbientLightChange(event, intensity)
               }
             />
           </RelightLightControls>
