@@ -453,16 +453,16 @@ class Relight extends React.Component {
               id={'DirectionalLightIntensity'}
               tooltipTitle={'Change Directional Light Intensity'}
               intensity={this.state.threeCanvasProps.directionalIntensity}
-              onChange={(event, intensity) =>
-                this.onDirectionalLightChange(event, intensity)
+              onChange={(event, value) =>
+                this.onDirectionalLightChange(event, value)
               }
             />
             <RelightAmbientLightIntensity
               id={'AmbientLightIntensity'}
               tooltipTitle={'Change Ambient Light Intensity'}
               intensity={this.state.threeCanvasProps.ambientIntensity}
-              onChange={(event, intensity) =>
-                this.onAmbientLightChange(event, intensity)
+              onChange={(event, value) =>
+                this.onAmbientLightChange(event, value)
               }
             />
           </RelightLightControls>
