@@ -331,7 +331,6 @@ class Relight extends React.Component {
   //  track of values stored in state and if they change if runs
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log(this.state.threeCanvasProps);
     this.state.active
       ? ReactDOM.render(
           <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
