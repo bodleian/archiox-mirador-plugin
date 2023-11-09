@@ -41,7 +41,8 @@
     "@material-ui/icons": "^4.11.3",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
-    "three": "^0.139.2"
+    "three": "^0.139.2",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.22.5",
