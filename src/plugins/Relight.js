@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import * as THREE from 'three';
 import { v4 as uuidv4 } from 'uuid';
-
 import {
   getLayers,
   getMap,
@@ -274,6 +273,9 @@ class Relight extends React.Component {
     );
 
     if (this.state.active) {
+
+      // todo: find a better way to removeOverlays and handlers.  Overlay works for the first instance of
+      //  duplicated windows, but for the second toggle it only adds the overlay to the first window!
       this.props.viewer.viewport.viewer.removeOverlay(this.threeCanvas);
       this.props.viewer.viewport.viewer.removeAllHandlers('viewport-change');
     } else {
@@ -284,7 +286,7 @@ class Relight extends React.Component {
       this.initialiseThreeCanvasProps();
       // create the overlay html element and add in the Three canvas component
       this.threeCanvas = document.createElement('div');
-      this.threeCanvas.id = 'three-canvas';  // this needs to be unique
+      this.threeCanvas.id = 'three-canvas-' + uuidv4();  // this needs to be unique
       this.props.viewer.viewport.viewer.addOverlay(this.threeCanvas);
       this.overlay = this.props.viewer.viewport.viewer.getOverlayById(this.threeCanvas);
       // this tells the overlay where to begin in terms of x, y coordinates
