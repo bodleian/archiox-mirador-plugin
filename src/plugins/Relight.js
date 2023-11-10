@@ -53,8 +53,8 @@ class Relight extends React.Component {
    * The threeCanvasProps are updated in state to cause a re-render each time the mouse is moved whilst the button
    * is pressed over the component, this updates the props passed to the Three canvas.
    * */
-  onMouseMove(event) {
-    const control = document.getElementById('LightDirectionControl');
+  onMouseMove(event, id) {
+    const control = document.getElementById(id);
     const boundingBox = control.getBoundingClientRect();
 
     if (event.type === 'mousemove') {
@@ -68,7 +68,7 @@ class Relight extends React.Component {
     }
 
     if (this.mouseDown) {
-      document.getElementById('LightDirectionControl').style.background =
+      document.getElementById(id).style.background =
           `radial-gradient(at ` +
           this.mouseX +
           `% ` +
@@ -181,7 +181,7 @@ class Relight extends React.Component {
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
         this.props
     );
-    this.threeCanvasProps.zoom = this.props.viewer.viewport.viewer.world
+    this.threeCanvasProps.zoom = this.props.viewer.world
         .getItemAt(0)
         .viewportToImageZoom(zoom_level);
     this.threeCanvasProps.albedoMap = this.albedoMap;
@@ -194,10 +194,10 @@ class Relight extends React.Component {
     this.threeCanvasProps.minTileLevel = Math.min.apply(this.tileLevels);
     this.threeCanvasProps.tileLevels = this.tileLevels;
     this.threeCanvasProps.maxTileLevel =
-        this.props.viewer.viewport.viewer.source.scale_factors.length - 1;
+        this.props.viewer.source.scale_factors.length - 1;
     this.tileSets = getTileSets(
         this.threeCanvasProps.maxTileLevel,
-        this.props.viewer.viewport.viewer.source,
+        this.props.viewer.source,
         this.threeCanvasProps.albedoMap,
         this.threeCanvasProps.normalMap
     );
@@ -276,29 +276,26 @@ class Relight extends React.Component {
 
       // todo: find a better way to removeOverlays and handlers.  Overlay works for the first instance of
       //  duplicated windows, but for the second toggle it only adds the overlay to the first window!
-      this.props.viewer.viewport.viewer.removeOverlay(this.threeCanvas);
-      this.props.viewer.viewport.viewer.removeAllHandlers('viewport-change');
+      this.props.viewer.removeOverlay(this.threeCanvas);
+      this.props.viewer.removeAllHandlers('viewport-change');
     } else {
-
-      console.log(this.props);
 
       // here we populate the required props for the Three canvas
       this.initialiseThreeCanvasProps();
       // create the overlay html element and add in the Three canvas component
-      this.threeCanvas = document.createElement('div');
-      this.threeCanvas.id = 'three-canvas-' + uuidv4();  // this needs to be unique
-      this.props.viewer.viewport.viewer.addOverlay(this.threeCanvas);
-      this.overlay = this.props.viewer.viewport.viewer.getOverlayById(this.threeCanvas);
       // this tells the overlay where to begin in terms of x, y coordinates
+      this.props.viewer.addOverlay(this.threeCanvas);
+      this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
+
       this.overlay.update(
           this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
 
       // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
       // glitch and not re-render until we cause the viewport-change event to trigger
-      this.props.viewer.viewport.viewer.forceRedraw();
+      this.props.viewer.forceRedraw();
       // add a custom event handler that listens for emission of the OpenSeaDragon viewport-change event
-      this.props.viewer.viewport.viewer.addHandler('viewport-change', () => {
+      this.props.viewer.addHandler('viewport-change', () => {
         // here we update a selection of the props for the Three canvas
         this.updateThreeCanvasProps();
         // update the threeCanvasProps state to cause a re-render and update the overlay
@@ -311,10 +308,10 @@ class Relight extends React.Component {
         );
       });
       // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
-      this.props.viewer.viewport.viewer.addHandler('close', () => {
+      this.props.viewer.addHandler('close', () => {
         this.setState({ active: false, visible: false });
         // remove all handlers so viewport-change isn't activated!
-        this.props.viewer.viewport.viewer.removeAllHandlers('viewport-change');
+        this.props.viewer.removeAllHandlers('viewport-change');
       });
     }
     // if the torchButton state is active render the overlay over OpenSeaDragon
@@ -370,6 +367,10 @@ class Relight extends React.Component {
           this.normalMap.split('/').pop(),
         ];
       }
+
+      this.viewer = this.props.viewer;
+      this.threeCanvas = document.createElement('div');
+      this.threeCanvas.id = 'three-canvas-' + uuidv4();  // this needs to be unique
     }
 
     // if the viewer object, albedoMap and normalMap URLs are not available, do not render
@@ -390,7 +391,7 @@ class Relight extends React.Component {
         this.updateLayer(this.excluded_maps, this.canvasID, this.layers, false);
 
         // add an event handler to keep track of the tile levels being drawn, no point getting all of them
-        this.props.viewer.viewport.viewer.addHandler('tile-drawn', (event) => {
+        this.props.viewer.addHandler('tile-drawn', (event) => {
           this.tileLevels[event.tile.level] = event.tile.level;
           this.tileLevel = event.tile.level;
         });
@@ -398,6 +399,7 @@ class Relight extends React.Component {
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
         this.props.viewer.viewport.viewer.addHandler('tile-loaded', (event) => {
+        this.props.viewer.addHandler('tile-loaded', (event) => {
           this.setState({ loadHandlerAdded: true });
           const sourceKey = event.image.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
@@ -425,38 +427,41 @@ class Relight extends React.Component {
     }
 
     let toolMenu = null;
+    const relightLightDirectionID = uuidv4();
 
     if (this.state.visible && this.state.open) {
       toolMenu = (
           <RelightToolMenu
+              id={uuidv4()}
               visible={this.state.visible}
               sideBarOpen={this.props.window.sideBarOpen}
           >
-            <RelightLightButtons>
+            <RelightLightButtons id={uuidv4()}>
               <RelightMenuButton
                   open={this.state.open}
                   onClick={() => this.menuHandler()}
               />
               <RelightTorchButton
+                  id={uuidv4()}
                   onClick={() => this.torchHandler()}
                   active={this.state.active}
               />
-              <RelightResetLights onClick={() => this.resetHandler()} />
+              <RelightResetLights onClick={() => this.resetHandler()}/>
             </RelightLightButtons>
             <RelightLightControls>
               <RelightLightDirection
-                  id={'LightDirectionControl'}
+                  id={relightLightDirectionID}
                   tooltipTitle={'Change Light Direction'}
                   mouseX={this.state.threeCanvasProps.mouseX}
                   mouseY={this.state.threeCanvasProps.mouseY}
-                  onMouseMove={(event) => this.onMouseMove(event)}
+                  onMouseMove={(event) => this.onMouseMove(event, relightLightDirectionID)}
                   onMouseDown={(event) => this.onMouseDown(event)}
                   onMouseUp={(event) => this.onMouseUp(event)}
                   onMouseLeave={(event) => this.onMouseLeave(event)}
-                  onTouchMove={(event) => this.onMouseMove(event)}
+                  onTouchMove={(event) => this.onMouseMove(event, relightLightDirectionID)}
               />
               <RelightDirectionalLightIntensity
-                  id={'DirectionalLightIntensity'}
+                  id={uuidv4()}
                   tooltipTitle={'Change Directional Light Intensity'}
                   intensity={this.state.threeCanvasProps.directionalIntensity}
                   onChange={(event, value) =>
@@ -464,7 +469,7 @@ class Relight extends React.Component {
                   }
               />
               <RelightAmbientLightIntensity
-                  id={'AmbientLightIntensity'}
+                  id={uuidv4()}
                   tooltipTitle={'Change Ambient Light Intensity'}
                   intensity={this.state.threeCanvasProps.ambientIntensity}
                   onChange={(event, value) =>
