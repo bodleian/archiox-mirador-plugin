@@ -16,16 +16,16 @@ class RelightTorchButton extends React.Component {
   render() {
     const { active, onClick, id } = this.props;
     return (
-        <MiradorMenuButton
-            aria-label={active ? 'Turn Off 3D Overlay' : 'Turn On 3D Overlay'}
-            style={{
-              float: 'left',
-              clear: 'both',
-            }}
-            onClick={onClick}
-        >
-          {active ? <WbIncandescentIcon /> : <WbIncandescentOutlinedIcon />}
-        </MiradorMenuButton>
+      <MiradorMenuButton
+        aria-label={active ? 'Turn Off 3D Overlay' : 'Turn On 3D Overlay'}
+        style={{
+          float: 'left',
+          clear: 'both',
+        }}
+        onClick={onClick}
+      >
+        {active ? <WbIncandescentIcon /> : <WbIncandescentOutlinedIcon />}
+      </MiradorMenuButton>
     );
   }
 }

@@ -26,27 +26,27 @@ class RelightAmbientLightIntensity extends React.Component {
       size,
     } = this.props;
     return (
-        <Tooltip title={tooltipTitle}>
-          <Slider
-              id={id}
-              style={{
-                marginTop: '20px',
-                marginBottom: '20px',
-                marginLeft: '8px',
-                marginRight: '8px',
-                height: '87px',
-              }}
-              size={size}
-              orientation={orientation}
-              marks
-              defaultValue={defaultIntensity}
-              value={intensity}
-              step={step}
-              min={min}
-              max={max}
-              onChange={onChange}
-          />
-        </Tooltip>
+      <Tooltip title={tooltipTitle}>
+        <Slider
+          id={id}
+          style={{
+            marginTop: '20px',
+            marginBottom: '20px',
+            marginLeft: '8px',
+            marginRight: '8px',
+            height: '87px',
+          }}
+          size={size}
+          orientation={orientation}
+          marks
+          defaultValue={defaultIntensity}
+          value={intensity}
+          step={step}
+          min={min}
+          max={max}
+          onChange={onChange}
+        />
+      </Tooltip>
     );
   }
 }
