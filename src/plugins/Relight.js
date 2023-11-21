@@ -237,7 +237,7 @@ class Relight extends React.Component {
       this.props.viewer.windowId,
       this.props.updateLayers,
       this.excluded_maps,
-      this.canvasID,
+      this.canvasId,
       this.layers,
       true
     );
@@ -248,7 +248,7 @@ class Relight extends React.Component {
       this.props.viewer.windowId,
       this.props.updateLayers,
       this.excluded_maps,
-      this.canvasID,
+      this.canvasId,
       this.layers,
       this.state.active
     );
@@ -365,13 +365,13 @@ class Relight extends React.Component {
 
         this.excluded_maps = ['depth', 'shaded'];
         this.layers = getLayers(this.props.canvas.iiifImageResources);
-        this.canvasID = this.props.canvas.id;
+        this.canvasId = this.props.canvas.id;
 
         updateLayer(
-          this.props.windowId,
+          this.props.viewer.windowId,
           this.props.updateLayers,
           this.excluded_maps,
-          this.canvasID,
+          this.canvasId,
           this.layers,
           false
         );
