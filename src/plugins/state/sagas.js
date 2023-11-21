@@ -5,7 +5,7 @@ import { takeEvery, select } from 'redux-saga/effects';
 import { updateLayer, getLayers } from '../RelightHelpers';
 import * as actions from 'mirador/dist/es/src/state/actions';
 
-export function* resourceAdded(action) {
+export function* setCanvas(action) {
   const windowId = action.windowId;
   const canvasId = action.canvasId;
   const canvas = yield select(getCanvases, { windowId });
@@ -22,5 +22,5 @@ export function* resourceAdded(action) {
 }
 
 export function* rootSaga() {
-  yield takeEvery(ActionTypes.SET_CANVAS, resourceAdded);
+  yield takeEvery(ActionTypes.SET_CANVAS, setCanvas);
 }
