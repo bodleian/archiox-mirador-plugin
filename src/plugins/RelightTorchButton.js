@@ -17,6 +17,7 @@ class RelightTorchButton extends React.Component {
     const { active, onClick, id } = this.props;
     return (
       <MiradorMenuButton
+        id={id}
         aria-label={active ? 'Turn Off 3D Overlay' : 'Turn On 3D Overlay'}
         style={{
           float: 'left',

@@ -31,6 +31,7 @@ class RelightToolMenu extends React.Component {
           left: leftOffset,
         }}
         className={'MuiPaper-elevation4 '}
+        id={id}
       >
         {children}
       </div>

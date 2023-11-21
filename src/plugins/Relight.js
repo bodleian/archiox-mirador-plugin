@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import * as THREE from 'three';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  updateLayer,
   getLayers,
   getMap,
   getRendererInstructions,
@@ -222,35 +223,6 @@ class Relight extends React.Component {
   }
 
   /**
-   * The updateLayer method is used to turn on or off any set of layers present in the viewer that you want to,
-   * it can be used to turn off a set of or a singular layer by specifying the layer mapTypes in excluded_maps
-   * and providing a list of the layers currently in the viewer.  You can send a boolean value to turn these on
-   * or off, which means you can toggle the state of a control e.g. active: false or true to control this too.
-   * @param {array} excluded_maps an array containing the mapTypes you wish to toggle visibility on
-   * @param {string} canvas_id the id of the current canvas in the viewer
-   * @param {object} layers an object containing all the layer ids (urls) in viewer
-   * @param {boolean} value a boolean value indicating whether you want the excluded layers on or off
-   */
-  updateLayer(excluded_maps, canvas_id, layers, value) {
-    const _props = this.props,
-      updateLayers = _props.updateLayers,
-      windowId = _props.windowId;
-
-    Object.keys(layers).forEach((key) => {
-      const mapType = layers[key].trim();
-
-      if (excluded_maps.includes(mapType)) {
-        // todo: if normalmap and albedo are off turn them on again!
-
-        const payload = {
-          [key]: { visibility: value },
-        };
-        updateLayers(windowId, canvas_id, payload);
-      }
-    });
-  }
-
-  /**
    * The torchHandler method is used to update the active state of the RelightTorchButton component; initialise and
    * update the threeCanvasProps, track changes to the OpenSeaDragon viewer and add or remove the Three canvas overlay
    * to the view port.
@@ -261,11 +233,20 @@ class Relight extends React.Component {
 
     // always turn on albedo and normal regardless
     this.excluded_maps = ['albedo', 'normal'];
-    this.updateLayer(this.excluded_maps, this.canvasID, this.layers, true);
+    updateLayer(
+      this.props.viewer.windowId,
+      this.props.updateLayers,
+      this.excluded_maps,
+      this.canvasID,
+      this.layers,
+      true
+    );
 
     // toggle on or off composite
     this.excluded_maps = ['composite'];
-    this.updateLayer(
+    updateLayer(
+      this.props.viewer.windowId,
+      this.props.updateLayers,
       this.excluded_maps,
       this.canvasID,
       this.layers,
@@ -386,7 +367,14 @@ class Relight extends React.Component {
         this.layers = getLayers(this.props.canvas.iiifImageResources);
         this.canvasID = this.props.canvas.id;
 
-        this.updateLayer(this.excluded_maps, this.canvasID, this.layers, false);
+        updateLayer(
+          this.props.windowId,
+          this.props.updateLayers,
+          this.excluded_maps,
+          this.canvasID,
+          this.layers,
+          false
+        );
 
         // add an event handler to keep track of the tile levels being drawn, no point getting all of them
         this.props.viewer.addHandler('tile-drawn', (event) => {
