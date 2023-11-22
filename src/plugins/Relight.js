@@ -234,7 +234,7 @@ class Relight extends React.Component {
     // always turn on albedo and normal regardless
     this.excluded_maps = ['albedo', 'normal'];
     updateLayer(
-      this.props.viewer.windowId,
+      this.props.windowId,
       this.props.updateLayers,
       this.excluded_maps,
       this.canvasId,
@@ -245,7 +245,7 @@ class Relight extends React.Component {
     // toggle on or off composite
     this.excluded_maps = ['composite'];
     updateLayer(
-      this.props.viewer.windowId,
+      this.props.windowId,
       this.props.updateLayers,
       this.excluded_maps,
       this.canvasId,
@@ -368,7 +368,7 @@ class Relight extends React.Component {
         this.canvasId = this.props.canvas.id;
 
         updateLayer(
-          this.props.viewer.windowId,
+          this.props.windowId,
           this.props.updateLayers,
           this.excluded_maps,
           this.canvasId,
