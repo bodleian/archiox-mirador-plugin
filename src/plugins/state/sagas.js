@@ -4,6 +4,11 @@ import { put, select, takeEvery } from 'redux-saga/effects';
 import { getLayers } from '../RelightHelpers';
 import * as actions from 'mirador/dist/es/src/state/actions';
 
+/**
+ * Saga for when the Mirador setCanvas action is triggered, such as by adding resources, layers that are switched off
+ * need to be turned on again.  Here we grab all windows currently open parse out their IDs and turn all the composite
+ * map type layers back on.
+ * **/
 export function* setCanvas(action) {
   const updateLayers = actions.updateLayers;
   const windowId = action.windowId;
