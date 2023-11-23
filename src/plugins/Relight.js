@@ -192,7 +192,6 @@ class Relight extends React.Component {
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
     this.threeCanvasProps.tileLevel = this.tileLevel;
-    this.threeCanvasProps.minTileLevel = Math.min.apply(this.tileLevels);
     this.threeCanvasProps.tileLevels = this.tileLevels;
     this.threeCanvasProps.maxTileLevel =
       this.props.viewer.source.scale_factors.length - 1;

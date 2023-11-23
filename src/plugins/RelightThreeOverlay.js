@@ -26,7 +26,6 @@ class RelightThreeOverlay extends React.Component {
       directionalIntensity,
       ambientIntensity,
       tileLevel,
-      minTileLevel,
       maxTileLevel,
       tileSets,
       tileLevels,
@@ -43,7 +42,6 @@ class RelightThreeOverlay extends React.Component {
         directionalIntensity={directionalIntensity}
         ambientIntensity={ambientIntensity}
         tileLevel={tileLevel}
-        minTileLevel={minTileLevel}
         maxTileLevel={maxTileLevel}
         tileSets={tileSets}
         tileLevels={tileLevels}
