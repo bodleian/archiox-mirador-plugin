@@ -104,12 +104,11 @@ class RelightThreeCanvas extends React.Component {
    * @private
    */
   _updateTextures() {
+    const tileCount =
+      this.props.tileSets[this.props.tileLevel].albedoTiles.urls.length;
+
     // loop through the materials and update with new textures
-    for (
-      let i = 0;
-      i < this.props.tileSets[this.props.tileLevel].albedoTiles.urls.length;
-      i++
-    ) {
+    for (let i = 0; i < tileCount; i++) {
       this.threeResources[this.props.tileLevel]['materials'][
         this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
       ].map =
@@ -262,13 +261,6 @@ class RelightThreeCanvas extends React.Component {
    */
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (
-      prevProps.tileLevel !== this.props.tileLevel ||
-      prevProps.images.length !== this.props.images.length
-    ) {
-      this.groups[this.props.tileLevel].visible = true;
-    }
-
     if (
       prevProps.zoom !== this.props.zoom ||
       prevProps.intersection !== this.props.intersection ||
