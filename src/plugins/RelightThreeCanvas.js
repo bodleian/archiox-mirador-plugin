@@ -1,6 +1,7 @@
 import React from 'react';
 import * as THREE from 'three';
 import PropTypes from 'prop-types';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * The RelightThreeCanvas component is a Three canvas object containing a scene with orthographic camera, ambient and
@@ -27,7 +28,7 @@ class RelightThreeCanvas extends React.Component {
       topLeft: this.props.intersection.topLeft,
       bottomLeft: this.props.intersection.bottomLeft,
     };
-    this.debug = false;
+    this.id = 'canvas-container-' + uuidv4();
     this.threeResources = {};
     this.helperResources = {};
     this.groups = {};
@@ -340,9 +341,7 @@ class RelightThreeCanvas extends React.Component {
    * animation.
    */
   componentDidMount() {
-    document
-      .getElementById('canvas-container')
-      .appendChild(this.renderer.domElement);
+    document.getElementById(this.id).appendChild(this.renderer.domElement);
     this.animate();
   }
 
@@ -399,13 +398,15 @@ class RelightThreeCanvas extends React.Component {
     };
     return (
       <div id="container" style={container}>
-        <div id="canvas-container" style={canvas} />
+        <div id={this.id} style={canvas} />
       </div>
     );
   }
 }
 
 RelightThreeCanvas.propTypes = {
+  /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
+  id: PropTypes.string.isRequired,
   /** The contentWidth prop is the total width of the OpenSeaDragon tiled image **/
   contentWidth: PropTypes.number.isRequired,
   /** The contentHeight prop is the total height of the OpenSeaDragon tiled image **/

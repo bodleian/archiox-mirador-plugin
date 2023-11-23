@@ -1,8 +1,8 @@
 import Relight from './Relight';
 import { getCurrentCanvas } from 'mirador/dist/es/src/state/selectors';
 import { getWindow } from 'mirador/dist/es/src/state/selectors';
-
 import * as actions from 'mirador/dist/es/src/state/actions';
+import { rootSaga } from './state/sagas';
 
 export default [
   {
@@ -17,6 +17,7 @@ export default [
         window: getWindow(state, _ref),
       };
     },
+    saga: rootSaga,
     mode: 'add',
     component: Relight,
   },

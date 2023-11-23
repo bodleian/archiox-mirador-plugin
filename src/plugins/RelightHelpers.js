@@ -487,3 +487,35 @@ void main() {
     vec3 s = Ks * specular * specularColor;
 */
 `;
+
+/**
+ * The updateLayer method is used to turn on or off any set of layers present in the viewer that you want to,
+ * it can be used to turn off a set of or a singular layer by specifying the layer mapTypes in excluded_maps
+ * and providing a list of the layers currently in the viewer.  You can send a boolean value to turn these on
+ * or off, which means you can toggle the state of a control e.g. active: false or true to control this too.
+ * @param {string} windowId the id of the current window in the viewer
+ * @param {function} updateLayers the Mirador updateLayers function
+ * @param {array} excluded_maps an array containing the mapTypes you wish to toggle visibility on
+ * @param {string} canvasId the id of the current canvas in the viewer
+ * @param {object} layers an object containing all the layer ids (urls) in viewer
+ * @param {boolean} value a boolean value indicating whether you want the excluded layers on or off
+ */
+export function updateLayer(
+  windowId,
+  updateLayers,
+  excluded_maps,
+  canvasId,
+  layers,
+  value
+) {
+  Object.keys(layers).forEach((key) => {
+    const mapType = layers[key].trim();
+
+    if (excluded_maps.includes(mapType)) {
+      const payload = {
+        [key]: { visibility: value },
+      };
+      updateLayers(windowId, canvasId, payload);
+    }
+  });
+}
