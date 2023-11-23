@@ -9,7 +9,7 @@ class RelightToolMenu extends React.Component {
   }
 
   render() {
-    const { sideBarOpen, children } = this.props;
+    const { id, sideBarOpen, children } = this.props;
     let leftOffset;
 
     if (sideBarOpen) {
@@ -31,6 +31,7 @@ class RelightToolMenu extends React.Component {
           left: leftOffset,
         }}
         className={'MuiPaper-elevation4 '}
+        id={id}
       >
         {children}
       </div>
@@ -39,6 +40,8 @@ class RelightToolMenu extends React.Component {
 }
 
 RelightToolMenu.propTypes = {
+  /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
+  id: PropTypes.string.isRequired,
   /** The sideBarOpen prop tells the component to render more to the right if the sidebar is open or not **/
   sideBarOpen: PropTypes.bool,
   /** The children prop carries all the props passed to the parent component **/
