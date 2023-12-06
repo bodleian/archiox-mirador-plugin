@@ -175,10 +175,6 @@ class Relight extends React.Component {
   initialiseThreeCanvasProps() {
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps = {};
-    this.threeCanvasProps.contentWidth =
-      this.props.viewer.viewport._contentSize.x;
-    this.threeCanvasProps.contentHeight =
-      this.props.viewer.viewport._contentSize.y;
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
       this.props
     );
@@ -202,6 +198,8 @@ class Relight extends React.Component {
       this.threeCanvasProps.albedoMap,
       this.threeCanvasProps.normalMap
     );
+    this.threeCanvasProps.contentWidth = this.tileSets[1].albedoTiles.width;
+    this.threeCanvasProps.contentHeight = this.tileSets[1].albedoTiles.height;
     this.threeCanvasProps.images = this.images;
     this.threeCanvasProps.tileSets = this.tileSets;
   }
