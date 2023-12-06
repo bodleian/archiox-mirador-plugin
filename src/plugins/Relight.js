@@ -150,13 +150,13 @@ class Relight extends React.Component {
    * is pressed.  It updates the threeCanvasProps to state causing a re-render; the appearance and values of the light
    * controls to return to their default values; and the light positions and intensities in the Three canvas to reset.
    */
-  resetHandler() {
+  resetHandler(id) {
     this.ambientIntensity = 0.1;
     this.directionalIntensity = 1.0;
     this.lightX = 0;
     this.lightY = 0;
 
-    document.getElementById('LightDirectionControl').style.background =
+    document.getElementById(id).style.background =
       `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
 
     this.initialiseThreeCanvasProps();
@@ -431,7 +431,7 @@ class Relight extends React.Component {
               onClick={() => this.torchHandler()}
               active={this.state.active}
             />
-            <RelightResetLights onClick={() => this.resetHandler()} />
+            <RelightResetLights onClick={() => this.resetHandler(relightLightDirectionID)} />
           </RelightLightButtons>
           <RelightLightControls>
             <RelightLightDirection
