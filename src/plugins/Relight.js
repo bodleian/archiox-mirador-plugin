@@ -205,6 +205,22 @@ class Relight extends React.Component {
   }
 
   /**
+   * The updateOverlay method updates a selection of the props for the Three canvas to keep it in sync with the
+   * image in Openseadragon.
+   * */
+  updateOverlay() {
+    this.updateThreeCanvasProps();
+    // update the threeCanvasProps state to cause a re-render and update the overlay
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
+    // this tells the overlay where to begin in terms of x, y coordinates
+    this.overlay.update(
+      this.threeCanvasProps.rendererInstructions.intersectionTopLeft
+    );
+  }
+
+  /**
    * The updateThreeCanvasProps method is used by the viewport-change event handler to keep the overlay dimensions and
    * Three camera view in sync with OpenSeaDragon and make sure the updated Three textures are sent to Three canvas.
    */
@@ -273,17 +289,13 @@ class Relight extends React.Component {
       this.props.viewer.forceRedraw();
       // add a custom event handler that listens for emission of the OpenSeaDragon viewport-change event
       this.props.viewer.addHandler('viewport-change', () => {
-        // here we update a selection of the props for the Three canvas
-        this.updateThreeCanvasProps();
-        // update the threeCanvasProps state to cause a re-render and update the overlay
-        this.setState({
-          threeCanvasProps: this.threeCanvasProps,
-        });
-        // this tells the overlay where to begin in terms of x, y coordinates
-        this.overlay.update(
-          this.threeCanvasProps.rendererInstructions.intersectionTopLeft
-        );
+        this.updateOverlay();
       });
+
+      this.props.viewer.addHandler('rotate', () => {
+        this.updateOverlay();
+      });
+
       // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
       this.props.viewer.addHandler('close', () => {
         this.setState({ active: false, visible: false });
@@ -429,7 +441,9 @@ class Relight extends React.Component {
               onClick={() => this.torchHandler()}
               active={this.state.active}
             />
-            <RelightResetLights onClick={() => this.resetHandler(relightLightDirectionID)} />
+            <RelightResetLights
+              onClick={() => this.resetHandler(relightLightDirectionID)}
+            />
           </RelightLightButtons>
           <RelightLightControls>
             <RelightLightDirection
