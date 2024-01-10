@@ -9,7 +9,14 @@
  * @param {number} scaleFactor the scaleFactor you want to generate tiles for
  * @returns {{}} an array of objects containing IIIF image tile URLs with tile dimensions
  */
-export function generateTiles(id, width, height, tileSource, scaleFactor) {
+export function generateTiles(
+  id,
+  width,
+  height,
+  preferredFormats,
+  tileSource,
+  scaleFactor
+) {
   let tiles = [];
   const tileWidth = tileSource.width;
   const tileHeight = tileSource.height || tileSource.width;
@@ -42,7 +49,14 @@ export function generateTiles(id, width, height, tileSource, scaleFactor) {
       }
       const scaledWidthRemaining = Math.ceil((width - x) / scale);
       const tw = Math.min(tileWidth, scaledWidthRemaining);
-      const iiifArgs = '/' + region + '/' + tw + ',/0/default.jpg';
+
+      let tileFormat = 'jpg';
+
+      if (preferredFormats) {
+        tileFormat = preferredFormats[0];
+      }
+
+      const iiifArgs = '/' + region + '/' + tw + ',/0/default.' + tileFormat;
 
       tiles.push({
         url: id + iiifArgs,
@@ -107,14 +121,15 @@ export function _getProperty(property, data) {
 export const getTiles = (mapURL, data, tilesIndex) => {
   let imageData = {};
   const id = mapURL;
+  imageData.preferredFormats = _parseTiles(data, 'preferredFormats') || null;
   imageData.width = _parseTiles(data, 'width');
   imageData.height = _parseTiles(data, 'height');
   const tiles = _parseTiles(data, 'tiles')[0]; // tiles is index 0 of a singleton
-
   const tileData = generateTiles(
     id,
     imageData.width,
     imageData.height,
+    imageData.preferredFormats,
     tiles,
     tilesIndex
   );
