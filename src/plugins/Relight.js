@@ -10,6 +10,7 @@ import {
   getRendererInstructions,
   getTileSets,
 } from './RelightHelpers';
+import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
 import RelightDirectionalLightIntensity from './RelightDirectionalLightIntensity';
 import RelightLightDirection from './RelightLightDirection';
@@ -42,6 +43,7 @@ class Relight extends React.Component {
     this.mouseY = 0;
     this.lightX = 0;
     this.lightY = 0;
+    this.normalDepth = 1.0;
     this.directionalIntensity = 1.0;
     this.ambientIntensity = 0.1;
     this.images = {};
@@ -139,6 +141,20 @@ class Relight extends React.Component {
   }
 
   /**
+   * The onNormalDepthChange method updates the normalDepth threeCanvasProp in state when the target
+   * component is changed, causing a re-render and updating the props sent to the Three canvas.
+   * @param {event} event event being emitted by the RelightNormalDepthChange component.
+   * @param {number} value new normalDepth value from the component to add to state.
+   */
+  onNormalDepthChange(event, value) {
+    this.normalDepth = value;
+    this.threeCanvasProps.normalDepth = value;
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
+  }
+
+  /**
    * The menuHandler method updates open in state to keep track of if the Mirador sidebar is expanded or contracted.
    */
   menuHandler() {
@@ -185,6 +201,7 @@ class Relight extends React.Component {
     this.threeCanvasProps.normalMap = this.normalMap;
     this.threeCanvasProps.lightX = this.lightX;
     this.threeCanvasProps.lightY = this.lightY;
+    this.threeCanvasProps.normalDepth = this.normalDepth;
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
     this.threeCanvasProps.tileLevel = this.tileLevel;
@@ -475,6 +492,14 @@ class Relight extends React.Component {
               intensity={this.state.threeCanvasProps.ambientIntensity}
               onChange={(event, value) =>
                 this.onAmbientLightChange(event, value)
+              }
+            />
+            <RelightNormalDepth
+              id={uuidv4()}
+              tooltipTitle={'Change Normal Map Depth'}
+              normalDepth={this.state.threeCanvasProps.normalDepth}
+              onChange={(event, value) =>
+                this.onNormalDepthChange(event, value)
               }
             />
           </RelightLightControls>

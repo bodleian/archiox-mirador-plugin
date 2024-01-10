@@ -16,6 +16,7 @@ class RelightThreeCanvas extends React.Component {
     this.state = {
       lightX: this.props.lightX,
       lightY: this.props.lightY,
+      normalDepth: this.props.normalDepth,
       directionalIntensity: this.props.directionalIntensity,
       ambientIntensity: this.props.ambientIntensity,
       zoom: this.props.zoom,
@@ -126,6 +127,13 @@ class RelightThreeCanvas extends React.Component {
         this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
       ].needsUpdate = true;
 
+      this.threeResources[this.props.tileLevel]['materials'][
+        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
+      ].normalScale = new THREE.Vector3(
+        this.props.normalDepth,
+        this.props.normalDepth
+      );
+
       this.threeResources[this.props.tileLevel]['meshes'][
         this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
       ].visible = !(
@@ -164,10 +172,19 @@ class RelightThreeCanvas extends React.Component {
             map: albedoMap,
             normalMap: normalMap,
             flatShading: true,
-            normalScale: new THREE.Vector3(1, 1),
+            normalScale: new THREE.Vector3(
+              this.state.normalDepth,
+              this.state.normalDepth
+            ),
           });
         } else {
-          plane_material = new THREE.MeshPhongMaterial();
+          plane_material = new THREE.MeshPhongMaterial({
+            flatShading: true,
+            normalScale: new THREE.Vector3(
+              this.state.normalDepth,
+              this.state.normalDepth
+            ),
+          });
         }
         const x =
           this.props.tileSets[i].albedoTiles.tiles[j].x +
@@ -275,7 +292,8 @@ class RelightThreeCanvas extends React.Component {
       prevProps.lightX !== this.props.lightX ||
       prevProps.lightY !== this.props.lightY ||
       prevProps.directionalIntensity !== this.props.directionalIntensity ||
-      prevProps.ambientIntensity !== this.props.ambientIntensity
+      prevProps.ambientIntensity !== this.props.ambientIntensity ||
+      prevProps.normalDepth !== this.props.normalDepth
     ) {
       this.ambientLight.intensity = this.props.ambientIntensity;
       this.directionalLight.intensity = this.props.directionalIntensity;
@@ -334,6 +352,8 @@ RelightThreeCanvas.propTypes = {
   lightY: PropTypes.number.isRequired,
   /** The zoom prop is the current OpenSeaDragon zoom ratio **/
   zoom: PropTypes.number.isRequired,
+  /** The normalDepth prop is the current value set in the RelightNormalDepth control **/
+  normalDepth: PropTypes.number.isRequired,
   /** The ambientIntensity prop is the current value set in the RelightAmbientLightIntensity control **/
   ambientIntensity: PropTypes.number.isRequired,
   /** The directionalIntensity prop is the current value set in the RelightDirectionalLightIntensity control **/
