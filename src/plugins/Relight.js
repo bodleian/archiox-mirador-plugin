@@ -205,7 +205,7 @@ class Relight extends React.Component {
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
     this.threeCanvasProps.tileLevel = this.tileLevel;
-    this.threeCanvasProps.minTileLevel = Math.min.apply(this.tileLevels);
+    this.threeCanvasProps.minTileLevel = Math.min.apply(Math, this.tileLevels);
     this.threeCanvasProps.tileLevels = this.tileLevels;
     this.threeCanvasProps.maxTileLevel =
       this.props.viewer.source.scale_factors.length - 1;
@@ -403,16 +403,12 @@ class Relight extends React.Component {
           false
         );
 
-        // add an event handler to keep track of the tile levels being drawn, no point getting all of them
-        this.props.viewer.addHandler('tile-drawn', (event) => {
-          this.tileLevels[event.tile.level] = event.tile.level;
-          this.tileLevel = event.tile.level;
-        });
-
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
         this.props.viewer.addHandler('tile-loaded', (event) => {
           this.setState({ loadHandlerAdded: true });
+          this.tileLevels[event.tile.level] = event.tile.level;
+          this.tileLevel = event.tile.level;
           const sourceKey = event.image.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
           const tileTexture = new THREE.Texture(event.image);
