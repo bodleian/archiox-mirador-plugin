@@ -77,7 +77,7 @@ RelightNormalDepth.propTypes = {
 RelightNormalDepth.defaultProps = {
   normalDepth: 1,
   defaultNormalDepth: 1,
-  step: 0.1,
+  step: 1,
   min: 1,
   max: 10,
   orientation: 'vertical',

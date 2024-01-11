@@ -171,6 +171,7 @@ class Relight extends React.Component {
     this.directionalIntensity = 1.0;
     this.lightX = 0;
     this.lightY = 0;
+    this.normalDepth = 1.0;
 
     document.getElementById(id).style.background =
       `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
