@@ -5,6 +5,7 @@
  * @param {string} id IIIF image resource id
  * @param {number} width width of the image resource at a particular scale factor
  * @param {number} height height of the image resource at a particular scale factor
+ * @param {preferredFormats} preferredFormats format to use in tile requests for ARCHiOx objects
  * @param {object} tileSource object containing information parsed out from the image info.json in the manifest
  * @param {number} scaleFactor the scaleFactor you want to generate tiles for
  * @returns {{}} an array of objects containing IIIF image tile URLs with tile dimensions
