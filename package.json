@@ -25,8 +25,8 @@
   },
   "homepage": "https://gitlab.bodleian.ox.ac.uk/arch0396/archiox-mirador-plugin",
   "peerDependencies": {
-    "mirador": "github:ProjectMirador/mirador#master",
-    "openseadragon": "github:openseadragon/openseadragon.git#master",
+    "mirador": "git+https://github.com/ProjectMirador/mirador.git#master",
+    "openseadragon": "git+https://github.com/openseadragon/openseadragon.git#master",
     "react": "^17.0.2",
     "react-dom": "^17.0.0"
   },
@@ -60,7 +60,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "expect.js": "^0.3.1",
-    "mirador": "github:ProjectMirador/mirador#master",
+    "mirador": "git+https://github.com/ProjectMirador/mirador.git#master",
     "mocha": "^10.2.0",
     "prettier": "^2.8.8",
     "react": "^17.0.2",
