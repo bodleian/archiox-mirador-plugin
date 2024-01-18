@@ -27,8 +27,8 @@
   "peerDependencies": {
     "mirador": "github:ProjectMirador/mirador#master",
     "openseadragon": "github:openseadragon/openseadragon.git#master",
-    "react": "16.x",
-    "react-dom": "16.x"
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0"
   },
   "resolutions": {
     "word-wrap": "npm:@aashutoshrathi/word-wrap",
@@ -60,11 +60,11 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "expect.js": "^0.3.1",
-    "mirador": "github:openseadragon/openseadragon.git#master",
+    "mirador": "github:ProjectMirador/mirador#master",
     "mocha": "^10.2.0",
     "prettier": "^2.8.8",
-    "react": "16.x",
-    "react-dom": "16.x",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
     "reselect": "^4.1.5",
     "tap-nirvana": "^1.1.0",
     "three": "^0.139.2",
