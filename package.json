@@ -58,7 +58,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "mirador": "github:bodleian/archiox-mirador-build",
+    "mirador": "*",
     "expect.js": "^0.3.1",
     "mocha": "^10.2.0",
     "prettier": "^2.8.8",
