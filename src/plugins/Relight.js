@@ -404,8 +404,6 @@ class Relight extends React.Component {
           false
         );
 
-        this.props.viewer.setImageFormatsSupported({webp: true})
-
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
         this.props.viewer.addHandler('tile-loaded', (event) => {
