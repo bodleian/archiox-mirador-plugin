@@ -462,7 +462,9 @@ class Relight extends React.Component {
           <RelightLightControls>
             <RelightLightDirection
               id={relightLightDirectionID}
-              tooltipTitle={'Change Light Direction'}
+              tooltipTitle={
+                'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
+              }
               mouseX={this.state.threeCanvasProps.mouseX}
               mouseY={this.state.threeCanvasProps.mouseY}
               onMouseMove={(event) =>
@@ -477,7 +479,9 @@ class Relight extends React.Component {
             />
             <RelightDirectionalLightIntensity
               id={uuidv4()}
-              tooltipTitle={'Change Directional Light Intensity'}
+              tooltipTitle={
+                'Change the directional light intensity (the torch): decreasing this can help you to see more features if the light is over saturated'
+              }
               intensity={this.state.threeCanvasProps.directionalIntensity}
               onChange={(event, value) =>
                 this.onDirectionalLightChange(event, value)
@@ -485,7 +489,9 @@ class Relight extends React.Component {
             />
             <RelightAmbientLightIntensity
               id={uuidv4()}
-              tooltipTitle={'Change Ambient Light Intensity'}
+              tooltipTitle={
+                'Change the ambient light intensity (the incidental light): increasing this can help you to see the colours of the object more clearly'
+              }
               intensity={this.state.threeCanvasProps.ambientIntensity}
               onChange={(event, value) =>
                 this.onAmbientLightChange(event, value)
@@ -493,7 +499,9 @@ class Relight extends React.Component {
             />
             <RelightNormalDepth
               id={uuidv4()}
-              tooltipTitle={'Change Normal Map Depth'}
+              tooltipTitle={
+                'Change normal map depth: increasing this exagerates the depth of the details helping to bring out more features'
+              }
               normalDepth={this.state.threeCanvasProps.normalDepth}
               onChange={(event, value) =>
                 this.onNormalDepthChange(event, value)
