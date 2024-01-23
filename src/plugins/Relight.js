@@ -10,6 +10,7 @@ import {
   getRendererInstructions,
   getTileSets,
 } from './RelightHelpers';
+import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
 import RelightDirectionalLightIntensity from './RelightDirectionalLightIntensity';
 import RelightLightDirection from './RelightLightDirection';
@@ -42,6 +43,7 @@ class Relight extends React.Component {
     this.mouseY = 0;
     this.lightX = 0;
     this.lightY = 0;
+    this.normalDepth = 1.0;
     this.directionalIntensity = 1.0;
     this.ambientIntensity = 0.1;
     this.images = {};
@@ -139,6 +141,20 @@ class Relight extends React.Component {
   }
 
   /**
+   * The onNormalDepthChange method updates the normalDepth threeCanvasProp in state when the target
+   * component is changed, causing a re-render and updating the props sent to the Three canvas.
+   * @param {event} event event being emitted by the RelightNormalDepthChange component.
+   * @param {number} value new normalDepth value from the component to add to state.
+   */
+  onNormalDepthChange(event, value) {
+    this.normalDepth = value;
+    this.threeCanvasProps.normalDepth = value;
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
+  }
+
+  /**
    * The menuHandler method updates open in state to keep track of if the Mirador sidebar is expanded or contracted.
    */
   menuHandler() {
@@ -155,6 +171,7 @@ class Relight extends React.Component {
     this.directionalIntensity = 1.0;
     this.lightX = 0;
     this.lightY = 0;
+    this.normalDepth = 1.0;
 
     document.getElementById(id).style.background =
       `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
@@ -185,10 +202,11 @@ class Relight extends React.Component {
     this.threeCanvasProps.normalMap = this.normalMap;
     this.threeCanvasProps.lightX = this.lightX;
     this.threeCanvasProps.lightY = this.lightY;
+    this.threeCanvasProps.normalDepth = this.normalDepth;
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
     this.threeCanvasProps.tileLevel = this.tileLevel;
-    this.threeCanvasProps.minTileLevel = Math.min.apply(this.tileLevels);
+    this.threeCanvasProps.minTileLevel = Math.min.apply(Math, this.tileLevels);
     this.threeCanvasProps.tileLevels = this.tileLevels;
     this.threeCanvasProps.maxTileLevel =
       this.props.viewer.source.scale_factors.length - 1;
@@ -386,25 +404,21 @@ class Relight extends React.Component {
           false
         );
 
-        // add an event handler to keep track of the tile levels being drawn, no point getting all of them
-        this.props.viewer.addHandler('tile-drawn', (event) => {
-          this.tileLevels[event.tile.level] = event.tile.level;
-          this.tileLevel = event.tile.level;
-        });
-
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
         this.props.viewer.addHandler('tile-loaded', (event) => {
           this.setState({ loadHandlerAdded: true });
-          const sourceKey = event.image.currentSrc.split('/')[5];
+          this.tileLevels[event.tile.level] = event.tile.level;
+          this.tileLevel = event.tile.level;
+          const sourceKey = event.data.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
-          const tileTexture = new THREE.Texture(event.image);
+          const tileTexture = new THREE.Texture(event.data);
           const key = event.tile.cacheKey;
 
-          canvas.width = event.image.width;
-          canvas.height = event.image.height;
+          canvas.width = event.data.width;
+          canvas.height = event.data.height;
           event.tile.context2D = canvas.getContext('2d');
-          event.tile.context2D.drawImage(event.image, 0, 0);
+          event.tile.context2D.drawImage(event.data, 0, 0);
 
           tileTexture.needsUpdate = true;
 
@@ -475,6 +489,14 @@ class Relight extends React.Component {
               intensity={this.state.threeCanvasProps.ambientIntensity}
               onChange={(event, value) =>
                 this.onAmbientLightChange(event, value)
+              }
+            />
+            <RelightNormalDepth
+              id={uuidv4()}
+              tooltipTitle={'Change Normal Map Depth'}
+              normalDepth={this.state.threeCanvasProps.normalDepth}
+              onChange={(event, value) =>
+                this.onNormalDepthChange(event, value)
               }
             />
           </RelightLightControls>

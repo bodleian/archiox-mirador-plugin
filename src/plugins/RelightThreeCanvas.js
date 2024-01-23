@@ -16,6 +16,7 @@ class RelightThreeCanvas extends React.Component {
     this.state = {
       lightX: this.props.lightX,
       lightY: this.props.lightY,
+      normalDepth: this.props.normalDepth,
       directionalIntensity: this.props.directionalIntensity,
       ambientIntensity: this.props.ambientIntensity,
       zoom: this.props.zoom,
@@ -106,36 +107,49 @@ class RelightThreeCanvas extends React.Component {
   _updateTextures() {
     // loop through the materials and update with new textures
     for (
-      let i = 0;
-      i < this.props.tileSets[this.props.tileLevel].albedoTiles.urls.length;
-      i++
+      let minTileLevel = 1;
+      minTileLevel < this.props.maxTileLevel + 1;
+      minTileLevel++
     ) {
-      this.threeResources[this.props.tileLevel]['materials'][
-        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-      ].map =
-        this.props.images[
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ] || null;
-      this.threeResources[this.props.tileLevel]['materials'][
-        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-      ].normalMap =
-        this.props.images[
-          this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]
-        ] || null;
-      this.threeResources[this.props.tileLevel]['materials'][
-        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-      ].needsUpdate = true;
+      for (
+        let i = 0;
+        i < this.props.tileSets[minTileLevel].albedoTiles.urls.length;
+        i++
+      ) {
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].map =
+          this.props.images[
+            this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+          ] || null;
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].normalMap =
+          this.props.images[
+            this.props.tileSets[minTileLevel].normalTiles.urls[i]
+          ] || null;
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].needsUpdate = true;
 
-      this.threeResources[this.props.tileLevel]['meshes'][
-        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-      ].visible = !(
-        this.threeResources[this.props.tileLevel]['materials'][
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].map === null ||
-        this.threeResources[this.props.tileLevel]['materials'][
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].normalMap === null
-      );
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].normalScale = new THREE.Vector3(
+          this.props.normalDepth,
+          this.props.normalDepth
+        );
+
+        this.threeResources[minTileLevel]['meshes'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].visible = !(
+          this.threeResources[minTileLevel]['materials'][
+            this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+          ].map === null ||
+          this.threeResources[minTileLevel]['materials'][
+            this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+          ].normalMap === null
+        );
+      }
     }
   }
 
@@ -164,10 +178,19 @@ class RelightThreeCanvas extends React.Component {
             map: albedoMap,
             normalMap: normalMap,
             flatShading: true,
-            normalScale: new THREE.Vector3(1, 1),
+            normalScale: new THREE.Vector3(
+              this.props.normalDepth,
+              this.props.normalDepth
+            ),
           });
         } else {
-          plane_material = new THREE.MeshPhongMaterial();
+          plane_material = new THREE.MeshPhongMaterial({
+            flatShading: true,
+            normalScale: new THREE.Vector3(
+              this.props.normalDepth,
+              this.props.normalDepth
+            ),
+          });
         }
         const x =
           this.props.tileSets[i].albedoTiles.tiles[j].x +
@@ -275,8 +298,10 @@ class RelightThreeCanvas extends React.Component {
       prevProps.lightX !== this.props.lightX ||
       prevProps.lightY !== this.props.lightY ||
       prevProps.directionalIntensity !== this.props.directionalIntensity ||
-      prevProps.ambientIntensity !== this.props.ambientIntensity
+      prevProps.ambientIntensity !== this.props.ambientIntensity ||
+      prevProps.normalDepth !== this.props.normalDepth
     ) {
+      //this._updateTextures();
       this.ambientLight.intensity = this.props.ambientIntensity;
       this.directionalLight.intensity = this.props.directionalIntensity;
       this.moveLight();
@@ -334,6 +359,8 @@ RelightThreeCanvas.propTypes = {
   lightY: PropTypes.number.isRequired,
   /** The zoom prop is the current OpenSeaDragon zoom ratio **/
   zoom: PropTypes.number.isRequired,
+  /** The normalDepth prop is the current value set in the RelightNormalDepth control **/
+  normalDepth: PropTypes.number.isRequired,
   /** The ambientIntensity prop is the current value set in the RelightAmbientLightIntensity control **/
   ambientIntensity: PropTypes.number.isRequired,
   /** The directionalIntensity prop is the current value set in the RelightDirectionalLightIntensity control **/
