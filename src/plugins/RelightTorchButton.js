@@ -18,7 +18,11 @@ class RelightTorchButton extends React.Component {
     return (
       <MiradorMenuButton
         id={id}
-        aria-label={active ? 'Turn Off 3D Overlay' : 'Turn On 3D Overlay'}
+        aria-label={
+          active
+            ? 'Turn off the 3D overlay to return to the default Mirador view'
+            : 'Turn on the 3D overlay to relight this object virtually'
+        }
         style={{
           float: 'left',
           clear: 'both',
