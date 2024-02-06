@@ -18,7 +18,9 @@ class RelightLightHelper extends React.Component {
     return (
       <MiradorMenuButton
         aria-label={
-          'Turn on a light direction helper to help you to visualise light position'
+          helperOn
+            ? 'Turn on a light direction helper to help you to visualise light position'
+            : 'Turn off the light direction helper'
         }
         style={{
           float: 'left',
