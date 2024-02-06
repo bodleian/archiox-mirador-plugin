@@ -21,6 +21,7 @@ import RelightLightButtons from './RelightLightButtons';
 import RelightTorchButton from './RelightTorchButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
+import RelightLightHelper from './RelightLightHelper';
 
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
@@ -49,6 +50,7 @@ class Relight extends React.Component {
     this.images = {};
     this.tileSets = {};
     this.tileLevels = {};
+    this.helperOn = false;
   }
   /**
    * The onMouseMove method tracks the mouse coordinates over the RelightLightDirectionControl component to allow the
@@ -183,6 +185,11 @@ class Relight extends React.Component {
     });
   }
 
+  helperHandler() {
+    this.helperOn = !this.helperOn;
+    this.updateOverlay();
+  }
+
   /**
    * The initialiseThreeCanvasProps method sets the threeCanvasProps object with the current lighting positions,
    * zoom level, tile levels, image intersection dimensions, and maps so that the Three canvas overlay has everything
@@ -192,6 +199,7 @@ class Relight extends React.Component {
   initialiseThreeCanvasProps() {
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps = {};
+    this.threeCanvasProps.helperOn = this.helperOn;
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
       this.props
     );
@@ -233,9 +241,11 @@ class Relight extends React.Component {
       threeCanvasProps: this.threeCanvasProps,
     });
     // this tells the overlay where to begin in terms of x, y coordinates
-    this.overlay.update(
-      this.threeCanvasProps.rendererInstructions.intersectionTopLeft
-    );
+    if (this.overlay) {
+      this.overlay.update(
+        this.threeCanvasProps.rendererInstructions.intersectionTopLeft
+      );
+    }
   }
 
   /**
@@ -243,6 +253,7 @@ class Relight extends React.Component {
    * Three camera view in sync with OpenSeaDragon and make sure the updated Three textures are sent to Three canvas.
    */
   updateThreeCanvasProps() {
+    this.threeCanvasProps.helperOn = this.helperOn;
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
       this.props
@@ -457,6 +468,10 @@ class Relight extends React.Component {
             />
             <RelightResetLights
               onClick={() => this.resetHandler(relightLightDirectionID)}
+            />
+            <RelightLightHelper
+              helperOn={this.helperOn}
+              onClick={() => this.helperHandler()}
             />
           </RelightLightButtons>
           <RelightLightControls>

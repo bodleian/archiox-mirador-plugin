@@ -37,6 +37,11 @@ class RelightThreeCanvas extends React.Component {
       this.state.height * this.state.zoom
     );
 
+    this.targetGeometry = new THREE.BoxGeometry(10, 10, 0.2);
+    this.targetMaterial = new THREE.MeshStandardMaterial();
+    this.target = new THREE.Mesh(this.targetGeometry, this.targetMaterial);
+    this.target.position.set(0, 0, 0);
+
     // define an orthographic camera
     this.camera = new THREE.OrthographicCamera(
       this.props.contentWidth / -2,
@@ -44,10 +49,10 @@ class RelightThreeCanvas extends React.Component {
       this.props.contentHeight / 2,
       this.props.contentHeight / -2,
       -1,
-      1
+      1200
     );
 
-    this.camera.position.set(0, 0, 1);
+    this.camera.position.set(0, 0, 1200);
 
     // only show a part of the orthographic camera that matches the zoom and intersection of OpenSeaDragon
     this._cameraOffset(this.camera, this.props);
@@ -70,12 +75,22 @@ class RelightThreeCanvas extends React.Component {
       0xffffff,
       this.state.directionalIntensity
     );
-    this.directionalLight.position.set(0, 0, 1);
+
+    this.directionalLight.position.set(0, 0, 999);
+    this.directionalLightHelper = new THREE.DirectionalLightHelper(
+      this.directionalLight,
+      100
+    );
     this.directionalLight.castShadow = true;
+    this.scene.add(this.target);
+    this.scene.add(this.directionalLightHelper);
+    this.directionalLight.target = this.target;
     this.moveLight();
     this.scene.add(this.camera);
     this.scene.add(this.directionalLight);
     this.scene.add(this.ambientLight);
+    this.directionalLightHelper.visible = this.props.helperOn;
+    this.target.visible = this.props.helperOn;
   }
 
   /**
@@ -132,7 +147,7 @@ class RelightThreeCanvas extends React.Component {
 
         this.threeResources[minTileLevel]['materials'][
           this.props.tileSets[minTileLevel].albedoTiles.urls[i]
-        ].normalScale = new THREE.Vector3(
+        ].normalScale = new THREE.Vector2(
           this.props.normalDepth,
           this.props.normalDepth
         );
@@ -176,7 +191,7 @@ class RelightThreeCanvas extends React.Component {
             map: albedoMap,
             normalMap: normalMap,
             flatShading: true,
-            normalScale: new THREE.Vector3(
+            normalScale: new THREE.Vector2(
               this.props.normalDepth,
               this.props.normalDepth
             ),
@@ -184,7 +199,7 @@ class RelightThreeCanvas extends React.Component {
         } else {
           plane_material = new THREE.MeshPhongMaterial({
             flatShading: true,
-            normalScale: new THREE.Vector3(
+            normalScale: new THREE.Vector2(
               this.props.normalDepth,
               this.props.normalDepth
             ),
@@ -249,17 +264,51 @@ class RelightThreeCanvas extends React.Component {
       this.props.intersection.height * this.props.zoom
     );
     this._cameraOffset(this.camera, this.props);
+
+    let size = new THREE.Vector2();
+    this.renderer.getSize(size);
+
+    let yOffset = null;
+
+    if (this.props.intersection.y <= 0) {
+      yOffset =
+        this.props.intersection.y -
+        this.props.intersection.height / 2 +
+        this.props.contentHeight / 2;
+    } else {
+      yOffset = -(
+        this.props.intersection.y +
+        this.props.intersection.height / 2 -
+        this.props.contentHeight / 2
+      );
+    }
+    this.target.position.set(
+      this.props.intersection.x +
+        this.props.intersection.width / 2 -
+        this.props.contentWidth / 2,
+      yOffset,
+      0
+    );
+    this.moveLight();
   }
 
   /**
    * The moveLight method updates the direction the directionalLight is pointing.
    */
   moveLight() {
-    let vector = new THREE.Vector3(this.props.lightX, this.props.lightY, 0);
+    let vector = new THREE.Vector3(this.props.lightX, -this.props.lightY, 0);
     let dir = vector.sub(this.camera.position).normalize();
     let distance = -this.camera.position.z / dir.z;
     let pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
-    this.directionalLight.position.set(pos.x, pos.y, 1);
+    this.directionalLight.position.set(
+      this.target.position.x + pos.x * this.props.intersection.width,
+      this.target.position.y + pos.y * this.props.intersection.height,
+      999
+    );
+    this.directionalLight.updateMatrixWorld();
+    this.target.updateMatrixWorld();
+    this.directionalLightHelper.updateMatrixWorld();
+    this.directionalLightHelper.update();
   }
 
   /**
@@ -283,6 +332,9 @@ class RelightThreeCanvas extends React.Component {
    */
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
+    this.directionalLightHelper.visible = this.props.helperOn;
+    this.target.visible = this.props.helperOn;
+
     if (
       prevProps.tileLevel !== this.props.tileLevel ||
       prevProps.images.length !== this.props.images.length
@@ -299,12 +351,14 @@ class RelightThreeCanvas extends React.Component {
       prevProps.ambientIntensity !== this.props.ambientIntensity ||
       prevProps.normalDepth !== this.props.normalDepth
     ) {
-      //this._updateTextures();
       this.ambientLight.intensity = this.props.ambientIntensity;
       this.directionalLight.intensity = this.props.directionalIntensity;
       this.moveLight();
       this.rerender();
       this.camera.updateProjectionMatrix();
+      this.directionalLight.updateMatrixWorld();
+      this.directionalLightHelper.updateMatrixWorld();
+      this.directionalLightHelper.update();
     }
   }
 
@@ -374,6 +428,8 @@ RelightThreeCanvas.propTypes = {
   images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
   /** The tileSets prop is an array of all the albedo/normal tile levels, image tile dimensions, and tile image urls **/
   tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
+  /** The helperOn prop is a boolean value telling the ThreeCanvas whether or not to render the directional light helper **/
+  helperOn: PropTypes.bool.isRequired,
 };
 
 export default RelightThreeCanvas;
