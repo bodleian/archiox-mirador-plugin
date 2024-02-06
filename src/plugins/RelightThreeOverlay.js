@@ -62,8 +62,6 @@ RelightThreeOverlay.propTypes = {
       width: PropTypes.number.isRequired,
       x: PropTypes.number.isRequired,
       y: PropTypes.number.isRequired,
-      topLeft: PropTypes.number.isRequired,
-      bottomLeft: PropTypes.number.isRequired,
     }).isRequired,
     contentWidth: PropTypes.number.isRequired,
     contentHeight: PropTypes.number.isRequired,

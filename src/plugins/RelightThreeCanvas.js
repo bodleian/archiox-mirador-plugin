@@ -26,8 +26,6 @@ class RelightThreeCanvas extends React.Component {
       contentHeight: this.props.contentHeight,
       x: this.props.intersection.x,
       y: this.props.intersection.y,
-      topLeft: this.props.intersection.topLeft,
-      bottomLeft: this.props.intersection.bottomLeft,
     };
     this.id = 'canvas-container-' + uuidv4();
     this.threeResources = {};
@@ -371,8 +369,6 @@ RelightThreeCanvas.propTypes = {
     width: PropTypes.number.isRequired,
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
-    topLeft: PropTypes.number.isRequired,
-    bottomLeft: PropTypes.number.isRequired,
   }).isRequired,
   /** The images prop is an array of all the required tile images that have been loaded from OpenSeaDragon **/
   images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
