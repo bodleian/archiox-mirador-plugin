@@ -34,24 +34,24 @@ class RelightThreeOverlay extends React.Component {
       helperOn,
     } = this.props.threeCanvasProps;
     return (
-        <RelightThreeCanvas
-            images={images}
-            zoom={zoom}
-            intersection={rendererInstructions.intersection}
-            contentWidth={contentWidth}
-            contentHeight={contentHeight}
-            lightX={lightX}
-            lightY={lightY}
-            normalDepth={normalDepth}
-            shininess={shininess}
-            directionalIntensity={directionalIntensity}
-            ambientIntensity={ambientIntensity}
-            tileLevel={tileLevel}
-            maxTileLevel={maxTileLevel}
-            tileSets={tileSets}
-            tileLevels={tileLevels}
-            helperOn={helperOn}
-        />
+      <RelightThreeCanvas
+        images={images}
+        zoom={zoom}
+        intersection={rendererInstructions.intersection}
+        contentWidth={contentWidth}
+        contentHeight={contentHeight}
+        lightX={lightX}
+        lightY={lightY}
+        normalDepth={normalDepth}
+        shininess={shininess}
+        directionalIntensity={directionalIntensity}
+        ambientIntensity={ambientIntensity}
+        tileLevel={tileLevel}
+        maxTileLevel={maxTileLevel}
+        tileSets={tileSets}
+        tileLevels={tileLevels}
+        helperOn={helperOn}
+      />
     );
   }
 }

@@ -79,7 +79,7 @@ RelightShininessIntensity.defaultProps = {
   defaultIntensity: 30.0,
   step: 1,
   min: 0.0,
-  max: 100.00,
+  max: 100.0,
   orientation: 'vertical',
   size: 'small',
 };

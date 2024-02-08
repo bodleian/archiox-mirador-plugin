@@ -22,7 +22,7 @@ import RelightTorchButton from './RelightTorchButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
 import RelightLightHelper from './RelightLightHelper';
-import RelightShininessIntensity from "./RelightShininessIntensity";
+import RelightShininessIntensity from './RelightShininessIntensity';
 
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
@@ -76,11 +76,11 @@ class Relight extends React.Component {
 
     if (this.mouseDown) {
       document.getElementById(id).style.background =
-          `radial-gradient(at ` +
-          this.mouseX +
-          `% ` +
-          this.mouseY +
-          `%, #ffffff, #000000)`;
+        `radial-gradient(at ` +
+        this.mouseX +
+        `% ` +
+        this.mouseY +
+        `%, #ffffff, #000000)`;
       this.lightX = (this.mouseX / 100) * 2 - 1;
       this.lightY = (this.mouseY / 100) * 2 - 1;
       this.threeCanvasProps.lightX = this.lightX;
@@ -193,7 +193,7 @@ class Relight extends React.Component {
     this.shininess = 30.0;
 
     document.getElementById(id).style.background =
-        `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
+      `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
 
     this.initialiseThreeCanvasProps();
 
@@ -218,11 +218,11 @@ class Relight extends React.Component {
     this.threeCanvasProps = {};
     this.threeCanvasProps.helperOn = this.helperOn;
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
-        this.props
+      this.props
     );
     this.threeCanvasProps.zoom = this.props.viewer.world
-        .getItemAt(0)
-        .viewportToImageZoom(zoom_level);
+      .getItemAt(0)
+      .viewportToImageZoom(zoom_level);
     this.threeCanvasProps.albedoMap = this.albedoMap;
     this.threeCanvasProps.normalMap = this.normalMap;
     this.threeCanvasProps.lightX = this.lightX;
@@ -235,12 +235,12 @@ class Relight extends React.Component {
     this.threeCanvasProps.minTileLevel = Math.min.apply(Math, this.tileLevels);
     this.threeCanvasProps.tileLevels = this.tileLevels;
     this.threeCanvasProps.maxTileLevel =
-        this.props.viewer.source.scale_factors.length - 1;
+      this.props.viewer.source.scale_factors.length - 1;
     this.tileSets = getTileSets(
-        this.threeCanvasProps.maxTileLevel,
-        this.props.viewer.source,
-        this.threeCanvasProps.albedoMap,
-        this.threeCanvasProps.normalMap
+      this.threeCanvasProps.maxTileLevel,
+      this.props.viewer.source,
+      this.threeCanvasProps.albedoMap,
+      this.threeCanvasProps.normalMap
     );
     this.threeCanvasProps.contentWidth = this.tileSets[1].albedoTiles.width;
     this.threeCanvasProps.contentHeight = this.tileSets[1].albedoTiles.height;
@@ -261,7 +261,7 @@ class Relight extends React.Component {
     // this tells the overlay where to begin in terms of x, y coordinates
     if (this.overlay) {
       this.overlay.update(
-          this.threeCanvasProps.rendererInstructions.intersectionTopLeft
+        this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
     }
   }
@@ -274,11 +274,11 @@ class Relight extends React.Component {
     this.threeCanvasProps.helperOn = this.helperOn;
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
-        this.props
+      this.props
     );
     this.threeCanvasProps.zoom = this.props.viewer.viewport.viewer.world
-        .getItemAt(0)
-        .viewportToImageZoom(zoom_level);
+      .getItemAt(0)
+      .viewportToImageZoom(zoom_level);
     this.threeCanvasProps.tileLevel = this.tileLevel;
     this.threeCanvasProps.images = this.images;
   }
@@ -295,23 +295,23 @@ class Relight extends React.Component {
     // always turn on albedo and normal regardless
     this.excluded_maps = ['albedo', 'normal'];
     updateLayer(
-        this.props.windowId,
-        this.props.updateLayers,
-        this.excluded_maps,
-        this.canvasId,
-        this.layers,
-        true
+      this.props.windowId,
+      this.props.updateLayers,
+      this.excluded_maps,
+      this.canvasId,
+      this.layers,
+      true
     );
 
     // toggle on or off composite
     this.excluded_maps = ['composite'];
     updateLayer(
-        this.props.windowId,
-        this.props.updateLayers,
-        this.excluded_maps,
-        this.canvasId,
-        this.layers,
-        this.state.active
+      this.props.windowId,
+      this.props.updateLayers,
+      this.excluded_maps,
+      this.canvasId,
+      this.layers,
+      this.state.active
     );
 
     if (this.state.active) {
@@ -328,7 +328,7 @@ class Relight extends React.Component {
       this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
 
       this.overlay.update(
-          this.threeCanvasProps.rendererInstructions.intersectionTopLeft
+        this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
 
       // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
@@ -352,11 +352,11 @@ class Relight extends React.Component {
     }
     // if the torchButton state is active render the overlay over OpenSeaDragon
     !this.state.active
-        ? ReactDOM.render(
-            <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
-            this.threeCanvas
+      ? ReactDOM.render(
+          <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
+          this.threeCanvas
         )
-        : ReactDOM.unmountComponentAtNode(this.threeCanvas);
+      : ReactDOM.unmountComponentAtNode(this.threeCanvas);
   }
 
   /**
@@ -372,11 +372,11 @@ class Relight extends React.Component {
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.state.active
-        ? ReactDOM.render(
-            <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
-            this.threeCanvas
+      ? ReactDOM.render(
+          <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
+          this.threeCanvas
         )
-        : null;
+      : null;
   }
 
   /**
@@ -393,9 +393,9 @@ class Relight extends React.Component {
       // if albedo or normal maps are not present set visible state to false, this will prevent the plug-in from
       // rendering at all, which is what we want.
       if (
-          typeof this.albedoMap !== 'undefined' &&
-          typeof this.normalMap !== 'undefined' &&
-          !this.state.visible
+        typeof this.albedoMap !== 'undefined' &&
+        typeof this.normalMap !== 'undefined' &&
+        !this.state.visible
       ) {
         this.setState((prevState) => ({ visible: !prevState.visible }));
         this.map_ids = [
@@ -411,9 +411,9 @@ class Relight extends React.Component {
 
     // if the viewer object, albedoMap and normalMap URLs are not available, do not render
     if (
-        this.props.viewer &&
-        typeof this.albedoMap !== 'undefined' &&
-        typeof this.normalMap !== 'undefined'
+      this.props.viewer &&
+      typeof this.albedoMap !== 'undefined' &&
+      typeof this.normalMap !== 'undefined'
     ) {
       // if the loaded in state is false and the loadHandlerAdded state is false then add the tile-loaded event
       // handler, and update state this prevents the handler being added each time there is a re-render
@@ -425,12 +425,12 @@ class Relight extends React.Component {
         this.canvasId = this.props.canvas.id;
 
         updateLayer(
-            this.props.windowId,
-            this.props.updateLayers,
-            this.excluded_maps,
-            this.canvasId,
-            this.layers,
-            false
+          this.props.windowId,
+          this.props.updateLayers,
+          this.excluded_maps,
+          this.canvasId,
+          this.layers,
+          false
         );
 
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
@@ -469,100 +469,100 @@ class Relight extends React.Component {
 
     if (this.state.visible && this.state.open) {
       toolMenu = (
-          <RelightToolMenu
+        <RelightToolMenu
+          id={uuidv4()}
+          visible={this.state.visible}
+          sideBarOpen={this.props.window.sideBarOpen}
+        >
+          <RelightLightButtons id={uuidv4()}>
+            <RelightMenuButton
+              open={this.state.open}
+              onClick={() => this.menuHandler()}
+            />
+            <RelightTorchButton
               id={uuidv4()}
-              visible={this.state.visible}
-              sideBarOpen={this.props.window.sideBarOpen}
-          >
-            <RelightLightButtons id={uuidv4()}>
-              <RelightMenuButton
-                  open={this.state.open}
-                  onClick={() => this.menuHandler()}
-              />
-              <RelightTorchButton
-                  id={uuidv4()}
-                  onClick={() => this.torchHandler()}
-                  active={this.state.active}
-              />
-              <RelightResetLights
-                  onClick={() => this.resetHandler(relightLightDirectionID)}
-              />
-              <RelightLightHelper
-                  helperOn={this.helperOn}
-                  onClick={() => this.helperHandler()}
-              />
-            </RelightLightButtons>
-            <RelightLightControls>
-              <RelightLightDirection
-                  id={relightLightDirectionID}
-                  tooltipTitle={
-                    'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
-                  }
-                  mouseX={this.state.threeCanvasProps.mouseX}
-                  mouseY={this.state.threeCanvasProps.mouseY}
-                  onMouseMove={(event) =>
-                      this.onMouseMove(event, relightLightDirectionID)
-                  }
-                  onMouseDown={(event) => this.onMouseDown(event)}
-                  onMouseUp={(event) => this.onMouseUp(event)}
-                  onMouseLeave={(event) => this.onMouseLeave(event)}
-                  onTouchMove={(event) =>
-                      this.onMouseMove(event, relightLightDirectionID)
-                  }
-              />
-              <RelightDirectionalLightIntensity
-                  id={uuidv4()}
-                  tooltipTitle={
-                    'Change the directional light intensity (the torch): decreasing this can help you to see more features if the light is over saturated'
-                  }
-                  intensity={this.state.threeCanvasProps.directionalIntensity}
-                  onChange={(event, value) =>
-                      this.onDirectionalLightChange(event, value)
-                  }
-              />
-              <RelightAmbientLightIntensity
-                  id={uuidv4()}
-                  tooltipTitle={
-                    'Change the ambient light intensity (the incidental light): increasing this can help you to see the colours of the object more clearly'
-                  }
-                  intensity={this.state.threeCanvasProps.ambientIntensity}
-                  onChange={(event, value) =>
-                      this.onAmbientLightChange(event, value)
-                  }
-              />
-              <RelightNormalDepth
-                  id={uuidv4()}
-                  tooltipTitle={
-                    'Change normal map depth: increasing this exagerates the depth of the details helping to bring out more features'
-                  }
-                  normalDepth={this.state.threeCanvasProps.normalDepth}
-                  onChange={(event, value) =>
-                      this.onNormalDepthChange(event, value)
-                  }
-              />
-              <RelightShininessIntensity
-                  id={uuidv4()}
-                  tooltipTitle={'Change the shininess of the object to see specular highlights'}
-                  intensity={this.state.threeCanvasProps.shininess}
-                  onChange={(event, value) =>
-                      this.onShininessChange(event, value)
-                  }
-              />
-            </RelightLightControls>
-          </RelightToolMenu>
+              onClick={() => this.torchHandler()}
+              active={this.state.active}
+            />
+            <RelightResetLights
+              onClick={() => this.resetHandler(relightLightDirectionID)}
+            />
+            <RelightLightHelper
+              helperOn={this.helperOn}
+              onClick={() => this.helperHandler()}
+            />
+          </RelightLightButtons>
+          <RelightLightControls>
+            <RelightLightDirection
+              id={relightLightDirectionID}
+              tooltipTitle={
+                'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
+              }
+              mouseX={this.state.threeCanvasProps.mouseX}
+              mouseY={this.state.threeCanvasProps.mouseY}
+              onMouseMove={(event) =>
+                this.onMouseMove(event, relightLightDirectionID)
+              }
+              onMouseDown={(event) => this.onMouseDown(event)}
+              onMouseUp={(event) => this.onMouseUp(event)}
+              onMouseLeave={(event) => this.onMouseLeave(event)}
+              onTouchMove={(event) =>
+                this.onMouseMove(event, relightLightDirectionID)
+              }
+            />
+            <RelightDirectionalLightIntensity
+              id={uuidv4()}
+              tooltipTitle={
+                'Change the directional light intensity (the torch): decreasing this can help you to see more features if the light is over saturated'
+              }
+              intensity={this.state.threeCanvasProps.directionalIntensity}
+              onChange={(event, value) =>
+                this.onDirectionalLightChange(event, value)
+              }
+            />
+            <RelightAmbientLightIntensity
+              id={uuidv4()}
+              tooltipTitle={
+                'Change the ambient light intensity (the incidental light): increasing this can help you to see the colours of the object more clearly'
+              }
+              intensity={this.state.threeCanvasProps.ambientIntensity}
+              onChange={(event, value) =>
+                this.onAmbientLightChange(event, value)
+              }
+            />
+            <RelightNormalDepth
+              id={uuidv4()}
+              tooltipTitle={
+                'Change normal map depth: increasing this exagerates the depth of the details helping to bring out more features'
+              }
+              normalDepth={this.state.threeCanvasProps.normalDepth}
+              onChange={(event, value) =>
+                this.onNormalDepthChange(event, value)
+              }
+            />
+            <RelightShininessIntensity
+              id={uuidv4()}
+              tooltipTitle={
+                'Change the shininess of the object: increasing this can enhance the reflective highlights to bring out more features'
+              }
+              intensity={this.state.threeCanvasProps.shininess}
+              onChange={(event, value) => this.onShininessChange(event, value)}
+            />
+          </RelightLightControls>
+        </RelightToolMenu>
       );
     } else if (this.state.visible && !this.state.open) {
       toolMenu = (
-          <RelightToolMenu
-              id={uuidv4()}
-              visible={this.state.visible}
-              sideBarOpen={this.props.window.sideBarOpen}
-          >
-            <RelightMenuButton
-                open={this.state.open}
-                onClick={() => this.menuHandler()}
-            />
-          </RelightToolMenu>
+        <RelightToolMenu
+          id={uuidv4()}
+          visible={this.state.visible}
+          sideBarOpen={this.props.window.sideBarOpen}
+        >
+          <RelightMenuButton
+            open={this.state.open}
+            onClick={() => this.menuHandler()}
+          />
+        </RelightToolMenu>
       );
     } else if (!this.state.visible) {
       toolMenu = null;
