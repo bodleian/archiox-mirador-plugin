@@ -75,7 +75,7 @@ RelightShininessIntensity.propTypes = {
 };
 
 RelightShininessIntensity.defaultProps = {
-  intensity: 1.0,
+  intensity: 30.0,
   defaultIntensity: 30.0,
   step: 1,
   min: 0.0,
