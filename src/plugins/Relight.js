@@ -22,6 +22,7 @@ import RelightTorchButton from './RelightTorchButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
 import RelightLightHelper from './RelightLightHelper';
+import RelightShininessIntensity from './RelightShininessIntensity';
 
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
@@ -45,6 +46,7 @@ class Relight extends React.Component {
     this.lightX = 0;
     this.lightY = 0;
     this.normalDepth = 1.0;
+    this.shininess = 30;
     this.directionalIntensity = 1.0;
     this.ambientIntensity = 0.1;
     this.images = {};
@@ -157,6 +159,20 @@ class Relight extends React.Component {
   }
 
   /**
+   * The onShininessChange method updates the shininess threeCanvasProp in state when the
+   * target component is changed, causing a re-render and updating the props sent to the Three canvas.
+   * @param {event} event event being emitted by the RelightShininessIntensity component.
+   * @param {number} value new shininess value from the component to ad to state.
+   * **/
+  onShininessChange(event, value) {
+    this.shininess = value;
+    this.threeCanvasProps.shininess = value;
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
+  }
+
+  /**
    * The menuHandler method updates open in state to keep track of if the Mirador sidebar is expanded or contracted.
    */
   menuHandler() {
@@ -174,6 +190,7 @@ class Relight extends React.Component {
     this.lightX = 0;
     this.lightY = 0;
     this.normalDepth = 1.0;
+    this.shininess = 30.0;
 
     document.getElementById(id).style.background =
       `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
@@ -211,6 +228,7 @@ class Relight extends React.Component {
     this.threeCanvasProps.lightX = this.lightX;
     this.threeCanvasProps.lightY = this.lightY;
     this.threeCanvasProps.normalDepth = this.normalDepth;
+    this.threeCanvasProps.shininess = this.shininess;
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
     this.threeCanvasProps.tileLevel = this.tileLevel;
@@ -521,6 +539,14 @@ class Relight extends React.Component {
               onChange={(event, value) =>
                 this.onNormalDepthChange(event, value)
               }
+            />
+            <RelightShininessIntensity
+              id={uuidv4()}
+              tooltipTitle={
+                'Change the shininess of the object: increasing this can enhance the reflective highlights to bring out more features'
+              }
+              intensity={this.state.threeCanvasProps.shininess}
+              onChange={(event, value) => this.onShininessChange(event, value)}
             />
           </RelightLightControls>
         </RelightToolMenu>
