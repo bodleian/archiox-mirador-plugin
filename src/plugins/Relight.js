@@ -9,7 +9,6 @@ import {
   getMap,
   getRendererInstructions,
   getTileSets,
-  parseIIIFUrl,
 } from './RelightHelpers';
 import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
