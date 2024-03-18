@@ -25,9 +25,9 @@
   },
   "homepage": "https://gitlab.bodleian.ox.ac.uk/arch0396/archiox-mirador-plugin",
   "peerDependencies": {
-    "mirador": "*",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "mirador": "4.0.0-alpha.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "resolutions": {
     "word-wrap": "npm:@aashutoshrathi/word-wrap",
@@ -37,8 +37,8 @@
     "tap-out": "github:scottcorgan/tap-out.git"
   },
   "dependencies": {
-    "@material-ui/core": "^4.12.4",
-    "@material-ui/icons": "^4.11.3",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.13.5",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
     "three": "^0.139.2",
@@ -58,12 +58,12 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "mirador": "*",
+    "mirador": "4.0.0-alpha.1",
     "expect.js": "^0.3.1",
     "mocha": "^10.2.0",
     "prettier": "^2.8.8",
-    "react": "^16.8.6x",
-    "react-dom": "^16.8.6",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "reselect": "^4.1.5",
     "tap-nirvana": "^1.1.0",
     "three": "^0.139.2",
