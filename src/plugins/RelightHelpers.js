@@ -274,3 +274,16 @@ export function updateLayer(
     }
   });
 }
+
+/**
+ * A function to parse a IIIF tile URL and get the x, y, width, and height
+ */
+export function parseIIIFUrl(url) {
+  // example url https://iiif.bodleian.ox.ac.uk/iiif/image/5f34d322-61d9-44a0-81a3-9422364fa991/3072,0,136,1024/34,/0/default.webp
+  const rawURL = new URL(url);
+  const path = rawURL.pathname;
+  const pathParts = path.split('/');
+  const imageParams = pathParts[pathParts.length - 4];
+
+  return imageParams.split(',');
+}

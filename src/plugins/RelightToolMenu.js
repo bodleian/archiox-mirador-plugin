@@ -21,7 +21,7 @@ class RelightToolMenu extends React.Component {
     return (
       <div
         style={{
-          display: 'flex',
+          display: 'grid',
           alignItems: 'center',
           position: 'absolute',
           top: '8px',

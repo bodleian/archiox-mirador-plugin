@@ -24,6 +24,7 @@ class RelightThreeOverlay extends React.Component {
       lightX,
       lightY,
       normalDepth,
+      shininess,
       directionalIntensity,
       ambientIntensity,
       tileLevel,
@@ -42,6 +43,7 @@ class RelightThreeOverlay extends React.Component {
         lightX={lightX}
         lightY={lightY}
         normalDepth={normalDepth}
+        shininess={shininess}
         directionalIntensity={directionalIntensity}
         ambientIntensity={ambientIntensity}
         tileLevel={tileLevel}
@@ -70,11 +72,12 @@ RelightThreeOverlay.propTypes = {
     lightX: PropTypes.number.isRequired,
     lightY: PropTypes.number.isRequired,
     normalDepth: PropTypes.number.isRequired,
+    shininess: PropTypes.number.isRequired,
     directionalIntensity: PropTypes.number.isRequired,
     ambientIntensity: PropTypes.number.isRequired,
     tileLevel: PropTypes.number.isRequired,
     maxTileLevel: PropTypes.number.isRequired,
-    tileSets: PropTypes.arrayOf(PropTypes.any).isRequired, // might need to go into this in more detail as to what this is composed of
+    tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
     tileLevels: PropTypes.arrayOf(PropTypes.number).isRequired,
     helperOn: PropTypes.bool.isRequired,
   }),

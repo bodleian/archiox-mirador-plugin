@@ -12,7 +12,15 @@ class RelightLightControls extends React.Component {
   render() {
     // children is used so that parent props can be passed to the children components inside its tags
     const { children } = this.props;
-    return <div style={{ float: 'left', display: 'flex' }}>{children}</div>;
+    return (
+      <div
+        style={{
+          display: 'flex',
+        }}
+      >
+        {children}
+      </div>
+    );
   }
 }
 

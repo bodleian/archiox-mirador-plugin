@@ -17,6 +17,7 @@ class RelightThreeCanvas extends React.Component {
       lightX: this.props.lightX,
       lightY: this.props.lightY,
       normalDepth: this.props.normalDepth,
+      shininess: this.props.shininess,
       directionalIntensity: this.props.directionalIntensity,
       ambientIntensity: this.props.ambientIntensity,
       zoom: this.props.zoom,
@@ -152,6 +153,10 @@ class RelightThreeCanvas extends React.Component {
           this.props.normalDepth
         );
 
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].shininess = this.props.shininess;
+
         this.threeResources[minTileLevel]['meshes'][
           this.props.tileSets[minTileLevel].albedoTiles.urls[i]
         ].visible = !(
@@ -195,6 +200,7 @@ class RelightThreeCanvas extends React.Component {
               this.props.normalDepth,
               this.props.normalDepth
             ),
+            shininess: this.props.shininess,
           });
         } else {
           plane_material = new THREE.MeshPhongMaterial({
@@ -203,6 +209,7 @@ class RelightThreeCanvas extends React.Component {
               this.props.normalDepth,
               this.props.normalDepth
             ),
+            shininess: this.props.shininess,
           });
         }
         const x =
@@ -413,6 +420,8 @@ RelightThreeCanvas.propTypes = {
   zoom: PropTypes.number.isRequired,
   /** The normalDepth prop is the current value set in the RelightNormalDepth control **/
   normalDepth: PropTypes.number.isRequired,
+  /** The shininess prop is the current value set in the RelightShininessIntensity controll **/
+  shininess: PropTypes.number.isRequired,
   /** The ambientIntensity prop is the current value set in the RelightAmbientLightIntensity control **/
   ambientIntensity: PropTypes.number.isRequired,
   /** The directionalIntensity prop is the current value set in the RelightDirectionalLightIntensity control **/
