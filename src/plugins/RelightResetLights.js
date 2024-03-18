@@ -1,5 +1,5 @@
 import React from 'react';
-import ReplaySharpIcon from '@material-ui/icons/ReplaySharp';
+import ReplaySharpIcon from '@mui/icons-material/ReplaySharp';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 

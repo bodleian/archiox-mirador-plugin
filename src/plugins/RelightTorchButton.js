@@ -1,8 +1,8 @@
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import React from 'react';
 
-import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
-import WbIncandescentOutlinedIcon from '@material-ui/icons/WbIncandescentOutlined';
+import WbIncandescentIcon from '@mui/icons-material/WbIncandescent';
+import WbIncandescentOutlinedIcon from '@mui/icons-material/WbIncandescentOutlined';
 
 import PropTypes from 'prop-types';
 

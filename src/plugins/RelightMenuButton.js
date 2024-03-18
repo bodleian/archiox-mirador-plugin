@@ -1,6 +1,6 @@
 import React from 'react';
-import HighlightIcon from '@material-ui/icons/Highlight';
-import CloseSharpIcon from '@material-ui/icons/CloseSharp';
+import HighlightIcon from '@mui/icons-material/Highlight';
+import CloseSharpIcon from '@mui/icons-material/CloseSharp';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import PropTypes from 'prop-types';
 

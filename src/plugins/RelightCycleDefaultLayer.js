@@ -1,5 +1,5 @@
 import React from 'react';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 

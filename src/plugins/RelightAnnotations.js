@@ -1,6 +1,6 @@
 import React from 'react';
-import SpeakerNotes from '@material-ui/icons/SpeakerNotes';
-import SpeakerNotesOff from '@material-ui/icons/SpeakerNotesOff';
+import SpeakerNotes from '@mui/icons-material/SpeakerNotes';
+import SpeakerNotesOff from '@mui/icons-material/SpeakerNotesOff';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
@@ -35,6 +35,8 @@ class RelightAnnotationButton extends React.Component {
 }
 
 RelightAnnotationButton.propTypes = {
+  /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
+  id: PropTypes.string.isRequired,
   /** The open prop tells the button to render as if the tool menu is expanded or closed **/
   active: PropTypes.bool.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
