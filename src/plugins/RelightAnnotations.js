@@ -35,7 +35,9 @@ class RelightAnnotationButton extends React.Component {
 }
 
 RelightAnnotationButton.propTypes = {
-  /** The open prop tells the button to render as if the tool menu is expanded or closed **/
+  /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
+  id: PropTypes.string.isRequired,
+  /** The active prop tells the button to render as if the annotation layer is on or off **/
   active: PropTypes.bool.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,

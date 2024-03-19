@@ -13,14 +13,13 @@ class RelightCycleDefaultLayer extends React.Component {
   }
 
   render() {
-    const { id, defaulLayer, onClick } = this.props;
+    const { id, onClick } = this.props;
     return (
       <MiradorMenuButton
         id={id}
         aria-label={
           'Click here to cycle through the layers for this object in Mirador; layers can tell you extra information about this object.'
         }
-        // todo: add the ability to get the current texture and relabel the instructions appropriately        }
         style={{
           clear: 'both',
         }}
@@ -33,10 +32,8 @@ class RelightCycleDefaultLayer extends React.Component {
 }
 
 RelightCycleDefaultLayer.propTypes = {
-  /** bla bla bla **/
+  /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
   id: PropTypes.string.isRequired,
-  /** bla bla bla **/
-  defaultLayer: PropTypes.string.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,
 };

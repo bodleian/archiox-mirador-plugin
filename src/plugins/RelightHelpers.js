@@ -11,12 +11,12 @@
  * @returns {{}} an array of objects containing IIIF image tile URLs with tile dimensions
  */
 export function generateTiles(
-    id,
-    width,
-    height,
-    preferredFormats,
-    tileSource,
-    scaleFactor
+  id,
+  width,
+  height,
+  preferredFormats,
+  tileSource,
+  scaleFactor
 ) {
   let tiles = [];
   const tileWidth = tileSource.width;
@@ -49,7 +49,7 @@ export function generateTiles(
         region = x + ',' + y + ',' + rw + ',' + rh;
       }
       const scaledWidthRemaining = Math.ceil((width - x) / scale);
-      const scaledHeightRemaining = Math.ceil((height - y)/ scale);
+      const scaledHeightRemaining = Math.ceil((height - y) / scale);
       const tw = Math.min(tileWidth, scaledWidthRemaining);
       const th = Math.min(tileHeight, scaledHeightRemaining);
 
@@ -59,7 +59,8 @@ export function generateTiles(
         tileFormat = preferredFormats[0];
       }
 
-      const iiifArgs = '/' + region + '/' + tw + ',' + th + '/0/default.' + tileFormat; // this is where the bug is
+      const iiifArgs =
+        '/' + region + '/' + tw + ',' + th + '/0/default.' + tileFormat; // this is where the bug is
 
       tiles.push({
         url: id + iiifArgs,
@@ -129,12 +130,12 @@ export const getTiles = (mapURL, data, tilesIndex) => {
   imageData.height = _parseTiles(data, 'height');
   const tiles = _parseTiles(data, 'tiles')[0]; // tiles is index 0 of a singleton
   const tileData = generateTiles(
-      id,
-      imageData.width,
-      imageData.height,
-      imageData.preferredFormats,
-      tiles,
-      tilesIndex
+    id,
+    imageData.width,
+    imageData.height,
+    imageData.preferredFormats,
+    tiles,
+    tilesIndex
   );
   imageData.urls = _getProperty('url', tileData);
   imageData.tiles = _getProperty('tile', tileData);
@@ -151,7 +152,7 @@ export function getLayers(annotationBodies) {
   let layers = {};
   annotationBodies.forEach(function (element) {
     let service = element.getService(
-        'http://iiif.io/api/annex/services/lightingmap'
+      'http://iiif.io/api/annex/services/lightingmap'
     );
     if (service === null) {
       service = element.getService('http://iiif.io/api/extension/lightingmap');
@@ -175,7 +176,7 @@ export function getMap(annotationBodies, mapType) {
 
   annotationBodies.forEach(function (element) {
     let service = element.getService(
-        'http://iiif.io/api/annex/services/lightingmap'
+      'http://iiif.io/api/annex/services/lightingmap'
     );
 
     // anticipate future edge case now, we can always fix this at a later date
@@ -258,12 +259,12 @@ export function getRendererInstructions(props) {
  * @param {boolean} value a boolean value indicating whether you want the excluded layers on or off
  */
 export function updateLayer(
-    windowId,
-    updateLayers,
-    excluded_maps,
-    canvasId,
-    layers,
-    value
+  windowId,
+  updateLayers,
+  excluded_maps,
+  canvasId,
+  layers,
+  value
 ) {
   Object.keys(layers).forEach((key) => {
     const mapType = layers[key].trim();
