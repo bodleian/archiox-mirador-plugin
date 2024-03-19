@@ -21,11 +21,11 @@ import RelightLightButtons from './RelightLightButtons';
 import RelightTorchButton from './RelightTorchButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
-import RelightAnnotationButton from './RelightAnnotations';
+//import RelightAnnotationButton from './RelightAnnotations';
 import RelightMenuButtons from './RelightMenuButtons';
 import RelightLightHelper from './RelightLightHelper';
-import RelightRenderMode from './RelightRenderMode';
-import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
+//import RelightRenderMode from './RelightRenderMode';
+//import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
@@ -543,10 +543,10 @@ class Relight extends React.Component {
             helperOn={this.helperOn}
             onClick={() => this.helperHandler()}
           />
-          <RelightRenderMode
-            mode={this.renderMode}
-            onClick={() => this.renderHandler()}
-          />
+          {/*<RelightRenderMode*/}
+          {/*  mode={this.renderMode}*/}
+          {/*  onClick={() => this.renderHandler()}*/}
+          {/*/>*/}
         </RelightLightButtons>
       );
 
@@ -647,16 +647,16 @@ class Relight extends React.Component {
               onClick={() => this.torchHandler()}
               active={this.state.active}
             />
-            <RelightAnnotationButton
-              id={uuidv4()}
-              onClick={() => this.annotationsHandler()}
-              active={this.annotationsOn}
-            />
-            <RelightCycleDefaultLayer
-              id={uuidv4()}
-              onClick={() => this.defaultLayerHandler()}
-              defaultTexture={this.defaultLayer}
-            />
+            {/*<RelightAnnotationButton*/}
+            {/*  id={uuidv4()}*/}
+            {/*  onClick={() => this.annotationsHandler()}*/}
+            {/*  active={this.annotationsOn}*/}
+            {/*/>*/}
+            {/*<RelightCycleDefaultLayer*/}
+            {/*  id={uuidv4()}*/}
+            {/*  onClick={() => this.defaultLayerHandler()}*/}
+            {/*  defaultTexture={this.defaultLayer}*/}
+            {/*/>*/}
           </RelightMenuButtons>
           {toolMenuLightButtons}
           {toolMenuLightControls}
