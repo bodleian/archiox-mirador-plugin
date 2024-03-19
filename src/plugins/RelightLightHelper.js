@@ -1,6 +1,6 @@
 import React from 'react';
-import Help from '@mui/icons-material/Help';
-import HelpOutline from '@mui/icons-material/HelpOutline';
+import Help from '@material-ui/icons/Help';
+import HelpOutline from '@material-ui/icons/HelpOutline';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 

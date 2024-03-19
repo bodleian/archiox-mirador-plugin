@@ -1,5 +1,5 @@
 import React from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip from '@material-ui/core/Tooltip';
 import PropTypes from 'prop-types';
 
 /**

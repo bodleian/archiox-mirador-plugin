@@ -1,6 +1,6 @@
 import React from 'react';
-import Slider from '@mui/material/Slider';
-import Tooltip from '@mui/material/Tooltip';
+import Slider from '@material-ui/core/Slider';
+import Tooltip from '@material-ui/core/Tooltip';
 import PropTypes from 'prop-types';
 
 /**

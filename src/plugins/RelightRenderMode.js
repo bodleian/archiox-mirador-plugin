@@ -1,6 +1,6 @@
 import React from 'react';
-import LocalMoviesIcon from '@mui/icons-material/LocalMovies';
-import FlareIcon from '@mui/icons-material/Flare';
+import LocalMoviesIcon from '@material-ui/icons/LocalMovies';
+import FlareIcon from '@material-ui/icons/Flare';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
