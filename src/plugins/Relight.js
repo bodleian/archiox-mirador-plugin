@@ -60,7 +60,7 @@ class Relight extends React.Component {
     this.tileSets = {};
     this.tileLevels = {};
     this.helperOn = false;
-    this.renderMode = false;
+    this.renderMode = true;
     if (!this.renderMode) {
       this.normalDepth = 10.0;
     } else {
