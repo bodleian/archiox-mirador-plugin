@@ -597,13 +597,17 @@ class Relight extends React.Component {
           <>
             <RelightRoughnessIntensity
               id={uuidv4()}
-              tooltipTitle={'Change material roughness: bla bla bla'}
+              tooltipTitle={
+                'Change material roughness: change the roughness to model how polished the material is'
+              }
               intensity={this.state.threeCanvasProps.roughness}
               onChange={(event, value) => this.onRoughnessChange(event, value)}
             />
             <RelightMetalnessIntensity
               id={uuidv4()}
-              tooltipTitle={'Change meterial metalness: bla bla bla'}
+              tooltipTitle={
+                'Change meterial metalness: change the metalness to model how metalic the material is'
+              }
               intensity={this.state.threeCanvasProps.metalness}
               onChange={(event, value) => this.onMetalnessChange(event, value)}
             />
