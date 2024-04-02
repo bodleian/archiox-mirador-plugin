@@ -24,7 +24,7 @@ import RelightMenuButton from './RelightMenuButton';
 //import RelightAnnotationButton from './RelightAnnotations';
 import RelightMenuButtons from './RelightMenuButtons';
 import RelightLightHelper from './RelightLightHelper';
-//import RelightRenderMode from './RelightRenderMode';
+import RelightRenderMode from './RelightRenderMode';
 //import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
@@ -51,7 +51,8 @@ class Relight extends React.Component {
     this.mouseY = 0;
     this.lightX = 0;
     this.lightY = 0;
-    this.normalDepth = 1.0;
+    this.metalness = 0.0;
+    this.roughness = 0.5;
     this.shininess = 30;
     this.directionalIntensity = 1.0;
     this.ambientIntensity = 0.1;
@@ -60,6 +61,11 @@ class Relight extends React.Component {
     this.tileLevels = {};
     this.helperOn = false;
     this.renderMode = false;
+    if (!this.renderMode) {
+      this.normalDepth = 10.0;
+    } else {
+      this.normalDepth = 1.0;
+    }
   }
   /**
    * The onMouseMove method tracks the mouse coordinates over the RelightLightDirectionControl component to allow the
@@ -228,7 +234,15 @@ class Relight extends React.Component {
     this.directionalIntensity = 1.0;
     this.lightX = 0;
     this.lightY = 0;
-    this.normalDepth = 1.0;
+
+    if (!this.renderMode) {
+      this.normalDepth = 10.0;
+    } else {
+      this.normalDepth = 1.0;
+    }
+
+    this.metalness = 0.0;
+    this.roughness = 0.5;
     this.shininess = 30.0;
 
     document.getElementById(id).style.background =
@@ -241,6 +255,9 @@ class Relight extends React.Component {
     });
   }
 
+  /**
+   *
+   * **/
   helperHandler() {
     this.helperOn = !this.helperOn;
     this.updateOverlay();
@@ -256,6 +273,7 @@ class Relight extends React.Component {
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps = {};
     this.threeCanvasProps.helperOn = this.helperOn;
+    this.threeCanvasProps.renderMode = this.renderMode;
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
       this.props
     );
@@ -267,6 +285,8 @@ class Relight extends React.Component {
     this.threeCanvasProps.lightX = this.lightX;
     this.threeCanvasProps.lightY = this.lightY;
     this.threeCanvasProps.normalDepth = this.normalDepth;
+    this.threeCanvasProps.metalness = this.metalness;
+    this.threeCanvasProps.roughness = this.roughness;
     this.threeCanvasProps.shininess = this.shininess;
     this.threeCanvasProps.directionalIntensity = this.directionalIntensity;
     this.threeCanvasProps.ambientIntensity = this.ambientIntensity;
@@ -310,6 +330,8 @@ class Relight extends React.Component {
    * Three camera view in sync with OpenSeaDragon and make sure the updated Three textures are sent to Three canvas.
    */
   updateThreeCanvasProps() {
+    this.threeCanvasProps.renderMode = this.renderMode;
+
     this.threeCanvasProps.helperOn = this.helperOn;
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
@@ -330,6 +352,12 @@ class Relight extends React.Component {
   torchHandler() {
     // toggle the active state of the torchButton
     this.setState((prevState) => ({ active: !prevState.active }));
+
+    if (!this.renderMode) {
+      this.normalDepth = 10.0;
+    } else {
+      this.normalDepth = 1.0;
+    }
 
     // always turn on albedo and normal regardless
     this.excluded_maps = ['albedo', 'normal'];
@@ -410,6 +438,7 @@ class Relight extends React.Component {
    **/
   renderHandler() {
     this.renderMode = !this.renderMode;
+    this.resetHandler(this.relightLightDirectionID);
     this.updateOverlay();
   }
 
@@ -493,9 +522,6 @@ class Relight extends React.Component {
           this.layers,
           false
         );
-
-        console.log(this.props);
-
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
         this.props.viewer.addHandler('tile-loaded', (event) => {
@@ -529,24 +555,40 @@ class Relight extends React.Component {
 
     let toolMenu = null;
     let toolMenuLightControls = null;
+    let toolMenuLightControlsAmbientIntensity = null;
     let toolMenuLightButtons = null;
     let toolMenuMaterialControls = null;
-    const relightLightDirectionID = uuidv4();
+    this.relightLightDirectionID = uuidv4();
+
+    if (this.renderMode) {
+      toolMenuLightControlsAmbientIntensity = (
+        <RelightAmbientLightIntensity
+          id={uuidv4()}
+          tooltipTitle={
+            'Change the ambient light intensity (the incidental light): increasing this can help you to see the colours of the object more clearly'
+          }
+          intensity={this.state.threeCanvasProps.ambientIntensity}
+          onChange={(event, value) => this.onAmbientLightChange(event, value)}
+        />
+      );
+    } else {
+      toolMenuLightControlsAmbientIntensity = null;
+    }
 
     if (this.state.active) {
       toolMenuLightButtons = (
         <RelightLightButtons>
           <RelightResetLights
-            onClick={() => this.resetHandler(relightLightDirectionID)}
+            onClick={() => this.resetHandler(this.relightLightDirectionID)}
           />
           <RelightLightHelper
             helperOn={this.helperOn}
             onClick={() => this.helperHandler()}
           />
-          {/*<RelightRenderMode*/}
-          {/*  mode={this.renderMode}*/}
-          {/*  onClick={() => this.renderHandler()}*/}
-          {/*/>*/}
+          <RelightRenderMode
+            mode={this.renderMode}
+            onClick={() => this.renderHandler()}
+          />
         </RelightLightButtons>
       );
 
@@ -556,11 +598,13 @@ class Relight extends React.Component {
             <RelightRoughnessIntensity
               id={uuidv4()}
               tooltipTitle={'Change material roughness: bla bla bla'}
+              intensity={this.state.threeCanvasProps.roughness}
               onChange={(event, value) => this.onRoughnessChange(event, value)}
             />
             <RelightMetalnessIntensity
               id={uuidv4()}
               tooltipTitle={'Change meterial metalness: bla bla bla'}
+              intensity={this.state.threeCanvasProps.metalness}
               onChange={(event, value) => this.onMetalnessChange(event, value)}
             />
           </>
@@ -583,20 +627,20 @@ class Relight extends React.Component {
       toolMenuLightControls = (
         <RelightLightControls>
           <RelightLightDirection
-            id={relightLightDirectionID}
+            id={this.relightLightDirectionID}
             tooltipTitle={
               'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
             }
             mouseX={this.state.threeCanvasProps.mouseX}
             mouseY={this.state.threeCanvasProps.mouseY}
             onMouseMove={(event) =>
-              this.onMouseMove(event, relightLightDirectionID)
+              this.onMouseMove(event, this.relightLightDirectionID)
             }
             onMouseDown={(event) => this.onMouseDown(event)}
             onMouseUp={(event) => this.onMouseUp(event)}
             onMouseLeave={(event) => this.onMouseLeave(event)}
             onTouchMove={(event) =>
-              this.onMouseMove(event, relightLightDirectionID)
+              this.onMouseMove(event, this.relightLightDirectionID)
             }
           />
           <RelightDirectionalLightIntensity
@@ -609,14 +653,7 @@ class Relight extends React.Component {
               this.onDirectionalLightChange(event, value)
             }
           />
-          <RelightAmbientLightIntensity
-            id={uuidv4()}
-            tooltipTitle={
-              'Change the ambient light intensity (the incidental light): increasing this can help you to see the colours of the object more clearly'
-            }
-            intensity={this.state.threeCanvasProps.ambientIntensity}
-            onChange={(event, value) => this.onAmbientLightChange(event, value)}
-          />
+          {toolMenuLightControlsAmbientIntensity}
           <RelightNormalDepth
             id={uuidv4()}
             tooltipTitle={

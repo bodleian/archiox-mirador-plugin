@@ -24,6 +24,8 @@ class RelightThreeOverlay extends React.Component {
       lightX,
       lightY,
       normalDepth,
+      metalness,
+      roughness,
       shininess,
       directionalIntensity,
       ambientIntensity,
@@ -32,6 +34,7 @@ class RelightThreeOverlay extends React.Component {
       tileSets,
       tileLevels,
       helperOn,
+      renderMode,
     } = this.props.threeCanvasProps;
     return (
       <RelightThreeCanvas
@@ -43,6 +46,8 @@ class RelightThreeOverlay extends React.Component {
         lightX={lightX}
         lightY={lightY}
         normalDepth={normalDepth}
+        metalness={metalness}
+        roughness={roughness}
         shininess={shininess}
         directionalIntensity={directionalIntensity}
         ambientIntensity={ambientIntensity}
@@ -51,6 +56,7 @@ class RelightThreeOverlay extends React.Component {
         tileSets={tileSets}
         tileLevels={tileLevels}
         helperOn={helperOn}
+        renderMode={renderMode}
       />
     );
   }
@@ -72,6 +78,8 @@ RelightThreeOverlay.propTypes = {
     lightX: PropTypes.number.isRequired,
     lightY: PropTypes.number.isRequired,
     normalDepth: PropTypes.number.isRequired,
+    metalness: PropTypes.number.isRequired,
+    roughness: PropTypes.number.isRequired,
     shininess: PropTypes.number.isRequired,
     directionalIntensity: PropTypes.number.isRequired,
     ambientIntensity: PropTypes.number.isRequired,
@@ -80,6 +88,7 @@ RelightThreeOverlay.propTypes = {
     tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
     tileLevels: PropTypes.arrayOf(PropTypes.number).isRequired,
     helperOn: PropTypes.bool.isRequired,
+    renderMode: PropTypes.bool.isRequired,
   }),
 };
 export default RelightThreeOverlay;

@@ -18,8 +18,6 @@ class RelightThreeCanvas extends React.Component {
       lightY: this.props.lightY,
       normalDepth: this.props.normalDepth,
       shininess: this.props.shininess,
-      directionalIntensity: this.props.directionalIntensity,
-      ambientIntensity: this.props.ambientIntensity,
       zoom: this.props.zoom,
       width: this.props.intersection.width,
       height: this.props.intersection.height,
@@ -39,7 +37,7 @@ class RelightThreeCanvas extends React.Component {
     );
 
     this.targetGeometry = new THREE.BoxGeometry(10, 10, 0.2);
-    this.targetMaterial = new THREE.MeshStandardMaterial();
+    this.targetMaterial = new THREE.MeshBasicMaterial();
     this.target = new THREE.Mesh(this.targetGeometry, this.targetMaterial);
     this.target.position.set(0, 0, 0);
 
@@ -70,17 +68,18 @@ class RelightThreeCanvas extends React.Component {
 
     this.ambientLight = new THREE.AmbientLight(
       0xffffff,
-      this.state.ambientIntensity
+      this.props.ambientIntensity
     );
     this.directionalLight = new THREE.DirectionalLight(
       0xffffff,
-      this.state.directionalIntensity
+      this.props.directionalIntensity
     );
 
     this.directionalLight.position.set(0, 0, 999);
     this.directionalLightHelper = new THREE.DirectionalLightHelper(
       this.directionalLight,
-      100
+      100,
+      '#1967d2'
     );
     this.directionalLight.castShadow = true;
     this.scene.add(this.target);
@@ -157,6 +156,14 @@ class RelightThreeCanvas extends React.Component {
           this.props.tileSets[minTileLevel].albedoTiles.urls[i]
         ].shininess = this.props.shininess;
 
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].metalness = this.props.metalness;
+
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].roughness = this.props.roughness;
+
         this.threeResources[minTileLevel]['meshes'][
           this.props.tileSets[minTileLevel].albedoTiles.urls[i]
         ].visible = !(
@@ -192,25 +199,58 @@ class RelightThreeCanvas extends React.Component {
         if (albedoMap && normalMap) {
           albedoMap.needsUpdate = true;
           normalMap.needsUpdate = true;
-          plane_material = new THREE.MeshPhongMaterial({
-            map: albedoMap,
-            normalMap: normalMap,
-            flatShading: true,
-            normalScale: new THREE.Vector2(
-              this.props.normalDepth,
-              this.props.normalDepth
-            ),
-            shininess: this.props.shininess,
-          });
+
+          if (this.props.renderMode) {
+            plane_material = new THREE.MeshStandardMaterial({
+              map: albedoMap,
+              normalMap: normalMap,
+              flatShading: true,
+              normalScale: new THREE.Vector2(
+                this.props.normalDepth,
+                this.props.normalDepth
+              ),
+              metalness: this.props.metalness,
+              roughness: this.props.roughness,
+              color: '#ffffff',
+            });
+          } else {
+            plane_material = new THREE.MeshPhongMaterial({
+              map: albedoMap,
+              normalMap: normalMap,
+              flatShading: true,
+              normalScale: new THREE.Vector2(
+                this.props.normalDepth,
+                this.props.normalDepth
+              ),
+              shininess: this.props.shininess,
+              specular: '#ffffff',
+              color: '#000000',
+            });
+          }
         } else {
-          plane_material = new THREE.MeshPhongMaterial({
-            flatShading: true,
-            normalScale: new THREE.Vector2(
-              this.props.normalDepth,
-              this.props.normalDepth
-            ),
-            shininess: this.props.shininess,
-          });
+          if (this.props.renderMode) {
+            plane_material = new THREE.MeshStandardMaterial({
+              flatShading: true,
+              normalScale: new THREE.Vector2(
+                this.props.normalDepth,
+                this.props.normalDepth
+              ),
+              metalness: this.props.metalness,
+              roughness: this.props.roughness,
+              color: '#ffffff',
+            });
+          } else {
+            plane_material = new THREE.MeshPhongMaterial({
+              flatShading: true,
+              normalScale: new THREE.Vector2(
+                this.props.normalDepth,
+                this.props.normalDepth
+              ),
+              shininess: this.props.shininess,
+              specular: '#ffffff',
+              color: '#000000',
+            });
+          }
         }
         const x =
           this.props.tileSets[i].albedoTiles.tiles[j].x +
@@ -342,6 +382,10 @@ class RelightThreeCanvas extends React.Component {
     this.directionalLightHelper.visible = this.props.helperOn;
     this.target.visible = this.props.helperOn;
 
+    if (prevProps.renderMode !== this.props.renderMode) {
+      this.generateTiles();
+    }
+
     if (
       prevProps.tileLevel !== this.props.tileLevel ||
       prevProps.images.length !== this.props.images.length
@@ -420,6 +464,10 @@ RelightThreeCanvas.propTypes = {
   zoom: PropTypes.number.isRequired,
   /** The normalDepth prop is the current value set in the RelightNormalDepth control **/
   normalDepth: PropTypes.number.isRequired,
+  /** The metalness prop is the current value set in the RelightMetalinessInstensity control **/
+  metalness: PropTypes.number.isRequired,
+  /** The roughness prop is the current value set in the RelightRoughnessInstensity control **/
+  roughness: PropTypes.number.isRequired,
   /** The shininess prop is the current value set in the RelightShininessIntensity controll **/
   shininess: PropTypes.number.isRequired,
   /** The ambientIntensity prop is the current value set in the RelightAmbientLightIntensity control **/
@@ -439,6 +487,8 @@ RelightThreeCanvas.propTypes = {
   tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
   /** The helperOn prop is a boolean value telling the ThreeCanvas whether or not to render the directional light helper **/
   helperOn: PropTypes.bool.isRequired,
+  /** The renderMode prop is a boolean value telling the ThreeCanvas to swap between PBR and Phong materials **/
+  renderMode: PropTypes.bool.isRequired,
 };
 
 export default RelightThreeCanvas;
