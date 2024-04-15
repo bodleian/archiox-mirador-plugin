@@ -5,7 +5,9 @@ import * as THREE from 'three';
 import { v4 as uuidv4 } from 'uuid';
 import {
   updateLayer,
+  moveLayerToTop,
   getLayers,
+  getAllLayers,
   getMap,
   getRendererInstructions,
   getTileSets,
@@ -25,7 +27,7 @@ import RelightMenuButton from './RelightMenuButton';
 import RelightMenuButtons from './RelightMenuButtons';
 import RelightLightHelper from './RelightLightHelper';
 import RelightRenderMode from './RelightRenderMode';
-//import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
+import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
@@ -446,7 +448,28 @@ class Relight extends React.Component {
    * TODO: this needs documenting
    **/
   defaultLayerHandler() {
-    null;
+    // make all the layers visible...
+    const excluded_maps = ['depth', 'shaded'];
+
+    updateLayer(
+      this.props.windowId,
+      this.props.updateLayers,
+      excluded_maps,
+      this.canvasId,
+      this.layers,
+      true
+    );
+
+    if (this.allLayers === undefined) {
+      this.allLayers = getAllLayers(this.props.canvas.iiifImageResources);
+    }
+    this.allLayers.push(this.allLayers.shift());
+    moveLayerToTop(
+      this.props.windowId,
+      this.canvasId,
+      this.props.updateLayers,
+      this.allLayers
+    ).next();
   }
 
   /**
@@ -693,11 +716,11 @@ class Relight extends React.Component {
             {/*  onClick={() => this.annotationsHandler()}*/}
             {/*  active={this.annotationsOn}*/}
             {/*/>*/}
-            {/*<RelightCycleDefaultLayer*/}
-            {/*  id={uuidv4()}*/}
-            {/*  onClick={() => this.defaultLayerHandler()}*/}
-            {/*  defaultTexture={this.defaultLayer}*/}
-            {/*/>*/}
+            <RelightCycleDefaultLayer
+              id={uuidv4()}
+              onClick={() => this.defaultLayerHandler()}
+              defaultTexture={this.defaultLayer}
+            />
           </RelightMenuButtons>
           {toolMenuLightButtons}
           {toolMenuLightControls}

@@ -1,3 +1,5 @@
+import { put } from 'redux-saga/effects';
+
 /**
  * Generates an object containing a full tile pyramid. Mirador only generates the parts that are needed
  * as they are loaded in, so you cannot access the full pyramid until all the tiles have loaded.  We need the
@@ -165,6 +167,14 @@ export function getLayers(annotationBodies) {
   return layers;
 }
 
+export function getAllLayers(annotationBodies) {
+  let layers = [];
+  annotationBodies.forEach(function (element) {
+    layers.push({ id: element.id });
+  });
+  return layers;
+}
+
 /**
  * Parses IIIF annotationBodies to get the URL of a particular mapType
  * @param {object} annotationBodies IIIF annotationBodies from Mirador
@@ -276,6 +286,24 @@ export function updateLayer(
       updateLayers(windowId, canvasId, payload);
     }
   });
+}
+
+/**
+ * Todo: Document this  generator function
+ * **/
+export function* moveLayerToTop(windowId, canvasId, updateLayers, layers) {
+  console.log(layers);
+
+  const payload = layers.reduce(function (accumulator, layer, index) {
+    accumulator[layer.id] = {
+      index: index,
+    };
+    return accumulator;
+  }, {});
+
+  console.log(payload);
+
+  yield put(updateLayers(windowId, canvasId, payload));
 }
 
 /**
