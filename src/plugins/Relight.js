@@ -5,12 +5,13 @@ import * as THREE from 'three';
 import { v4 as uuidv4 } from 'uuid';
 import {
   updateLayer,
-  moveLayerToTop,
-  getLayers,
-  getAllLayers,
+  setLayers,
+  getMaps,
+  getImages,
   getMap,
   getRendererInstructions,
   getTileSets,
+  reduceLayers,
 } from './RelightHelpers';
 import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
@@ -31,7 +32,7 @@ import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
-
+import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
  * It is composed of a group of buttons and a group of controls that make up the relighting plug-in.
@@ -63,6 +64,7 @@ class Relight extends React.Component {
     this.tileLevels = {};
     this.helperOn = false;
     this.renderMode = true;
+
     if (!this.renderMode) {
       this.normalDepth = 10.0;
     } else {
@@ -362,25 +364,21 @@ class Relight extends React.Component {
     }
 
     // always turn on albedo and normal regardless
-    this.excluded_maps = ['albedo', 'normal'];
-    updateLayer(
-      this.props.windowId,
-      this.props.updateLayers,
-      this.excluded_maps,
-      this.canvasId,
-      this.layers,
-      true
-    );
+    let excluded_maps;
 
-    // toggle on or off composite
-    this.excluded_maps = ['composite'];
+    if (this.state.active) {
+      excluded_maps = ['normal', 'albedo', 'composite'];
+    } else {
+      excluded_maps = ['normal', 'albedo'];
+    }
+
     updateLayer(
+      this.props.state,
+      this.props.canvas.iiifImageResources,
       this.props.windowId,
       this.props.updateLayers,
-      this.excluded_maps,
-      this.canvasId,
-      this.layers,
-      this.state.active
+      excluded_maps,
+      this.canvasId
     );
 
     if (this.state.active) {
@@ -449,26 +447,35 @@ class Relight extends React.Component {
    **/
   defaultLayerHandler() {
     // make all the layers visible...
-    const excluded_maps = ['depth', 'shaded'];
+    const excluded_maps = ['composite', 'albedo', 'normal', 'shaded', 'depth'];
+    const layersInState = getLayers(this.props.state)[this.props.windowId][
+      this.canvasId
+    ];
 
-    updateLayer(
-      this.props.windowId,
-      this.props.updateLayers,
-      excluded_maps,
-      this.canvasId,
-      this.layers,
-      true
-    );
+    // get the current state to get the current order...
+    // we need to get the current order out and place it in
+    const items = Object.entries(layersInState)
+      .map(([url, { index, visibility }]) => ({ url, index, visibility }))
+      .sort((a, b) => a.index - b.index); // Sort items based on the index property
 
-    if (this.allLayers === undefined) {
-      this.allLayers = getAllLayers(this.props.canvas.iiifImageResources);
+    // Transform the sorted items into the desired output format
+    const imagesFromState = items.map(({ url }) => ({ id: url }));
+    const maps = getMaps(this.props.canvas.iiifImageResources);
+
+    if (this.layers === undefined) {
+      this.layers = getImages(this.props.canvas.iiifImageResources);
+    } else {
+      this.layers = imagesFromState;
     }
-    this.allLayers.push(this.allLayers.shift());
-    moveLayerToTop(
+
+    this.layers.push(this.layers.shift());
+    const payload = reduceLayers(this.allLayers, maps, excluded_maps);
+
+    setLayers(
       this.props.windowId,
       this.canvasId,
       this.props.updateLayers,
-      this.allLayers
+      payload
     ).next();
   }
 
@@ -533,17 +540,17 @@ class Relight extends React.Component {
       if (!this.state.loaded && !this.state.loadHandlerAdded) {
         this.setState({ loaded: true });
 
-        this.excluded_maps = ['depth', 'shaded'];
-        this.layers = getLayers(this.props.canvas.iiifImageResources);
+        const excluded_maps = ['composite', 'normal', 'albedo'];
+        this.maps = getMaps(this.props.canvas.iiifImageResources);
         this.canvasId = this.props.canvas.id;
 
         updateLayer(
+          this.props.state,
+          this.props.canvas.iiifImageResources,
           this.props.windowId,
           this.props.updateLayers,
-          this.excluded_maps,
-          this.canvasId,
-          this.layers,
-          false
+          excluded_maps,
+          this.canvasId
         );
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
@@ -629,7 +636,7 @@ class Relight extends React.Component {
             <RelightMetalnessIntensity
               id={uuidv4()}
               tooltipTitle={
-                'Change meterial metalness: change the metalness to model how metalic the material is'
+                'Change material metalness: change the metalness to model how metalic the material is'
               }
               intensity={this.state.threeCanvasProps.metalness}
               onChange={(event, value) => this.onMetalnessChange(event, value)}
@@ -720,6 +727,7 @@ class Relight extends React.Component {
               id={uuidv4()}
               onClick={() => this.defaultLayerHandler()}
               defaultTexture={this.defaultLayer}
+              active={this.state.active}
             />
           </RelightMenuButtons>
           {toolMenuLightButtons}
@@ -762,6 +770,8 @@ Relight.propTypes = {
   window: PropTypes.object.isRequired,
   /** The canvas prop is the Mirador canvas instance in the current instance of Mirador **/
   canvas: PropTypes.object.isRequired,
+  /** The state prop is the Mirador state from the redux store **/
+  state: PropTypes.object.isRequired,
 };
 
 export default Relight;

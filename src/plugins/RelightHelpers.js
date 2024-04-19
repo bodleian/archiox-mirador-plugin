@@ -1,4 +1,5 @@
 import { put } from 'redux-saga/effects';
+import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
 
 /**
  * Generates an object containing a full tile pyramid. Mirador only generates the parts that are needed
@@ -150,7 +151,7 @@ export const getTiles = (mapURL, data, tilesIndex) => {
  * @param {object} annotationBodies IIIF annotationBodies from Mirador
  * @returns {{}} an object containing the ids for all the lighting maps
  */
-export function getLayers(annotationBodies) {
+export function getMaps(annotationBodies) {
   let layers = {};
   annotationBodies.forEach(function (element) {
     let service = element.getService(
@@ -167,12 +168,12 @@ export function getLayers(annotationBodies) {
   return layers;
 }
 
-export function getAllLayers(annotationBodies) {
-  let layers = [];
+export function getImages(annotationBodies) {
+  let images = [];
   annotationBodies.forEach(function (element) {
-    layers.push({ id: element.id });
+    images.push({ id: element.id });
   });
-  return layers;
+  return images;
 }
 
 /**
@@ -261,48 +262,55 @@ export function getRendererInstructions(props) {
  * it can be used to turn off a set of or a singular layer by specifying the layer mapTypes in excluded_maps
  * and providing a list of the layers currently in the viewer.  You can send a boolean value to turn these on
  * or off, which means you can toggle the state of a control e.g. active: false or true to control this too.
+ * @param {string} state the state of the Mirador instance
  * @param {string} windowId the id of the current window in the viewer
  * @param {function} updateLayers the Mirador updateLayers function
  * @param {array} excluded_maps an array containing the mapTypes you wish to toggle visibility on
  * @param {string} canvasId the id of the current canvas in the viewer
- * @param {object} layers an object containing all the layer ids (urls) in viewer
- * @param {boolean} value a boolean value indicating whether you want the excluded layers on or off
  */
 export function updateLayer(
+  state,
+  iiifImageResources,
   windowId,
   updateLayers,
   excluded_maps,
-  canvasId,
-  layers,
-  value
+  canvasId
 ) {
-  Object.keys(layers).forEach((key) => {
-    const mapType = layers[key].trim();
+  let payload = getLayers(state);
+
+  const maps = getMaps(iiifImageResources);
+  const images = getImages(iiifImageResources);
+
+  payload = reduceLayers(images, maps, excluded_maps);
+  updateLayers(windowId, canvasId, payload);
+}
+
+/**
+ * todo: Document this function
+ * **/
+export function reduceLayers(layers, maps, excluded_maps) {
+  const payload = layers.reduce(function (accumulator, layer, index) {
+    let visibility;
+    const mapType = maps[layer.id].trim();
 
     if (excluded_maps.includes(mapType)) {
-      const payload = {
-        [key]: { visibility: value },
-      };
-      updateLayers(windowId, canvasId, payload);
+      visibility = true;
+    } else {
+      visibility = false;
     }
-  });
+    accumulator[layer.id] = {
+      index: index,
+      visibility: visibility, //visibility  // todo: this overwrites anything we have specified with false need a way to feed the desired visibility
+    };
+    return accumulator;
+  }, {});
+  return payload;
 }
 
 /**
  * Todo: Document this  generator function
  * **/
-export function* moveLayerToTop(windowId, canvasId, updateLayers, layers) {
-  console.log(layers);
-
-  const payload = layers.reduce(function (accumulator, layer, index) {
-    accumulator[layer.id] = {
-      index: index,
-    };
-    return accumulator;
-  }, {});
-
-  console.log(payload);
-
+export function* setLayers(windowId, canvasId, updateLayers, payload) {
   yield put(updateLayers(windowId, canvasId, payload));
 }
 

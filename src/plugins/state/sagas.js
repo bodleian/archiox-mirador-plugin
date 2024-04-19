@@ -1,8 +1,9 @@
 import { getCanvases, getWindows } from 'mirador/dist/es/src/state/selectors';
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
-import { put, select, takeEvery } from 'redux-saga/effects';
-import { getLayers } from '../RelightHelpers';
+import { all, put, select, takeEvery } from 'redux-saga/effects';
+import { getImages, getMaps, reduceLayers } from '../RelightHelpers';
 import * as actions from 'mirador/dist/es/src/state/actions';
+import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
 
 /**
  * Saga for when the Mirador setCanvas action is triggered, such as by adding resources, layers that are switched off
@@ -12,32 +13,26 @@ import * as actions from 'mirador/dist/es/src/state/actions';
 export function* setCanvas(action) {
   const updateLayers = actions.updateLayers;
   const windowId = action.windowId;
-  const excluded_maps = ['composite'];
+  const excluded_maps = ['composite', 'normal', 'albedo'];
   const windows = yield select(getWindows, windowId);
   const windowIds = Object.keys(windows).map((item) => {
     return windows[item].id;
   });
 
   for (let windowId of windowIds) {
+    let payload;
     const canvas = yield select(getCanvases, { windowId });
-    const layers = getLayers(canvas[0].iiifImageResources);
-    const layer_keys = Object.keys(layers).map((item) => {
-      return item;
-    });
+    const canvasId = canvas[0].id;
+    const maps = getMaps(canvas[0].iiifImageResources);
+    let images = getImages(canvas[0].iiifImageResources);
 
-    for (let layer of layer_keys) {
-      const mapType = layers[layer].trim();
-
-      if (excluded_maps.includes(mapType)) {
-        const payload = {
-          [layer]: { visibility: true },
-        };
-        yield put(updateLayers(windowId, canvas[0].id, payload));
-      }
-    }
+    payload = reduceLayers(images, maps, excluded_maps);
+    yield put(updateLayers(windowId, canvasId, payload));
   }
 }
 
 export function* rootSaga() {
-  yield takeEvery(ActionTypes.SET_CANVAS, setCanvas);
+  yield takeEvery(
+    takeEvery(ActionTypes.SET_CANVAS, setCanvas),
+  );
 }
