@@ -469,7 +469,7 @@ class Relight extends React.Component {
     }
 
     this.layers.push(this.layers.shift());
-    const payload = reduceLayers(this.allLayers, maps, excluded_maps);
+    const payload = reduceLayers(this.layers, maps, excluded_maps);
 
     setLayers(
       this.props.windowId,
