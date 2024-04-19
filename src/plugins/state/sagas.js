@@ -1,9 +1,8 @@
 import { getCanvases, getWindows } from 'mirador/dist/es/src/state/selectors';
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
-import { all, put, select, takeEvery } from 'redux-saga/effects';
+import { put, select, takeEvery } from 'redux-saga/effects';
 import { getImages, getMaps, reduceLayers } from '../RelightHelpers';
 import * as actions from 'mirador/dist/es/src/state/actions';
-import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
 
 /**
  * Saga for when the Mirador setCanvas action is triggered, such as by adding resources, layers that are switched off
@@ -32,7 +31,5 @@ export function* setCanvas(action) {
 }
 
 export function* rootSaga() {
-  yield takeEvery(
-    takeEvery(ActionTypes.SET_CANVAS, setCanvas),
-  );
+  yield takeEvery(takeEvery(ActionTypes.SET_CANVAS, setCanvas));
 }
