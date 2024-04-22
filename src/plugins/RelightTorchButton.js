@@ -24,7 +24,6 @@ class RelightTorchButton extends React.Component {
             : 'Turn on the 3D overlay to relight this object virtually'
         }
         style={{
-          float: 'left',
           clear: 'both',
         }}
         onClick={onClick}

@@ -15,6 +15,7 @@ export default [
       return {
         canvas: getCurrentCanvas(state, { windowId }),
         window: getWindow(state, _ref),
+        state: state,
       };
     },
     saga: rootSaga,

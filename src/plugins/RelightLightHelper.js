@@ -23,7 +23,6 @@ class RelightLightHelper extends React.Component {
             : 'Turn on a light direction helper to help you to visualise light position'
         }
         style={{
-          float: 'left',
           clear: 'both',
         }}
         onClick={onClick}
