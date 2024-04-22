@@ -731,7 +731,6 @@ class Relight extends React.Component {
             <RelightCycleDefaultLayer
               id={uuidv4()}
               onClick={() => this.defaultLayerHandler()}
-              defaultTexture={this.defaultLayer}
               active={this.state.active}
             />
           </RelightMenuButtons>

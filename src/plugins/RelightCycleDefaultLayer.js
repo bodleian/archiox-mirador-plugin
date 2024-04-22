@@ -13,7 +13,7 @@ class RelightCycleDefaultLayer extends React.Component {
   }
 
   render() {
-    const { id, onClick } = this.props;
+    const { id, onClick, active } = this.props;
     return (
       <MiradorMenuButton
         id={id}
@@ -24,6 +24,7 @@ class RelightCycleDefaultLayer extends React.Component {
           clear: 'both',
         }}
         onClick={onClick}
+        disabled={active}
       >
         <SkipNextIcon />
       </MiradorMenuButton>
@@ -36,6 +37,8 @@ RelightCycleDefaultLayer.propTypes = {
   id: PropTypes.string.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,
+  /** The active prop is a boolean value used to decide if the RelightCycleDefaultLayer should be enabled or not **/
+  active: PropTypes.bool.isRequired,
 };
 
 export default RelightCycleDefaultLayer;
