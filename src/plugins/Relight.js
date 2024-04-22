@@ -451,18 +451,23 @@ class Relight extends React.Component {
     const layersInState = getLayers(this.props.state)[this.props.windowId][
       this.canvasId
     ];
+    let items;
+    let imagesFromState;
 
-    // get the current state to get the current order...
-    // we need to get the current order out and place it in
-    const items = Object.entries(layersInState)
-      .map(([url, { index, visibility }]) => ({ url, index, visibility }))
-      .sort((a, b) => a.index - b.index); // Sort items based on the index property
+    if (layersInState) {
+      // get the current state to get the current order...
+      // we need to get the current order out and place it in
+      items = Object.entries(layersInState)
+        .map(([url, { index, visibility }]) => ({ url, index, visibility }))
+        .sort((a, b) => a.index - b.index); // Sort items based on the index property
 
-    // Transform the sorted items into the desired output format
-    const imagesFromState = items.map(({ url }) => ({ id: url }));
+      // Transform the sorted items into the desired output format
+      imagesFromState = items.map(({ url }) => ({ id: url }));
+    }
+
     const maps = getMaps(this.props.canvas.iiifImageResources);
 
-    if (this.layers === undefined) {
+    if (this.layers === undefined && !layersInState) {
       this.layers = getImages(this.props.canvas.iiifImageResources);
     } else {
       this.layers = imagesFromState;

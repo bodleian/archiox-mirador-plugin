@@ -31,5 +31,5 @@ export function* setCanvas(action) {
 }
 
 export function* rootSaga() {
-  yield takeEvery(takeEvery(ActionTypes.SET_CANVAS, setCanvas));
+  yield takeEvery(ActionTypes.SET_CANVAS, setCanvas);
 }
