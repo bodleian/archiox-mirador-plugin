@@ -82,7 +82,7 @@ export function generateTiles(
 }
 
 /**
- * Returns data from an object by using type as the key.  In this case we use it only for tiles
+ * Gets data from an object by using type as the key.  In this case we use it only for tiles
  * @param {object} data the object containing key: value pairs
  * @param {string} type the key of the data you wish to return
  * @returns {null|*} null if type is not present in the object | any value with type as the key
@@ -149,7 +149,7 @@ export const getTiles = (mapURL, data, tilesIndex) => {
 /**
  * Parses IIIF annotationBodies to get an array of the layers, we get these ids so that we can toggle their visibility
  * @param {object} annotationBodies IIIF annotationBodies from Mirador
- * @returns {{}} an object containing the ids for all the lighting maps
+ * @returns {{}} an object containing the ids for all the lighting maps as keys for their mapType
  */
 export function getMaps(annotationBodies) {
   let layers = {};
@@ -168,6 +168,11 @@ export function getMaps(annotationBodies) {
   return layers;
 }
 
+/**
+ * Gets the image ids from IIIF annotationBodies and returns them as an array
+ * @param {object} annotationBodies IIIF annotationBodies from Mirador
+ * @returns {array} an array of image ids
+ * **/
 export function getImages(annotationBodies) {
   let images = [];
   annotationBodies.forEach(function (element) {
@@ -222,7 +227,7 @@ export function getMap(annotationBodies, mapType) {
  * @param {object} data object containing the IIIFTileSource data from Mirador
  * @param {string} albedoMap URL of the albedoMap
  * @param {string} normalMap URL of the normalMap
- * @returns {{}}
+ * @returns {{}} a nested object containing albedo and normal tiles data
  */
 export function getTileSets(maxTileLevel, data, albedoMap, normalMap) {
   let tileLevels = {};
@@ -258,11 +263,12 @@ export function getRendererInstructions(props) {
 }
 
 /**
- * The updateLayer method is used to turn on or off any set of layers present in the viewer that you want to,
+ * Turns on or off any set of layers present in the viewer that you want to,
  * it can be used to turn off a set of or a singular layer by specifying the layer mapTypes in excluded_maps
  * and providing a list of the layers currently in the viewer.  You can send a boolean value to turn these on
  * or off, which means you can toggle the state of a control e.g. active: false or true to control this too.
  * @param {string} state the state of the Mirador instance
+ * @param {object} annotationBodies IIIF annotationBodies from Mirador
  * @param {string} windowId the id of the current window in the viewer
  * @param {function} updateLayers the Mirador updateLayers function
  * @param {array} excluded_maps an array containing the mapTypes you wish to toggle visibility on
@@ -270,7 +276,7 @@ export function getRendererInstructions(props) {
  */
 export function updateLayer(
   state,
-  iiifImageResources,
+  annotationBodies,
   windowId,
   updateLayers,
   excluded_maps,
@@ -278,44 +284,49 @@ export function updateLayer(
 ) {
   let payload = getLayers(state);
 
-  const maps = getMaps(iiifImageResources);
-  const images = getImages(iiifImageResources);
+  const maps = getMaps(annotationBodies);
+  const images = getImages(annotationBodies);
 
   payload = reduceLayers(images, maps, excluded_maps);
   updateLayers(windowId, canvasId, payload);
 }
 
 /**
- * todo: Document this function
+ * Converts an images array and maptype object into a payload body that can be injected into Miradors layers state
+ * @param {array} layers an array of objects containing image ids
+ * @param {object} maps an object containing image ids as keys with their mapTypes as values
+ * @param {array} excludedMaps an array of mapTypes to be rendered invisible in the layer choices stack
+ * @returns {{}} a nested object to be used as a payload for Mirador layers state
  * **/
-export function reduceLayers(layers, maps, excluded_maps) {
-  const payload = layers.reduce(function (accumulator, layer, index) {
+export function reduceLayers(layers, maps, excludedMaps) {
+  return layers.reduce(function (accumulator, layer, index) {
     let visibility;
     const mapType = maps[layer.id].trim();
 
-    if (excluded_maps.includes(mapType)) {
-      visibility = true;
-    } else {
-      visibility = false;
-    }
+    visibility = excludedMaps.includes(mapType);
     accumulator[layer.id] = {
       index: index,
-      visibility: visibility, //visibility  // todo: this overwrites anything we have specified with false need a way to feed the desired visibility
+      visibility: visibility,
     };
     return accumulator;
   }, {});
-  return payload;
 }
 
 /**
- * Todo: Document this  generator function
+ * Puts a payload object into the targeted Mirador layers state
+ * @param {string} windowId the targeted Mirador windowId
+ * @param {string} canvasId the targeted Mirador canvasId
+ * @param {function} updateLayers the Mirador updateLayers function
+ * @param {{}} payload a nested object to be used as a payload for Mirador layers state
  * **/
 export function* setLayers(windowId, canvasId, updateLayers, payload) {
   yield put(updateLayers(windowId, canvasId, payload));
 }
 
 /**
- * A function to parse a IIIF tile URL and get the x, y, width, and height
+ * Parses a IIIF tile URL and gets the x, y, width, and height of a tile
+ * @param {string} url a string containing the IIIF image API URL for parsing
+ * @returns {array} an array of the URL parameters in the original URL
  */
 export function parseIIIFUrl(url) {
   // example url https://iiif.bodleian.ox.ac.uk/iiif/image/5f34d322-61d9-44a0-81a3-9422364fa991/3072,0,136,1024/34,/0/default.webp
