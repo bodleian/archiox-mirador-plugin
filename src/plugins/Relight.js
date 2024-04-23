@@ -24,7 +24,7 @@ import RelightLightButtons from './RelightLightButtons';
 import RelightTorchButton from './RelightTorchButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
-//import RelightAnnotationButton from './RelightAnnotations';
+//import RelightAnnotationButton from './RelightAnnotations';  // disabled until we can get annotation data
 import RelightMenuButtons from './RelightMenuButtons';
 import RelightLightHelper from './RelightLightHelper';
 import RelightRenderMode from './RelightRenderMode';
@@ -260,7 +260,8 @@ class Relight extends React.Component {
   }
 
   /**
-   *
+   * The helperHandler method when called toggles the boolean value this.helperOn and then trigger an OSD overlay
+   * update to decide if the three.js directional light helper is rendered or not.
    * **/
   helperHandler() {
     this.helperOn = !this.helperOn;
@@ -427,14 +428,16 @@ class Relight extends React.Component {
   }
 
   /**
-   * TODO: this needs documenting
+   * The annotationsHandler method when called will get the state of annotation visibility from Mirador and toggle it.
    **/
   annotationsHandler() {
     null;
   }
 
   /**
-   * TODO: this needs documenting
+   * The renderHandler method when called will toggle the boolean value of this.renderMode, trigger the resetHandler
+   * method causing the UI settings to reset and cause an update of the OSD overlay.  The renderMode boolean value
+   * controls what material the three.js canvas overlay is currently using.
    **/
   renderHandler() {
     this.renderMode = !this.renderMode;
@@ -443,7 +446,10 @@ class Relight extends React.Component {
   }
 
   /**
-   * TODO: this needs documenting
+   * The defaultLayerHandler method when called will reset the visibility of all layers, get the current layers out
+   * of the Mirador state storage, shuffle their index order by one and put them back causing Mirador to change the
+   * current choices layer being rendered on top of the stack.  A user can use Miradors inbuilt functions to change
+   * the order of the choices layers, and this function will preserve that order when shuffling.
    **/
   defaultLayerHandler() {
     // make all the layers visible...
@@ -455,13 +461,12 @@ class Relight extends React.Component {
     let imagesFromState;
 
     if (layersInState) {
-      // get the current state to get the current order...
-      // we need to get the current order out and place it in
+      // get the current state and extract the current index values and visibilities into a sorted array
       items = Object.entries(layersInState)
         .map(([url, { index, visibility }]) => ({ url, index, visibility }))
-        .sort((a, b) => a.index - b.index); // Sort items based on the index property
+        .sort((a, b) => a.index - b.index); // sort items based on the index property
 
-      // Transform the sorted items into the desired output format
+      // transform the sorted items into the desired output format for use as a payload body for Mirador
       imagesFromState = items.map(({ url }) => ({ id: url }));
     }
 

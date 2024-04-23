@@ -1,5 +1,134 @@
 # archiox-mirador-plugin
-This is a dev version of the archiox-mirador-plugin, it is designed to be installed as a mirador plug-in.
+This is the ARCHiOx Mirador Viewer plug-in, it is designed to be installed as a Mirador viewer plug-in and is not
+a standalone application.
+
+# Image Formats
+The plug-in makes use of normal map data generated from photometric techniques of objects and renders a "2.5D"
+interactive experience using a three.js canvas overlay.  Because of this, we recommend that you use a lossless image
+format such as PNG or WebP for your albedo and normal map layers. WebP, however, is not currently supported as of 
+version 4.10 of OpenSeadragon, it is, however, planned for inclusion in version 5.0.  In order to work around this for 
+now, you can build your own version of OpenSeadragon with the following modification, where we have added WebP to the 
+list of formats supported.
+
+```javascript
+var FILEFORMATS = {
+            bmp:  false,
+            jpeg: true,
+            jpg:  true,
+            png:  true,
+            tif:  false,
+            wdp:  false,
+            webp: true
+}
+```
+
+Host your build on GitHub or GitLabs and override the version used by Mirador by adding something like the following
+to your package.json file, where the `org/repository` points to your own.
+
+```json
+"overrides": {
+    "openseadragon": "github:org/repository"
+  }
+```
+
+# IIIF Presentation and Image API Support
+The plug-in is intended to be used with version 3 of the IIIF presentation and image APIs to make use of the
+`preferredFormat` property, so that you can use WebP format.  However, you can technically get choices working
+in version 2.  For the plug-in to work at all you will need to extend IIIF presentation API for choices in the 
+following way, where we add in type `lightingMapExtension` and `mapType`:
+
+```json
+{
+            "id": "http://0.0.0.0:8000/iiif/canvas/object_id.json",
+            "type": "Canvas",
+            "label": {
+                "en": [
+                    "front end"
+                ]
+            },
+            "width": 1508,
+            "height": 5300,
+            "items": [
+                {
+                    "id": "http://0.0.0.0:8000/iiif/annotationpage/object_id.json",
+                    "type": "AnnotationPage",
+                    "items": [
+                        {
+                            "id": "http://0.0.0.0:8000/iiif/annotation/object_id.json",
+                            "type": "Annotation",
+                            "target": "http://0.0.0.0:8000/iiif/canvas/object_id.json",
+                            "body": {
+                                "type": "Choice",
+                                "items": [
+                                    {
+                                        "id": "http://0.0.0.0:8000/iiif/image/image_id/full/max/0/default.png",
+                                        "type": "Image",
+                                        "format": "image/png",
+                                        "label": {
+                                            "en": [
+                                                "front end"
+                                            ]
+                                        },
+                                        "width": 1508,
+                                        "height": 5300,
+                                        "service": [
+                                            {
+                                                "@id": "http://0.0.0.0:8000/iiif/image/image_id",
+                                                "@type": "ImageService2",
+                                                "profile": "http://iiif.io/api/image/2/level1.json"
+                                            },
+                                            {
+                                                "id": "http://0.0.0.0:8000/iiif/image/image_id",
+                                                "type": "ImageService3",
+                                                "profile": "level1"
+                                            },
+                                            {
+                                                "id": "http://0.0.0.0:8000/iiif/image/lightingmap/image_id.json",
+                                                "type": "LightingMapExtension",
+                                                "profile": "http://iiif.io/api/extension/lightingmap",
+                                                "mapType": "albedo"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": "http://0.0.0.0:8000/iiif/image/image_id/full/max/0/default.png",
+                                        "type": "Image",
+                                        "format": "image/png",
+                                        "label": {
+                                            "en": [
+                                                "front end"
+                                            ]
+                                        },
+                                        "width": 1508,
+                                        "height": 5300,
+                                        "service": [
+                                            {
+                                                "@id": "http://0.0.0.0:8000/iiif/image/image_id",
+                                                "@type": "ImageService2",
+                                                "profile": "http://iiif.io/api/image/2/level1.json"
+                                            },
+                                            {
+                                                "id": "http://0.0.0.0:8000/iiif/image/image_id",
+                                                "type": "ImageService3",
+                                                "profile": "level1"
+                                            },
+                                            {
+                                                "id": "http://0.0.0.0:8000/iiif/image/lightingmap/image_id.json",
+                                                "type": "LightingMapExtension",
+                                                "profile": "http://iiif.io/api/extension/lightingmap",
+                                                "mapType": "normal"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "motivation": "painting"
+                }
+            ]
+        }
+```
 
 # Installation and build
 Make sure you have node.js and npm installed.  It might also be good to install nvm to allow you to switch versions of
@@ -112,27 +241,32 @@ In your `index.html` file in your webpack folder add something like the below ex
             // open a specific manifest (optional)
             manifestId: 'some url for a manifest id'
           }],
-          requests: {
-            // Manipulate IIIF HTTP requests (info.json, IIIF presentation manifests, annotations, etc) 
-              // to add an Accept header to use v3 manifests
-            preprocessors: [
-              (url, options) => ({...options,
-                headers: {
-                  ...options.headers,
-                  Accept: 'application/ld+json;profile="http://iiif.io/api/presentation/3/context.json"'
-                }
-              })
-            ],
-          },
-          theme: {
-            palette: {
-              primary: {
-                main: '#1967d2',
-              },
+            requests: {
+                // Manipulate IIIF HTTP requests (info.json, IIIF presentation manifests, annotations, etc) to add an Accept header so we use our v3 manifests
+                preprocessors: [
+                    (url, options) => ({...options,
+                        headers: {
+                            ...options.headers,
+                            Accept: url.endsWith('/info.json')
+                                    ? 'application/ld+json;profile=http://iiif.io/api/image/3/context.json'
+                                    : 'application/ld+json;profile="http://iiif.io/api/presentation/3/context.json"'
+                        }
+                    })
+                ],
             },
-          },
+            theme: {
+                palette: {
+                    primary: {
+                        main: '#1967d2',
+                    },
+                },
+            },
+            osdConfig:{
+                crossOriginPolicy: "Anonymous",
+                subPixelRoundingForTransparency: 2,
+                immediateRender: true
+            },
         };
-
         // this includes all of the plug-ins under MiradorPlugins
         // it's the equivalent of [ ...MiradorPlugins.pluginA, ...MiradorPlugins.pluginB, ...MiradorPlugins.pluginC] 
           // for all plug-ins in MiradorPlugins
