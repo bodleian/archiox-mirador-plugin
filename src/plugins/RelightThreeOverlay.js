@@ -23,13 +23,18 @@ class RelightThreeOverlay extends React.Component {
       contentHeight,
       lightX,
       lightY,
+      normalDepth,
+      metalness,
+      roughness,
+      shininess,
       directionalIntensity,
       ambientIntensity,
       tileLevel,
-      minTileLevel,
       maxTileLevel,
       tileSets,
       tileLevels,
+      helperOn,
+      renderMode,
     } = this.props.threeCanvasProps;
     return (
       <RelightThreeCanvas
@@ -40,13 +45,18 @@ class RelightThreeOverlay extends React.Component {
         contentHeight={contentHeight}
         lightX={lightX}
         lightY={lightY}
+        normalDepth={normalDepth}
+        metalness={metalness}
+        roughness={roughness}
+        shininess={shininess}
         directionalIntensity={directionalIntensity}
         ambientIntensity={ambientIntensity}
         tileLevel={tileLevel}
-        minTileLevel={minTileLevel}
         maxTileLevel={maxTileLevel}
         tileSets={tileSets}
         tileLevels={tileLevels}
+        helperOn={helperOn}
+        renderMode={renderMode}
       />
     );
   }
@@ -62,20 +72,23 @@ RelightThreeOverlay.propTypes = {
       width: PropTypes.number.isRequired,
       x: PropTypes.number.isRequired,
       y: PropTypes.number.isRequired,
-      topLeft: PropTypes.number.isRequired,
-      bottomLeft: PropTypes.number.isRequired,
     }).isRequired,
     contentWidth: PropTypes.number.isRequired,
     contentHeight: PropTypes.number.isRequired,
     lightX: PropTypes.number.isRequired,
     lightY: PropTypes.number.isRequired,
+    normalDepth: PropTypes.number.isRequired,
+    metalness: PropTypes.number.isRequired,
+    roughness: PropTypes.number.isRequired,
+    shininess: PropTypes.number.isRequired,
     directionalIntensity: PropTypes.number.isRequired,
     ambientIntensity: PropTypes.number.isRequired,
     tileLevel: PropTypes.number.isRequired,
-    minTileLevel: PropTypes.number.isRequired,
     maxTileLevel: PropTypes.number.isRequired,
-    tileSets: PropTypes.arrayOf(PropTypes.any).isRequired, // might need to go into this in more detail as to what this is composed of
+    tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
     tileLevels: PropTypes.arrayOf(PropTypes.number).isRequired,
+    helperOn: PropTypes.bool.isRequired,
+    renderMode: PropTypes.bool.isRequired,
   }),
 };
 export default RelightThreeOverlay;

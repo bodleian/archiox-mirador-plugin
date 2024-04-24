@@ -1,6 +1,7 @@
 import React from 'react';
 import * as THREE from 'three';
 import PropTypes from 'prop-types';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * The RelightThreeCanvas component is a Three canvas object containing a scene with orthographic camera, ambient and
@@ -15,8 +16,8 @@ class RelightThreeCanvas extends React.Component {
     this.state = {
       lightX: this.props.lightX,
       lightY: this.props.lightY,
-      directionalIntensity: this.props.directionalIntensity,
-      ambientIntensity: this.props.ambientIntensity,
+      normalDepth: this.props.normalDepth,
+      shininess: this.props.shininess,
       zoom: this.props.zoom,
       width: this.props.intersection.width,
       height: this.props.intersection.height,
@@ -24,9 +25,8 @@ class RelightThreeCanvas extends React.Component {
       contentHeight: this.props.contentHeight,
       x: this.props.intersection.x,
       y: this.props.intersection.y,
-      topLeft: this.props.intersection.topLeft,
-      bottomLeft: this.props.intersection.bottomLeft,
     };
+    this.id = 'canvas-container-' + uuidv4();
     this.threeResources = {};
     this.groups = {};
     this.scene = new THREE.Scene();
@@ -36,6 +36,11 @@ class RelightThreeCanvas extends React.Component {
       this.state.height * this.state.zoom
     );
 
+    this.targetGeometry = new THREE.BoxGeometry(10, 10, 0.2);
+    this.targetMaterial = new THREE.MeshBasicMaterial();
+    this.target = new THREE.Mesh(this.targetGeometry, this.targetMaterial);
+    this.target.position.set(0, 0, 0);
+
     // define an orthographic camera
     this.camera = new THREE.OrthographicCamera(
       this.props.contentWidth / -2,
@@ -43,10 +48,10 @@ class RelightThreeCanvas extends React.Component {
       this.props.contentHeight / 2,
       this.props.contentHeight / -2,
       -1,
-      1
+      1200
     );
 
-    this.camera.position.set(0, 0, 1);
+    this.camera.position.set(0, 0, 1200);
 
     // only show a part of the orthographic camera that matches the zoom and intersection of OpenSeaDragon
     this._cameraOffset(this.camera, this.props);
@@ -63,18 +68,29 @@ class RelightThreeCanvas extends React.Component {
 
     this.ambientLight = new THREE.AmbientLight(
       0xffffff,
-      this.state.ambientIntensity
+      this.props.ambientIntensity
     );
     this.directionalLight = new THREE.DirectionalLight(
       0xffffff,
-      this.state.directionalIntensity
+      this.props.directionalIntensity
     );
-    this.directionalLight.position.set(0, 0, 1);
+
+    this.directionalLight.position.set(0, 0, 999);
+    this.directionalLightHelper = new THREE.DirectionalLightHelper(
+      this.directionalLight,
+      100,
+      '#1967d2'
+    );
     this.directionalLight.castShadow = true;
+    this.scene.add(this.target);
+    this.scene.add(this.directionalLightHelper);
+    this.directionalLight.target = this.target;
     this.moveLight();
     this.scene.add(this.camera);
     this.scene.add(this.directionalLight);
     this.scene.add(this.ambientLight);
+    this.directionalLightHelper.visible = this.props.helperOn;
+    this.target.visible = this.props.helperOn;
   }
 
   /**
@@ -104,36 +120,61 @@ class RelightThreeCanvas extends React.Component {
   _updateTextures() {
     // loop through the materials and update with new textures
     for (
-      let i = 0;
-      i < this.props.tileSets[this.props.tileLevel].albedoTiles.urls.length;
-      i++
+      let minTileLevel = 1;
+      minTileLevel < this.props.maxTileLevel + 1;
+      minTileLevel++
     ) {
-      this.threeResources[this.props.tileLevel]['materials'][
-        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-      ].map =
-        this.props.images[
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ] || null;
-      this.threeResources[this.props.tileLevel]['materials'][
-        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-      ].normalMap =
-        this.props.images[
-          this.props.tileSets[this.props.tileLevel].normalTiles.urls[i]
-        ] || null;
-      this.threeResources[this.props.tileLevel]['materials'][
-        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-      ].needsUpdate = true;
+      for (
+        let i = 0;
+        i < this.props.tileSets[minTileLevel].albedoTiles.urls.length;
+        i++
+      ) {
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].map =
+          this.props.images[
+            this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+          ] || null;
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].normalMap =
+          this.props.images[
+            this.props.tileSets[minTileLevel].normalTiles.urls[i]
+          ] || null;
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].needsUpdate = true;
 
-      this.threeResources[this.props.tileLevel]['meshes'][
-        this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-      ].visible = !(
-        this.threeResources[this.props.tileLevel]['materials'][
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].map === null ||
-        this.threeResources[this.props.tileLevel]['materials'][
-          this.props.tileSets[this.props.tileLevel].albedoTiles.urls[i]
-        ].normalMap === null
-      );
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].normalScale = new THREE.Vector2(
+          this.props.normalDepth,
+          this.props.normalDepth
+        );
+
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].shininess = this.props.shininess;
+
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].metalness = this.props.metalness;
+
+        this.threeResources[minTileLevel]['materials'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].roughness = this.props.roughness;
+
+        this.threeResources[minTileLevel]['meshes'][
+          this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+        ].visible = !(
+          this.threeResources[minTileLevel]['materials'][
+            this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+          ].map === null ||
+          this.threeResources[minTileLevel]['materials'][
+            this.props.tileSets[minTileLevel].albedoTiles.urls[i]
+          ].normalMap === null
+        );
+      }
     }
   }
 
@@ -158,14 +199,58 @@ class RelightThreeCanvas extends React.Component {
         if (albedoMap && normalMap) {
           albedoMap.needsUpdate = true;
           normalMap.needsUpdate = true;
-          plane_material = new THREE.MeshPhongMaterial({
-            map: albedoMap,
-            normalMap: normalMap,
-            flatShading: true,
-            normalScale: new THREE.Vector3(1, 1),
-          });
+
+          if (this.props.renderMode) {
+            plane_material = new THREE.MeshStandardMaterial({
+              map: albedoMap,
+              normalMap: normalMap,
+              flatShading: true,
+              normalScale: new THREE.Vector2(
+                this.props.normalDepth,
+                this.props.normalDepth
+              ),
+              metalness: this.props.metalness,
+              roughness: this.props.roughness,
+              color: '#ffffff',
+            });
+          } else {
+            plane_material = new THREE.MeshPhongMaterial({
+              map: albedoMap,
+              normalMap: normalMap,
+              flatShading: true,
+              normalScale: new THREE.Vector2(
+                this.props.normalDepth,
+                this.props.normalDepth
+              ),
+              shininess: this.props.shininess,
+              specular: '#ffffff',
+              color: '#000000',
+            });
+          }
         } else {
-          plane_material = new THREE.MeshPhongMaterial();
+          if (this.props.renderMode) {
+            plane_material = new THREE.MeshStandardMaterial({
+              flatShading: true,
+              normalScale: new THREE.Vector2(
+                this.props.normalDepth,
+                this.props.normalDepth
+              ),
+              metalness: this.props.metalness,
+              roughness: this.props.roughness,
+              color: '#ffffff',
+            });
+          } else {
+            plane_material = new THREE.MeshPhongMaterial({
+              flatShading: true,
+              normalScale: new THREE.Vector2(
+                this.props.normalDepth,
+                this.props.normalDepth
+              ),
+              shininess: this.props.shininess,
+              specular: '#ffffff',
+              color: '#000000',
+            });
+          }
         }
         const x =
           this.props.tileSets[i].albedoTiles.tiles[j].x +
@@ -226,17 +311,51 @@ class RelightThreeCanvas extends React.Component {
       this.props.intersection.height * this.props.zoom
     );
     this._cameraOffset(this.camera, this.props);
+
+    let size = new THREE.Vector2();
+    this.renderer.getSize(size);
+
+    let yOffset = null;
+
+    if (this.props.intersection.y <= 0) {
+      yOffset =
+        this.props.intersection.y -
+        this.props.intersection.height / 2 +
+        this.props.contentHeight / 2;
+    } else {
+      yOffset = -(
+        this.props.intersection.y +
+        this.props.intersection.height / 2 -
+        this.props.contentHeight / 2
+      );
+    }
+    this.target.position.set(
+      this.props.intersection.x +
+        this.props.intersection.width / 2 -
+        this.props.contentWidth / 2,
+      yOffset,
+      0
+    );
+    this.moveLight();
   }
 
   /**
    * The moveLight method updates the direction the directionalLight is pointing.
    */
   moveLight() {
-    let vector = new THREE.Vector3(this.props.lightX, this.props.lightY, 0);
+    let vector = new THREE.Vector3(this.props.lightX, -this.props.lightY, 0);
     let dir = vector.sub(this.camera.position).normalize();
     let distance = -this.camera.position.z / dir.z;
     let pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
-    this.directionalLight.position.set(pos.x, pos.y, 1);
+    this.directionalLight.position.set(
+      this.target.position.x + pos.x * this.props.intersection.width,
+      this.target.position.y + pos.y * this.props.intersection.height,
+      999
+    );
+    this.directionalLight.updateMatrixWorld();
+    this.target.updateMatrixWorld();
+    this.directionalLightHelper.updateMatrixWorld();
+    this.directionalLightHelper.update();
   }
 
   /**
@@ -245,9 +364,7 @@ class RelightThreeCanvas extends React.Component {
    * animation.
    */
   componentDidMount() {
-    document
-      .getElementById('canvas-container')
-      .appendChild(this.renderer.domElement);
+    document.getElementById(this.id).appendChild(this.renderer.domElement);
     this.animate();
   }
 
@@ -262,6 +379,13 @@ class RelightThreeCanvas extends React.Component {
    */
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
+    this.directionalLightHelper.visible = this.props.helperOn;
+    this.target.visible = this.props.helperOn;
+
+    if (prevProps.renderMode !== this.props.renderMode) {
+      this.generateTiles();
+    }
+
     if (
       prevProps.tileLevel !== this.props.tileLevel ||
       prevProps.images.length !== this.props.images.length
@@ -275,13 +399,17 @@ class RelightThreeCanvas extends React.Component {
       prevProps.lightX !== this.props.lightX ||
       prevProps.lightY !== this.props.lightY ||
       prevProps.directionalIntensity !== this.props.directionalIntensity ||
-      prevProps.ambientIntensity !== this.props.ambientIntensity
+      prevProps.ambientIntensity !== this.props.ambientIntensity ||
+      prevProps.normalDepth !== this.props.normalDepth
     ) {
       this.ambientLight.intensity = this.props.ambientIntensity;
       this.directionalLight.intensity = this.props.directionalIntensity;
       this.moveLight();
       this.rerender();
       this.camera.updateProjectionMatrix();
+      this.directionalLight.updateMatrixWorld();
+      this.directionalLightHelper.updateMatrixWorld();
+      this.directionalLightHelper.update();
     }
   }
 
@@ -311,13 +439,15 @@ class RelightThreeCanvas extends React.Component {
     };
     return (
       <div id="container" style={container}>
-        <div id="canvas-container" style={canvas} />
+        <div id={this.id} style={canvas} />
       </div>
     );
   }
 }
 
 RelightThreeCanvas.propTypes = {
+  /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
+  id: PropTypes.string.isRequired,
   /** The contentWidth prop is the total width of the OpenSeaDragon tiled image **/
   contentWidth: PropTypes.number.isRequired,
   /** The contentHeight prop is the total height of the OpenSeaDragon tiled image **/
@@ -332,6 +462,14 @@ RelightThreeCanvas.propTypes = {
   lightY: PropTypes.number.isRequired,
   /** The zoom prop is the current OpenSeaDragon zoom ratio **/
   zoom: PropTypes.number.isRequired,
+  /** The normalDepth prop is the current value set in the RelightNormalDepth control **/
+  normalDepth: PropTypes.number.isRequired,
+  /** The metalness prop is the current value set in the RelightMetalinessInstensity control **/
+  metalness: PropTypes.number.isRequired,
+  /** The roughness prop is the current value set in the RelightRoughnessInstensity control **/
+  roughness: PropTypes.number.isRequired,
+  /** The shininess prop is the current value set in the RelightShininessIntensity controll **/
+  shininess: PropTypes.number.isRequired,
   /** The ambientIntensity prop is the current value set in the RelightAmbientLightIntensity control **/
   ambientIntensity: PropTypes.number.isRequired,
   /** The directionalIntensity prop is the current value set in the RelightDirectionalLightIntensity control **/
@@ -342,13 +480,15 @@ RelightThreeCanvas.propTypes = {
     width: PropTypes.number.isRequired,
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
-    topLeft: PropTypes.number.isRequired,
-    bottomLeft: PropTypes.number.isRequired,
   }).isRequired,
   /** The images prop is an array of all the required tile images that have been loaded from OpenSeaDragon **/
   images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
   /** The tileSets prop is an array of all the albedo/normal tile levels, image tile dimensions, and tile image urls **/
   tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
+  /** The helperOn prop is a boolean value telling the ThreeCanvas whether or not to render the directional light helper **/
+  helperOn: PropTypes.bool.isRequired,
+  /** The renderMode prop is a boolean value telling the ThreeCanvas to swap between PBR and Phong materials **/
+  renderMode: PropTypes.bool.isRequired,
 };
 
 export default RelightThreeCanvas;

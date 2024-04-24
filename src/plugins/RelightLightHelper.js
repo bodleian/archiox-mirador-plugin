@@ -1,5 +1,6 @@
 import React from 'react';
-import ReplaySharpIcon from '@material-ui/icons/ReplaySharp';
+import Help from '@material-ui/icons/Help';
+import HelpOutline from '@material-ui/icons/HelpOutline';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
@@ -7,30 +8,37 @@ import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuBut
  * The RelightResetLights component is a plug-in button that will reset the state and appearance of the light controls
  * to their default values when it is clicked.
  */
-class RelightResetLights extends React.Component {
+class RelightLightHelper extends React.Component {
   constructor(props) {
     super(props);
   }
 
   render() {
-    const { onClick } = this.props;
+    const { helperOn, onClick } = this.props;
     return (
       <MiradorMenuButton
-        aria-label={'Reset all lighting settings to the default values'}
+        aria-label={
+          helperOn
+            ? 'Turn off the light direction helper'
+            : 'Turn on a light direction helper to help you to visualise light position'
+        }
         style={{
           clear: 'both',
         }}
         onClick={onClick}
+        helperOn={helperOn}
       >
-        <ReplaySharpIcon />
+        {helperOn ? <Help /> : <HelpOutline />}
       </MiradorMenuButton>
     );
   }
 }
 
-RelightResetLights.propTypes = {
+RelightLightHelper.propTypes = {
+  /** The helperOn prop is a boolean value used to toggle the appearence of the main icon **/
+  helperOn: PropTypes.bool.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,
 };
 
-export default RelightResetLights;
+export default RelightLightHelper;

@@ -1,3 +1,6 @@
+import { put } from 'redux-saga/effects';
+import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
+
 /**
  * Generates an object containing a full tile pyramid. Mirador only generates the parts that are needed
  * as they are loaded in, so you cannot access the full pyramid until all the tiles have loaded.  We need the
@@ -5,11 +8,19 @@
  * @param {string} id IIIF image resource id
  * @param {number} width width of the image resource at a particular scale factor
  * @param {number} height height of the image resource at a particular scale factor
+ * @param {preferredFormats} preferredFormats format to use in tile requests for ARCHiOx objects
  * @param {object} tileSource object containing information parsed out from the image info.json in the manifest
  * @param {number} scaleFactor the scaleFactor you want to generate tiles for
  * @returns {{}} an array of objects containing IIIF image tile URLs with tile dimensions
  */
-export function generateTiles(id, width, height, tileSource, scaleFactor) {
+export function generateTiles(
+  id,
+  width,
+  height,
+  preferredFormats,
+  tileSource,
+  scaleFactor
+) {
   let tiles = [];
   const tileWidth = tileSource.width;
   const tileHeight = tileSource.height || tileSource.width;
@@ -41,8 +52,18 @@ export function generateTiles(id, width, height, tileSource, scaleFactor) {
         region = x + ',' + y + ',' + rw + ',' + rh;
       }
       const scaledWidthRemaining = Math.ceil((width - x) / scale);
+      const scaledHeightRemaining = Math.ceil((height - y) / scale);
       const tw = Math.min(tileWidth, scaledWidthRemaining);
-      const iiifArgs = '/' + region + '/' + tw + ',/0/default.jpg';
+      const th = Math.min(tileHeight, scaledHeightRemaining);
+
+      let tileFormat = 'jpg';
+
+      if (preferredFormats) {
+        tileFormat = preferredFormats[0];
+      }
+
+      const iiifArgs =
+        '/' + region + '/' + tw + ',' + th + '/0/default.' + tileFormat; // this is where the bug is
 
       tiles.push({
         url: id + iiifArgs,
@@ -61,7 +82,7 @@ export function generateTiles(id, width, height, tileSource, scaleFactor) {
 }
 
 /**
- * Returns data from an object by using type as the key.  In this case we use it only for tiles
+ * Gets data from an object by using type as the key.  In this case we use it only for tiles
  * @param {object} data the object containing key: value pairs
  * @param {string} type the key of the data you wish to return
  * @returns {null|*} null if type is not present in the object | any value with type as the key
@@ -107,14 +128,15 @@ export function _getProperty(property, data) {
 export const getTiles = (mapURL, data, tilesIndex) => {
   let imageData = {};
   const id = mapURL;
+  imageData.preferredFormats = _parseTiles(data, 'preferredFormats') || null;
   imageData.width = _parseTiles(data, 'width');
   imageData.height = _parseTiles(data, 'height');
   const tiles = _parseTiles(data, 'tiles')[0]; // tiles is index 0 of a singleton
-
   const tileData = generateTiles(
     id,
     imageData.width,
     imageData.height,
+    imageData.preferredFormats,
     tiles,
     tilesIndex
   );
@@ -127,9 +149,9 @@ export const getTiles = (mapURL, data, tilesIndex) => {
 /**
  * Parses IIIF annotationBodies to get an array of the layers, we get these ids so that we can toggle their visibility
  * @param {object} annotationBodies IIIF annotationBodies from Mirador
- * @returns {{}} an object containing the ids for all the lighting maps
+ * @returns {{}} an object containing the ids for all the lighting maps as keys for their mapType
  */
-export function getLayers(annotationBodies) {
+export function getMaps(annotationBodies) {
   let layers = {};
   annotationBodies.forEach(function (element) {
     let service = element.getService(
@@ -144,6 +166,19 @@ export function getLayers(annotationBodies) {
     }
   });
   return layers;
+}
+
+/**
+ * Gets the image ids from IIIF annotationBodies and returns them as an array
+ * @param {object} annotationBodies IIIF annotationBodies from Mirador
+ * @returns {array} an array of image ids
+ * **/
+export function getImages(annotationBodies) {
+  let images = [];
+  annotationBodies.forEach(function (element) {
+    images.push({ id: element.id });
+  });
+  return images;
 }
 
 /**
@@ -192,7 +227,7 @@ export function getMap(annotationBodies, mapType) {
  * @param {object} data object containing the IIIFTileSource data from Mirador
  * @param {string} albedoMap URL of the albedoMap
  * @param {string} normalMap URL of the normalMap
- * @returns {{}}
+ * @returns {{}} a nested object containing albedo and normal tiles data
  */
 export function getTileSets(maxTileLevel, data, albedoMap, normalMap) {
   let tileLevels = {};
@@ -225,4 +260,80 @@ export function getRendererInstructions(props) {
     rendererInstructions.intersection = intersection;
     return rendererInstructions;
   }
+}
+
+/**
+ * Turns on or off any set of layers present in the viewer that you want to,
+ * it can be used to turn off a set of or a singular layer by specifying the layer mapTypes in excluded_maps
+ * and providing a list of the layers currently in the viewer.  You can send a boolean value to turn these on
+ * or off, which means you can toggle the state of a control e.g. active: false or true to control this too.
+ * @param {string} state the state of the Mirador instance
+ * @param {object} annotationBodies IIIF annotationBodies from Mirador
+ * @param {string} windowId the id of the current window in the viewer
+ * @param {function} updateLayers the Mirador updateLayers function
+ * @param {array} excluded_maps an array containing the mapTypes you wish to toggle visibility on
+ * @param {string} canvasId the id of the current canvas in the viewer
+ */
+export function updateLayer(
+  state,
+  annotationBodies,
+  windowId,
+  updateLayers,
+  excluded_maps,
+  canvasId
+) {
+  let payload = getLayers(state);
+
+  const maps = getMaps(annotationBodies);
+  const images = getImages(annotationBodies);
+
+  payload = reduceLayers(images, maps, excluded_maps);
+  updateLayers(windowId, canvasId, payload);
+}
+
+/**
+ * Converts an images array and maptype object into a payload body that can be injected into Miradors layers state
+ * @param {array} layers an array of objects containing image ids
+ * @param {object} maps an object containing image ids as keys with their mapTypes as values
+ * @param {array} excludedMaps an array of mapTypes to be rendered invisible in the layer choices stack
+ * @returns {{}} a nested object to be used as a payload for Mirador layers state
+ * **/
+export function reduceLayers(layers, maps, excludedMaps) {
+  return layers.reduce(function (accumulator, layer, index) {
+    let visibility;
+    const mapType = maps[layer.id].trim();
+
+    visibility = excludedMaps.includes(mapType);
+    accumulator[layer.id] = {
+      index: index,
+      visibility: visibility,
+    };
+    return accumulator;
+  }, {});
+}
+
+/**
+ * Puts a payload object into the targeted Mirador layers state
+ * @param {string} windowId the targeted Mirador windowId
+ * @param {string} canvasId the targeted Mirador canvasId
+ * @param {function} updateLayers the Mirador updateLayers function
+ * @param {{}} payload a nested object to be used as a payload for Mirador layers state
+ * **/
+export function* setLayers(windowId, canvasId, updateLayers, payload) {
+  yield put(updateLayers(windowId, canvasId, payload));
+}
+
+/**
+ * Parses a IIIF tile URL and gets the x, y, width, and height of a tile
+ * @param {string} url a string containing the IIIF image API URL for parsing
+ * @returns {array} an array of the URL parameters in the original URL
+ */
+export function parseIIIFUrl(url) {
+  // example url https://iiif.bodleian.ox.ac.uk/iiif/image/5f34d322-61d9-44a0-81a3-9422364fa991/3072,0,136,1024/34,/0/default.webp
+  const rawURL = new URL(url);
+  const path = rawURL.pathname;
+  const pathParts = path.split('/');
+  const imageParams = pathParts[pathParts.length - 4];
+
+  return imageParams.split(',');
 }

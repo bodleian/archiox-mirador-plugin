@@ -14,12 +14,16 @@ class RelightTorchButton extends React.Component {
     super(props);
   }
   render() {
-    const { active, onClick } = this.props;
+    const { active, onClick, id } = this.props;
     return (
       <MiradorMenuButton
-        aria-label={active ? 'Turn Off 3D Overlay' : 'Turn On 3D Overlay'}
+        id={id}
+        aria-label={
+          active
+            ? 'Turn off the 3D overlay to return to the default Mirador view'
+            : 'Turn on the 3D overlay to relight this object virtually'
+        }
         style={{
-          float: 'left',
           clear: 'both',
         }}
         onClick={onClick}
@@ -31,6 +35,8 @@ class RelightTorchButton extends React.Component {
 }
 
 RelightTorchButton.propTypes = {
+  /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
+  id: PropTypes.string.isRequired,
   /** The open prop tells the button to render as if the Three canvas layer is active or not **/
   active: PropTypes.bool,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
