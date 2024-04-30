@@ -2,6 +2,16 @@
 This is the ARCHiOx Mirador Viewer plug-in, it is designed to be installed as a Mirador viewer plug-in and is not
 a standalone application.
 
+# Demo
+You can play around with our implementation [here](https://iiif.bodleian.ox.ac.uk/iiif/mirador/?iiif-content=https://iiif.bodleian.ox.ac.uk/iiif/manifest/1fc3f35d-bbb5-4524-8fbe-a5bcb5468be2.json)
+
+Look for the torch button in the top left of the viewer window, pressing this will open up our plug-in menu that allows 
+you to render the normal map data alongside the albedo map in realtime in your browser giving the object the illusion of
+3D depth (2.5D) and allowing you to re-light and change the light direction by dragging your mouse cursor over the 
+"sphere" control.  You can also play around with metalness and roughness in `physically based rendering` (PBR) mode, or 
+shininess in `specular enhancement` mode.  The intensity of both directional and ambient light, and the normal depths
+can also be changed using the slider controls to allow you to explore all the details recorded in these special objects.
+
 # Image Formats
 The plug-in makes use of normal map data generated from photometric techniques of objects and renders a "2.5D"
 interactive experience using a three.js canvas overlay.  Because of this, we recommend that you use a lossless image
