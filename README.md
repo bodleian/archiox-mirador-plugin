@@ -3,8 +3,7 @@ This is the ARCHiOx Mirador Viewer plug-in, it is designed to be installed as a 
 a standalone application.
 
 # Demo
-You can play around with our implementation [here]
-(https://iiif.bodleian.ox.ac.uk/iiif/mirador/?iiif-content=https://iiif.bodleian.ox.ac.uk/iiif/manifest/1fc3f35d-bbb5-4524-8fbe-a5bcb5468be2.json)
+You can play around with our implementation [here](https://iiif.bodleian.ox.ac.uk/iiif/mirador/?iiif-content=https://iiif.bodleian.ox.ac.uk/iiif/manifest/1fc3f35d-bbb5-4524-8fbe-a5bcb5468be2.json)
 
 Look for the torch button in the top left of the viewer window, pressing this will open up our plug-in menu that allows 
 you to render the normal map data alongside the albedo map in realtime in your browser giving the object the illusion of
