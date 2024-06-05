@@ -453,7 +453,14 @@ class Relight extends React.Component {
    **/
   defaultLayerHandler() {
     // make all the layers visible...
-    const excluded_maps = ['composite', 'albedo', 'normal', 'shaded', 'depth'];
+    const excluded_maps = [
+      'composite',
+      'albedo',
+      'normal',
+      'shaded',
+      'depth',
+      'undefined',
+    ];
     const layersInState = getLayers(this.props.state)[this.props.windowId][
       this.canvasId
     ];
@@ -551,7 +558,6 @@ class Relight extends React.Component {
         this.setState({ loaded: true });
 
         const excluded_maps = ['composite', 'normal', 'albedo'];
-        this.maps = getMaps(this.props.canvas.iiifImageResources);
         this.canvasId = this.props.canvas.id;
 
         updateLayer(
@@ -562,13 +568,15 @@ class Relight extends React.Component {
           excluded_maps,
           this.canvasId
         );
+
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
         this.props.viewer.addHandler('tile-loaded', (event) => {
           this.setState({ loadHandlerAdded: true });
           this.tileLevels[event.tile.level] = event.tile.level;
           this.tileLevel = event.tile.level;
-          const sourceKey = event.data.currentSrc.split('/')[5];
+
+          const sourceKey = event.data.currentSrc.split('/')[5]; // this is now inadequate
           const canvas = document.createElement('canvas');
           const tileTexture = new THREE.Texture(event.data);
           const key = event.tile.cacheKey;
@@ -582,9 +590,10 @@ class Relight extends React.Component {
 
           if (this.map_ids.includes(sourceKey)) {
             // only keep tile textures we are interested in
-            this.images[key] = tileTexture;
-            this.threeCanvasProps.images = this.images;
-
+            if (!(key in this.images)) {
+              this.images[key] = tileTexture;
+              this.threeCanvasProps.images = this.images;
+            }
             this.setState({
               threeCanvasProps: this.threeCanvasProps,
             });
@@ -595,9 +604,9 @@ class Relight extends React.Component {
 
     let toolMenu = null;
     let toolMenuLightControls = null;
-    let toolMenuLightControlsAmbientIntensity = null;
     let toolMenuLightButtons = null;
     let toolMenuMaterialControls = null;
+    let toolMenuLightControlsAmbientIntensity;
     this.relightLightDirectionID = uuidv4();
 
     if (this.renderMode) {
