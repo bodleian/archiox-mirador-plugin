@@ -576,7 +576,7 @@ class Relight extends React.Component {
           this.tileLevels[event.tile.level] = event.tile.level;
           this.tileLevel = event.tile.level;
 
-          const sourceKey = event.data.currentSrc.split('/')[5]; // this is now inadequate
+          const sourceKey = event.data.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
           const tileTexture = new THREE.Texture(event.data);
           const key = event.tile.cacheKey;

@@ -62,9 +62,7 @@ export function generateTiles(
       }
 
       const iiifArgs =
-        '/' + region + '/' + tw + ',' + th + '/0/default.' + tileFormat; // this is where the bug is
-
-      //console.log(iiifArgs, tileWidth, scaledWidthRemaining);
+        '/' + region + '/' + tw + ',' + th + '/0/default.' + tileFormat;
 
       tiles.push({
         url: id + iiifArgs,
@@ -309,7 +307,6 @@ export function reduceLayers(layers, maps, excludedMaps) {
       mapType = maps[layer.id].trim();
     }
 
-    // re-think how visibility is determined
     visibility = excludedMaps.includes(mapType);
     accumulator[layer.id] = {
       index: index,

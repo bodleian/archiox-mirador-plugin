@@ -65,10 +65,6 @@ class RelightThreeCanvas extends React.Component {
 
     // define a group so that we can handle all the tiles together
     this.generateTiles();
-    // console.log(this.props.tileSets[2].albedoTiles.urls);
-    // console.log(this.props.tileSets[2].normalTiles.urls);
-    // console.log(this.threeResources[2]['materials']);
-    // console.log(this.threeResources[2]['meshes']);
 
     this.ambientLight = new THREE.AmbientLight(
       0xffffff,
