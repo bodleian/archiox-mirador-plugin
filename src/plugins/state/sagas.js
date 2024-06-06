@@ -1,4 +1,7 @@
-import { getCanvases, getWindows } from 'mirador/dist/es/src/state/selectors';
+import {
+  getCurrentCanvas,
+  getWindows,
+} from 'mirador/dist/es/src/state/selectors';
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
 import { put, select, takeEvery } from 'redux-saga/effects';
 import { getImages, getMaps, reduceLayers } from '../RelightHelpers';
@@ -20,10 +23,10 @@ export function* setCanvas(action) {
 
   for (let windowId of windowIds) {
     let payload;
-    const canvas = yield select(getCanvases, { windowId });
-    const canvasId = canvas[0].id;
-    const maps = getMaps(canvas[0].iiifImageResources);
-    let images = getImages(canvas[0].iiifImageResources);
+    const canvas = yield select(getCurrentCanvas, { windowId });
+    const canvasId = canvas.id;
+    const maps = getMaps(canvas.iiifImageResources);
+    let images = getImages(canvas.iiifImageResources);
 
     payload = reduceLayers(images, maps, excluded_maps);
     yield put(updateLayers(windowId, canvasId, payload));

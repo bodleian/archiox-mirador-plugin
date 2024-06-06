@@ -331,6 +331,18 @@ class Relight extends React.Component {
   }
 
   /**
+   *
+   **/
+  generateMapData() {
+    this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
+    this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
+    this.map_ids = [
+      this.albedoMap.split('/').pop(),
+      this.normalMap.split('/').pop(),
+    ];
+  }
+
+  /**
    * The updateThreeCanvasProps method is used by the viewport-change event handler to keep the overlay dimensions and
    * Three camera view in sync with OpenSeaDragon and make sure the updated Three textures are sent to Three canvas.
    */
@@ -409,13 +421,6 @@ class Relight extends React.Component {
 
       this.props.viewer.addHandler('rotate', () => {
         this.updateOverlay();
-      });
-
-      // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
-      this.props.viewer.addHandler('close', () => {
-        this.setState({ active: false, visible: false });
-        // remove all handlers so viewport-change isn't activated!
-        this.props.viewer.removeAllHandlers('viewport-change');
       });
     }
     // if the torchButton state is active render the overlay over OpenSeaDragon
@@ -558,6 +563,7 @@ class Relight extends React.Component {
         this.setState({ loaded: true });
 
         const excluded_maps = ['composite', 'normal', 'albedo'];
+        this.maps = getMaps(this.props.canvas.iiifImageResources);
         this.canvasId = this.props.canvas.id;
 
         updateLayer(
@@ -568,6 +574,24 @@ class Relight extends React.Component {
           excluded_maps,
           this.canvasId
         );
+
+        // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
+        this.props.viewer.addHandler('close', () => {
+          this.canvasId = this.props.canvas.id;
+          updateLayer(
+            this.props.state,
+            this.props.canvas.iiifImageResources,
+            this.props.windowId,
+            this.props.updateLayers,
+            excluded_maps,
+            this.canvasId
+          );
+          this.generateMapData();
+
+          this.setState({ active: false, visible: false });
+          // remove all handlers so viewport-change isn't activated!
+          this.props.viewer.removeAllHandlers('viewport-change');
+        });
 
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
