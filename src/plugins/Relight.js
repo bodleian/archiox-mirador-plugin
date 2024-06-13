@@ -331,6 +331,18 @@ class Relight extends React.Component {
   }
 
   /**
+   *
+   **/
+  generateMapData() {
+    this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
+    this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
+    this.map_ids = [
+      this.albedoMap.split('/').pop(),
+      this.normalMap.split('/').pop(),
+    ];
+  }
+
+  /**
    * The updateThreeCanvasProps method is used by the viewport-change event handler to keep the overlay dimensions and
    * Three camera view in sync with OpenSeaDragon and make sure the updated Three textures are sent to Three canvas.
    */
@@ -410,13 +422,6 @@ class Relight extends React.Component {
       this.props.viewer.addHandler('rotate', () => {
         this.updateOverlay();
       });
-
-      // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
-      this.props.viewer.addHandler('close', () => {
-        this.setState({ active: false, visible: false });
-        // remove all handlers so viewport-change isn't activated!
-        this.props.viewer.removeAllHandlers('viewport-change');
-      });
     }
     // if the torchButton state is active render the overlay over OpenSeaDragon
     !this.state.active
@@ -453,7 +458,14 @@ class Relight extends React.Component {
    **/
   defaultLayerHandler() {
     // make all the layers visible...
-    const excluded_maps = ['composite', 'albedo', 'normal', 'shaded', 'depth'];
+    const excluded_maps = [
+      'composite',
+      'albedo',
+      'normal',
+      'shaded',
+      'depth',
+      'undefined',
+    ];
     const layersInState = getLayers(this.props.state)[this.props.windowId][
       this.canvasId
     ];
@@ -562,12 +574,32 @@ class Relight extends React.Component {
           excluded_maps,
           this.canvasId
         );
+
+        // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
+        this.props.viewer.addHandler('close', () => {
+          this.canvasId = this.props.canvas.id;
+          updateLayer(
+            this.props.state,
+            this.props.canvas.iiifImageResources,
+            this.props.windowId,
+            this.props.updateLayers,
+            excluded_maps,
+            this.canvasId
+          );
+          this.generateMapData();
+
+          this.setState({ active: false, visible: false });
+          // remove all handlers so viewport-change isn't activated!
+          this.props.viewer.removeAllHandlers('viewport-change');
+        });
+
         // add an event handler to build Three textures from the tiles as they are loaded, this means they can be
         // reused and sent to the Three canvas.
         this.props.viewer.addHandler('tile-loaded', (event) => {
           this.setState({ loadHandlerAdded: true });
           this.tileLevels[event.tile.level] = event.tile.level;
           this.tileLevel = event.tile.level;
+
           const sourceKey = event.data.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
           const tileTexture = new THREE.Texture(event.data);
@@ -582,9 +614,10 @@ class Relight extends React.Component {
 
           if (this.map_ids.includes(sourceKey)) {
             // only keep tile textures we are interested in
-            this.images[key] = tileTexture;
-            this.threeCanvasProps.images = this.images;
-
+            if (!(key in this.images)) {
+              this.images[key] = tileTexture;
+              this.threeCanvasProps.images = this.images;
+            }
             this.setState({
               threeCanvasProps: this.threeCanvasProps,
             });
@@ -595,9 +628,9 @@ class Relight extends React.Component {
 
     let toolMenu = null;
     let toolMenuLightControls = null;
-    let toolMenuLightControlsAmbientIntensity = null;
     let toolMenuLightButtons = null;
     let toolMenuMaterialControls = null;
+    let toolMenuLightControlsAmbientIntensity;
     this.relightLightDirectionID = uuidv4();
 
     if (this.renderMode) {

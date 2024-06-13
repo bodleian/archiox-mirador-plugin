@@ -1,8 +1,12 @@
-import { getCanvases, getWindows } from 'mirador/dist/es/src/state/selectors';
+import {
+  getCurrentCanvas,
+  getWindows,
+} from 'mirador/dist/es/src/state/selectors';
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
-import { put, select, takeEvery } from 'redux-saga/effects';
+import { all, put, select, takeEvery } from 'redux-saga/effects';
 import { getImages, getMaps, reduceLayers } from '../RelightHelpers';
 import * as actions from 'mirador/dist/es/src/state/actions';
+import { getConfig } from 'mirador/dist/es/src/state/selectors';
 
 /**
  * Saga for when the Mirador setCanvas action is triggered, such as by adding resources, layers that are switched off
@@ -11,6 +15,7 @@ import * as actions from 'mirador/dist/es/src/state/actions';
  * **/
 export function* setCanvas(action) {
   const updateLayers = actions.updateLayers;
+  const updateConfig = actions.updateConfig;
   const windowId = action.windowId;
   const excluded_maps = ['composite', 'normal', 'albedo'];
   const windows = yield select(getWindows, windowId);
@@ -20,16 +25,34 @@ export function* setCanvas(action) {
 
   for (let windowId of windowIds) {
     let payload;
-    const canvas = yield select(getCanvases, { windowId });
-    const canvasId = canvas[0].id;
-    const maps = getMaps(canvas[0].iiifImageResources);
-    let images = getImages(canvas[0].iiifImageResources);
+    const canvas = yield select(getCurrentCanvas, { windowId });
+    const canvasId = canvas.id;
+    const maps = getMaps(canvas.iiifImageResources);
+    let images = getImages(canvas.iiifImageResources);
+    // length of one image implies no choices...
+    // only if the length is above one do we want to toggle layer visibility
+    if (canvas.__jsonld.items[0].items[0].body.type === 'Choice') {
+      // set the required views for the plug-in here...
+      const views = [
+        { key: 'single', behaviors: ['individuals', 'paged'] },
+        { key: 'book', behaviors: ['individuals', 'paged'] },
+        { key: 'scroll', behaviors: ['continuous'] },
+        { key: 'gallery' },
+      ];
 
-    payload = reduceLayers(images, maps, excluded_maps);
-    yield put(updateLayers(windowId, canvasId, payload));
+      // get the current config
+      let config = yield select(getConfig);
+
+      // override the default config with our own...
+      config['window']['views'] = views;
+
+      payload = reduceLayers(images, maps, excluded_maps);
+      yield put(updateLayers(windowId, canvasId, payload));
+      yield put(updateConfig(config));
+    }
   }
 }
 
 export function* rootSaga() {
-  yield takeEvery(ActionTypes.SET_CANVAS, setCanvas);
+  yield all([takeEvery(ActionTypes.SET_CANVAS, setCanvas)]);
 }

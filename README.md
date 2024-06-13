@@ -140,6 +140,23 @@ following way, where we add in type `lightingMapExtension` and `mapType`:
         }
 ```
 
+# IIIF Choices and Mirador Viewer Config
+This Mirador plug-in makes use of IIIF Choices and is developed for single page view only; because of this we take control of Mirador via the plug-in and set
+the config for the default viewing experience whenever a Choices body type is detected at canvas level.  
+
+You are still free to manually change to book view in the Mirador menu, however, the plug-in won't work as intended.
+
+The view config we inject is identical to the exerpt below:
+
+```json
+    views: [
+    { key: 'single', behaviors: ['individuals', 'paged'] },
+    { key: 'book', behaviors: ['individuals', 'paged'] },
+    { key: 'scroll', behaviors: ['continuous'] },
+    { key: 'gallery' },
+    ]
+```
+
 # Installation and build
 Make sure you have node.js and npm installed.  It might also be good to install nvm to allow you to switch versions of
 node.js more easily.
