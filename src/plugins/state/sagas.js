@@ -29,10 +29,9 @@ export function* setCanvas(action) {
     const canvasId = canvas.id;
     const maps = getMaps(canvas.iiifImageResources);
     let images = getImages(canvas.iiifImageResources);
-
     // length of one image implies no choices...
     // only if the length is above one do we want to toggle layer visibility
-    if (images.length > 1) {
+    if (canvas.__jsonld.items[0].items[0].body.type === 'Choice') {
       // set the required views for the plug-in here...
       const views = [
         { key: 'single', behaviors: ['individuals', 'paged'] },
@@ -42,7 +41,7 @@ export function* setCanvas(action) {
       ];
 
       // get the current config
-      let config = yield select(getConfig, windowId);
+      let config = yield select(getConfig);
 
       // override the default config with our own...
       config['window']['views'] = views;
