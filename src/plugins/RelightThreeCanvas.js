@@ -30,12 +30,12 @@ class RelightThreeCanvas extends React.Component {
     this.threeResources = {};
     this.groups = {};
     this.scene = new THREE.Scene();
-    this.renderer = new THREE.WebGLRenderer({ alpha: true });
+    this.renderer = new THREE.WebGLRenderer({ alpha: false });
     this.renderer.setSize(
       this.state.width * this.state.zoom,
       this.state.height * this.state.zoom
     );
-
+    this.wireframe = false;
     this.targetGeometry = new THREE.BoxGeometry(10, 10, 0.2);
     this.targetMaterial = new THREE.MeshBasicMaterial();
     this.target = new THREE.Mesh(this.targetGeometry, this.targetMaterial);
@@ -56,7 +56,7 @@ class RelightThreeCanvas extends React.Component {
     // only show a part of the orthographic camera that matches the zoom and intersection of OpenSeaDragon
     this._cameraOffset(this.camera, this.props);
 
-    for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
+    for (let i = 0; i < this.props.maxTileLevel + 1; i++) {
       this.threeResources[i] = {};
       this.threeResources[i]['geometries'] = {};
       this.threeResources[i]['materials'] = {};
@@ -120,7 +120,7 @@ class RelightThreeCanvas extends React.Component {
   _updateTextures() {
     // loop through the materials and update with new textures
     for (
-      let minTileLevel = 1;
+      let minTileLevel = 0;
       minTileLevel < this.props.maxTileLevel + 1;
       minTileLevel++
     ) {
@@ -185,14 +185,15 @@ class RelightThreeCanvas extends React.Component {
    * textures.
    */
   generateTiles() {
-    for (let i = 1; i < this.props.maxTileLevel + 1; i++) {
+    for (let i = 0; i < this.props.maxTileLevel + 1; i++) {
       this.groups[i] = new THREE.Group();
 
       for (let j = 0; j < this.props.tileSets[i].albedoTiles.urls.length; j++) {
+        // this appears to be wrong! Some of these end up at this end as "undefined"
         const albedoMap =
-          this.props.images[this.props.tileSets[i].albedoTiles.urls[j]] || null;
+          this.props.images[this.props.tileSets[i].albedoTiles.urls[j]];
         const normalMap =
-          this.props.images[this.props.tileSets[i].normalTiles.urls[j]] || null;
+          this.props.images[this.props.tileSets[i].normalTiles.urls[j]];
 
         let plane_material;
 
@@ -212,6 +213,7 @@ class RelightThreeCanvas extends React.Component {
               metalness: this.props.metalness,
               roughness: this.props.roughness,
               color: '#ffffff',
+              wireframe: this.wireframe,
             });
           } else {
             plane_material = new THREE.MeshPhongMaterial({
@@ -225,6 +227,7 @@ class RelightThreeCanvas extends React.Component {
               shininess: this.props.shininess,
               specular: '#ffffff',
               color: '#000000',
+              wireframe: this.wireframe,
             });
           }
         } else {
@@ -238,6 +241,7 @@ class RelightThreeCanvas extends React.Component {
               metalness: this.props.metalness,
               roughness: this.props.roughness,
               color: '#ffffff',
+              wireframe: this.wireframe,
             });
           } else {
             plane_material = new THREE.MeshPhongMaterial({
@@ -249,6 +253,7 @@ class RelightThreeCanvas extends React.Component {
               shininess: this.props.shininess,
               specular: '#ffffff',
               color: '#000000',
+              wireframe: this.wireframe,
             });
           }
         }
@@ -264,8 +269,8 @@ class RelightThreeCanvas extends React.Component {
           this.props.tileSets[i].albedoTiles.tiles[j].h
         );
 
-        const mesh = new THREE.Mesh(plane_geometry, plane_material);
-        mesh.position.set(x, this.props.intersection.height - y, 0);
+        let mesh = new THREE.Mesh(plane_geometry, plane_material);
+        mesh.position.set(x, Math.ceil(this.props.intersection.height - y), 0);
 
         if (!albedoMap && !normalMap) {
           mesh.visible = false;
@@ -315,7 +320,7 @@ class RelightThreeCanvas extends React.Component {
     let size = new THREE.Vector2();
     this.renderer.getSize(size);
 
-    let yOffset = null;
+    let yOffset;
 
     if (this.props.intersection.y <= 0) {
       yOffset =

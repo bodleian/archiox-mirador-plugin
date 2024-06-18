@@ -1,5 +1,4 @@
 import { put } from 'redux-saga/effects';
-import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
 
 /**
  * Generates an object containing a full tile pyramid. Mirador only generates the parts that are needed
@@ -31,8 +30,8 @@ export function generateTiles(
   let scale = factors[scaleFactor];
   const regionWidth = scale * tileWidth;
   const regionHeight = scale * tileHeight;
-  const scaleWidth = Math.ceil(width / scale);
-  const scaleHeight = Math.ceil(height / scale);
+  const scaleWidth = Math.floor(width / scale);
+  const scaleHeight = Math.floor(height / scale);
   let y = 0;
 
   while (y < height) {
@@ -51,8 +50,8 @@ export function generateTiles(
         rh = Math.min(regionHeight, height - y);
         region = x + ',' + y + ',' + rw + ',' + rh;
       }
-      const scaledWidthRemaining = Math.ceil((width - x) / scale);
-      const scaledHeightRemaining = Math.ceil((height - y) / scale);
+      const scaledWidthRemaining = Math.floor((width - x) / scale);
+      const scaledHeightRemaining = Math.floor((height - y) / scale);
       const tw = Math.min(tileWidth, scaledWidthRemaining);
       const th = Math.min(tileHeight, scaledHeightRemaining);
 
@@ -63,7 +62,7 @@ export function generateTiles(
       }
 
       const iiifArgs =
-        '/' + region + '/' + tw + ',' + th + '/0/default.' + tileFormat; // this is where the bug is
+        '/' + region + '/' + tw + ',' + th + '/0/default.' + tileFormat;
 
       tiles.push({
         url: id + iiifArgs,
@@ -232,7 +231,7 @@ export function getMap(annotationBodies, mapType) {
 export function getTileSets(maxTileLevel, data, albedoMap, normalMap) {
   let tileLevels = {};
 
-  for (let i = 1; i < maxTileLevel + 1; i++) {
+  for (let i = 0; i < maxTileLevel + 1; i++) {
     tileLevels[i] = {
       albedoTiles: getTiles(albedoMap, data, i),
       normalTiles: getTiles(normalMap, data, i),
@@ -282,7 +281,7 @@ export function updateLayer(
   excluded_maps,
   canvasId
 ) {
-  let payload = getLayers(state);
+  let payload;
 
   const maps = getMaps(annotationBodies);
   const images = getImages(annotationBodies);
@@ -301,7 +300,12 @@ export function updateLayer(
 export function reduceLayers(layers, maps, excludedMaps) {
   return layers.reduce(function (accumulator, layer, index) {
     let visibility;
-    const mapType = maps[layer.id].trim();
+    let mapType;
+    if (maps[layer.id] === undefined) {
+      mapType = 'undefined';
+    } else {
+      mapType = maps[layer.id].trim();
+    }
 
     visibility = excludedMaps.includes(mapType);
     accumulator[layer.id] = {
@@ -321,19 +325,4 @@ export function reduceLayers(layers, maps, excludedMaps) {
  * **/
 export function* setLayers(windowId, canvasId, updateLayers, payload) {
   yield put(updateLayers(windowId, canvasId, payload));
-}
-
-/**
- * Parses a IIIF tile URL and gets the x, y, width, and height of a tile
- * @param {string} url a string containing the IIIF image API URL for parsing
- * @returns {array} an array of the URL parameters in the original URL
- */
-export function parseIIIFUrl(url) {
-  // example url https://iiif.bodleian.ox.ac.uk/iiif/image/5f34d322-61d9-44a0-81a3-9422364fa991/3072,0,136,1024/34,/0/default.webp
-  const rawURL = new URL(url);
-  const path = rawURL.pathname;
-  const pathParts = path.split('/');
-  const imageParams = pathParts[pathParts.length - 4];
-
-  return imageParams.split(',');
 }
