@@ -94,65 +94,77 @@ class Relight extends React.Component {
       xMove = event.touches[0].clientX - boundingBox.left;
       yMove = event.touches[0].clientY - boundingBox.top;
     }
-    switch (this.rotation) {
-      case 0:
-        this.mouseX = xMove;
-        this.mouseY = yMove;
-        this.lightX = (this.mouseX / 100) * 2 - 1;
-        this.lightY = (this.mouseY / 100) * 2 - 1;
-        this.lightX = this.flipped ? -this.lightX : this.lightX;
-        style =
-          `radial-gradient(at ` +
-          this.mouseX +
-          `% ` +
-          this.mouseY +
-          `%, #ffffff, #000000)`;
-        break;
-      case -270:
-      case 90:
-        this.mouseX = yMove;
-        this.mouseY = xMove;
-        this.lightX = (this.mouseX / 100) * 2 - 1;
-        this.lightY = -((this.mouseY / 100) * 2 - 1);
-        this.lightY = this.flipped ? -this.lightY : this.lightY;
-        style =
-          `radial-gradient(at ` +
-          this.mouseY +
-          `% ` +
-          this.mouseX +
-          `%, #ffffff, #000000)`;
-        break;
-      case -180:
-      case 180:
-        this.mouseX = xMove;
-        this.mouseY = yMove;
-        this.lightX = -((this.mouseX / 100) * 2 - 1);
-        this.lightY = -((this.mouseY / 100) * 2 - 1);
-        this.lightX = this.flipped ? -this.lightX : this.lightX;
-        style =
-          `radial-gradient(at ` +
-          this.mouseX +
-          `% ` +
-          this.mouseY +
-          `%, #ffffff, #000000)`;
-        break;
-      case -90:
-      case 270:
-        this.mouseX = yMove;
-        this.mouseY = xMove;
-        this.lightX = -((this.mouseX / 100) * 2 - 1);
-        this.lightY = (this.mouseY / 100) * 2 - 1;
-        this.lightY = this.flipped ? -this.lightY : this.lightY;
-        style =
-          `radial-gradient(at ` +
-          this.mouseY +
-          `% ` +
-          this.mouseX +
-          `%, #ffffff, #000000)`;
-        break;
-    }
-
     if (this.mouseDown) {
+      switch (this.rotation) {
+        case 0:
+          this.mouseX = xMove;
+          this.mouseY = yMove;
+          this.lightX = (this.mouseX / 100) * 2 - 1;
+          this.lightY = (this.mouseY / 100) * 2 - 1;
+          this.lightX = this.flipped ? -this.lightX : this.lightX;
+          style =
+            `radial-gradient(at ` +
+            this.mouseX +
+            `% ` +
+            this.mouseY +
+            `%, #ffffff, #000000)`;
+          break;
+        case -270:
+        case 90:
+          this.mouseX = yMove;
+          this.mouseY = xMove;
+          this.lightX = (this.mouseX / 100) * 2 - 1;
+          this.lightY = -((this.mouseY / 100) * 2 - 1);
+          this.lightY = this.flipped ? -this.lightY : this.lightY;
+          style =
+            `radial-gradient(at ` +
+            this.mouseY +
+            `% ` +
+            this.mouseX +
+            `%, #ffffff, #000000)`;
+          break;
+        case -180:
+        case 180:
+          this.mouseX = xMove;
+          this.mouseY = yMove;
+          this.lightX = -((this.mouseX / 100) * 2 - 1);
+          this.lightY = -((this.mouseY / 100) * 2 - 1);
+          this.lightX = this.flipped ? -this.lightX : this.lightX;
+          style =
+            `radial-gradient(at ` +
+            this.mouseX +
+            `% ` +
+            this.mouseY +
+            `%, #ffffff, #000000)`;
+          break;
+        case -90:
+        case 270:
+          this.mouseX = yMove;
+          this.mouseY = xMove;
+          this.lightX = -((this.mouseX / 100) * 2 - 1);
+          this.lightY = (this.mouseY / 100) * 2 - 1;
+          this.lightY = this.flipped ? -this.lightY : this.lightY;
+          style =
+            `radial-gradient(at ` +
+            this.mouseY +
+            `% ` +
+            this.mouseX +
+            `%, #ffffff, #000000)`;
+          break;
+        default:
+          this.mouseX = xMove;
+          this.mouseY = yMove;
+          this.lightX = (this.mouseX / 100) * 2 - 1;
+          this.lightY = (this.mouseY / 100) * 2 - 1;
+          this.lightX = this.flipped ? -this.lightX : this.lightX;
+          style =
+            `radial-gradient(at ` +
+            this.mouseX +
+            `% ` +
+            this.mouseY +
+            `%, #ffffff, #000000)`;
+      }
+
       document.getElementById(id).style.background = style;
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
