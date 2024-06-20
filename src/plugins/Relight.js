@@ -115,7 +115,6 @@ class Relight extends React.Component {
         this.lightX = (this.mouseX / 100) * 2 - 1;
         this.lightY = -((this.mouseY / 100) * 2 - 1);
         this.lightY = this.flipped ? -this.lightY : this.lightY;
-        this.lightY = this.flipped ? this.lightY : -this.lightY;
         style =
           `radial-gradient(at ` +
           this.mouseY +
