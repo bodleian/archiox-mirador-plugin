@@ -75,31 +75,90 @@ class Relight extends React.Component {
    * The onMouseMove method tracks the mouse coordinates over the RelightLightDirectionControl component to allow the
    * style of the component to change and indicate to the user which direction the light should be shining from.
    * The threeCanvasProps are updated in state to cause a re-render each time the mouse is moved whilst the button
-   * is pressed over the component, this updates the props passed to the Three canvas.
+   * is pressed over the component, this tracks the current rotation and flipped status of the canvas,
+   * this also updates the props passed to the Three canvas.
    * */
-  onMouseMove(event, id) {
+  onMouseMove(event, id, rotation) {
     const control = document.getElementById(id);
     const boundingBox = control.getBoundingClientRect();
 
+    let xMove;
+    let yMove;
+    let style;
+
     if (event.type === 'mousemove') {
       event.preventDefault();
-      this.mouseX = event.clientX - boundingBox.left;
-      this.mouseY = event.clientY - boundingBox.top;
+      xMove = event.clientX - boundingBox.left;
+      yMove = event.clientY - boundingBox.top;
     } else if (event.type === 'touchmove') {
       this.mouseDown = true;
-      this.mouseX = event.touches[0].clientX - boundingBox.left;
-      this.mouseY = event.touches[0].clientY - boundingBox.top;
+      xMove = event.touches[0].clientX - boundingBox.left;
+      yMove = event.touches[0].clientY - boundingBox.top;
+    }
+
+    // rotation is the total degrees the canvas has rotated, i.e. it stacks, we need to get this back
+    // to a relative number by using modulus...
+    const rotationModulus = rotation % 360;
+
+    switch (rotationModulus) {
+      case 0:
+        this.mouseX = xMove;
+        this.mouseY = yMove;
+        this.lightX = (this.mouseX / 100) * 2 - 1;
+        this.lightY = (this.mouseY / 100) * 2 - 1;
+        this.lightX = this.flipped ? -this.lightX : this.lightX;
+        style =
+          `radial-gradient(at ` +
+          this.mouseX +
+          `% ` +
+          this.mouseY +
+          `%, #ffffff, #000000)`;
+        break;
+      case -270:
+      case 90:
+        this.mouseX = yMove;
+        this.mouseY = xMove;
+        this.lightX = (this.mouseX / 100) * 2 - 1;
+        this.lightY = -((this.mouseY / 100) * 2 - 1);
+        this.lightY = this.flipped ? -this.lightY : this.lightY;
+        style =
+          `radial-gradient(at ` +
+          this.mouseY +
+          `% ` +
+          this.mouseX +
+          `%, #ffffff, #000000)`;
+        break;
+      case -180:
+      case 180:
+        this.mouseX = xMove;
+        this.mouseY = yMove;
+        this.lightX = -((this.mouseX / 100) * 2 - 1);
+        this.lightY = -((this.mouseY / 100) * 2 - 1);
+        this.lightX = this.flipped ? -this.lightX : this.lightX;
+        style =
+          `radial-gradient(at ` +
+          this.mouseX +
+          `% ` +
+          this.mouseY +
+          `%, #ffffff, #000000)`;
+        break;
+      case -90:
+      case 270:
+        this.mouseX = yMove;
+        this.mouseY = xMove;
+        this.lightX = -((this.mouseX / 100) * 2 - 1);
+        this.lightY = (this.mouseY / 100) * 2 - 1;
+        this.lightY = this.flipped ? -this.lightY : this.lightY;
+        style =
+          `radial-gradient(at ` +
+          this.mouseY +
+          `% ` +
+          this.mouseX +
+          `%, #ffffff, #000000)`;
     }
 
     if (this.mouseDown) {
-      document.getElementById(id).style.background =
-        `radial-gradient(at ` +
-        this.mouseX +
-        `% ` +
-        this.mouseY +
-        `%, #ffffff, #000000)`;
-      this.lightX = (this.mouseX / 100) * 2 - 1;
-      this.lightY = (this.mouseY / 100) * 2 - 1;
+      document.getElementById(id).style.background = style;
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
 
@@ -565,6 +624,8 @@ class Relight extends React.Component {
         const excluded_maps = ['composite', 'normal', 'albedo'];
         this.maps = getMaps(this.props.canvas.iiifImageResources);
         this.canvasId = this.props.canvas.id;
+        this.rotation = this.props.viewer.viewport.getRotation(true);
+        this.flipped = this.props.viewer.viewport.flipped;
 
         updateLayer(
           this.props.state,
@@ -574,6 +635,16 @@ class Relight extends React.Component {
           excluded_maps,
           this.canvasId
         );
+
+        // add a rotate event handler
+        this.props.viewer.addHandler('rotate', (event) => {
+          this.rotation = event.degrees;
+        });
+
+        // add a flip event handler
+        this.props.viewer.addHandler('flip', (event) => {
+          this.flipped = event.flipped;
+        });
 
         // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
         this.props.viewer.addHandler('close', () => {
@@ -711,13 +782,21 @@ class Relight extends React.Component {
             mouseX={this.state.threeCanvasProps.mouseX}
             mouseY={this.state.threeCanvasProps.mouseY}
             onMouseMove={(event) =>
-              this.onMouseMove(event, this.relightLightDirectionID)
+              this.onMouseMove(
+                event,
+                this.relightLightDirectionID,
+                this.rotation
+              )
             }
             onMouseDown={(event) => this.onMouseDown(event)}
             onMouseUp={(event) => this.onMouseUp(event)}
             onMouseLeave={(event) => this.onMouseLeave(event)}
             onTouchMove={(event) =>
-              this.onMouseMove(event, this.relightLightDirectionID)
+              this.onMouseMove(
+                event,
+                this.relightLightDirectionID,
+                this.rotation
+              )
             }
           />
           <RelightDirectionalLightIntensity
