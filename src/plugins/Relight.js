@@ -78,7 +78,6 @@ class Relight extends React.Component {
    * is pressed over the component, this updates the props passed to the Three canvas.
    * */
   onMouseMove(event, id, rotation) {
-    event.preventDefault();
     const control = document.getElementById(id);
     const boundingBox = control.getBoundingClientRect();
 
@@ -87,6 +86,7 @@ class Relight extends React.Component {
     let style;
 
     if (event.type === 'mousemove') {
+      event.preventDefault();
       xMove = event.clientX - boundingBox.left;
       yMove = event.clientY - boundingBox.top;
     } else if (event.type === 'touchmove') {
