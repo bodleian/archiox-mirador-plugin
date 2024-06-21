@@ -75,7 +75,8 @@ class Relight extends React.Component {
    * The onMouseMove method tracks the mouse coordinates over the RelightLightDirectionControl component to allow the
    * style of the component to change and indicate to the user which direction the light should be shining from.
    * The threeCanvasProps are updated in state to cause a re-render each time the mouse is moved whilst the button
-   * is pressed over the component, this updates the props passed to the Three canvas.
+   * is pressed over the component, this tracks the current rotation and flipped status of the canvas,
+   * this also updates the props passed to the Three canvas.
    * */
   onMouseMove(event, id, rotation) {
     const control = document.getElementById(id);
