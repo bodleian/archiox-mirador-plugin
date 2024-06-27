@@ -32,8 +32,8 @@ class RelightAmbientLightIntensity extends React.Component {
           style={{
             marginTop: '20px',
             marginBottom: '20px',
-            marginLeft: '8px',
-            marginRight: '8px',
+            marginLeft: '3px',
+            marginRight: '3px',
             height: '87px',
           }}
           size={size}

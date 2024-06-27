@@ -181,7 +181,7 @@ class RelightThreeCanvas extends React.Component {
   /**
    * The generateTiles method generates all the geometry we will use in our scene, we pre-build all the geometries,
    * materials, and meshes so that they can be added or removed from the scene, updated when loading in more tiles, and
-   * removed when the component is unmounted.  This will only be run onece.  Another helper function will update the
+   * removed when the component is unmounted.  This will only be run once.  Another helper function will update the
    * textures.
    */
   generateTiles() {

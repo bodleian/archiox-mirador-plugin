@@ -22,6 +22,7 @@ import RelightToolMenu from './RelightToolMenu';
 import RelightResetLights from './RelightResetLights';
 import RelightLightButtons from './RelightLightButtons';
 import RelightTorchButton from './RelightTorchButton';
+import RelightExpandSlidersButton from './RelightExpandSlidersButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
 //import RelightAnnotationButton from './RelightAnnotations';  // disabled until we can get annotation data
@@ -43,6 +44,7 @@ class Relight extends React.Component {
     this.state = {
       active: false,
       open: false,
+      drawerOpen: false,
       visible: false,
       loaded: false,
       loadHandlerAdded: false,
@@ -561,6 +563,13 @@ class Relight extends React.Component {
   }
 
   /**
+   * The drawerHandler method when called will get the state of drawerOpen and toggle it.
+   * **/
+  drawerHandler() {
+    this.setState((prevState) => ({ drawerOpen: !prevState.drawerOpen }));
+  }
+
+  /**
    * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
    * props are updated.  Here we used it to re-render the overlay if there is a change in state detected.
    * ever an update of state.  Here we use it to keep th
@@ -701,6 +710,7 @@ class Relight extends React.Component {
     let toolMenuLightControls = null;
     let toolMenuLightButtons = null;
     let toolMenuMaterialControls = null;
+    let toolMenuSliders = null;
     let toolMenuLightControlsAmbientIntensity;
     this.relightLightDirectionID = uuidv4();
 
@@ -733,6 +743,10 @@ class Relight extends React.Component {
             mode={this.renderMode}
             onClick={() => this.renderHandler()}
           />
+          <RelightExpandSlidersButton
+            drawerOpen={this.state.drawerOpen}
+            onClick={() => this.drawerHandler()}
+          />
         </RelightLightButtons>
       );
 
@@ -742,7 +756,7 @@ class Relight extends React.Component {
             <RelightRoughnessIntensity
               id={uuidv4()}
               tooltipTitle={
-                'Change material roughness: change the roughness to model how polished the material is'
+                'Change material roughness: change the roughness to model how polished the material is, glass is highly polished (low roughness) and a corroded piece of metal is not (high roughness).'
               }
               intensity={this.state.threeCanvasProps.roughness}
               onChange={(event, value) => this.onRoughnessChange(event, value)}
@@ -750,7 +764,7 @@ class Relight extends React.Component {
             <RelightMetalnessIntensity
               id={uuidv4()}
               tooltipTitle={
-                'Change material metalness: change the metalness to model how metalic the material is'
+                'Change material metalness: change the metalness to model how metalic the material is, generally a metal has a metalness of 1, however I highly corroded metal and a none metal would have a metalness of 0.'
               }
               intensity={this.state.threeCanvasProps.metalness}
               onChange={(event, value) => this.onMetalnessChange(event, value)}
@@ -770,6 +784,36 @@ class Relight extends React.Component {
             />
           </>
         );
+      }
+      if (this.state.drawerOpen) {
+        toolMenuSliders = (
+          <>
+            <RelightDirectionalLightIntensity
+              id={uuidv4()}
+              tooltipTitle={
+                'Change the directional light intensity (the torch): decreasing this can help you to see more features if the light is over saturated'
+              }
+              intensity={this.state.threeCanvasProps.directionalIntensity}
+              onChange={(event, value) =>
+                this.onDirectionalLightChange(event, value)
+              }
+            />
+            {toolMenuLightControlsAmbientIntensity}
+            <RelightNormalDepth
+              id={uuidv4()}
+              tooltipTitle={
+                'Change normal map depth: increasing this exagerates the depth of the details helping to bring out more features'
+              }
+              normalDepth={this.state.threeCanvasProps.normalDepth}
+              onChange={(event, value) =>
+                this.onNormalDepthChange(event, value)
+              }
+            />
+            {toolMenuMaterialControls}
+          </>
+        );
+      } else {
+        toolMenuSliders = null;
       }
 
       toolMenuLightControls = (
@@ -799,26 +843,7 @@ class Relight extends React.Component {
               )
             }
           />
-          <RelightDirectionalLightIntensity
-            id={uuidv4()}
-            tooltipTitle={
-              'Change the directional light intensity (the torch): decreasing this can help you to see more features if the light is over saturated'
-            }
-            intensity={this.state.threeCanvasProps.directionalIntensity}
-            onChange={(event, value) =>
-              this.onDirectionalLightChange(event, value)
-            }
-          />
-          {toolMenuLightControlsAmbientIntensity}
-          <RelightNormalDepth
-            id={uuidv4()}
-            tooltipTitle={
-              'Change normal map depth: increasing this exagerates the depth of the details helping to bring out more features'
-            }
-            normalDepth={this.state.threeCanvasProps.normalDepth}
-            onChange={(event, value) => this.onNormalDepthChange(event, value)}
-          />
-          {toolMenuMaterialControls}
+          {toolMenuSliders}
         </RelightLightControls>
       );
     }
