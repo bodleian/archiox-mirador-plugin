@@ -787,7 +787,7 @@ class Relight extends React.Component {
       }
       if (this.state.drawerOpen) {
         toolMenuSliders = (
-          <>
+          <div style={{ textAlign: 'center' }}>
             <RelightDirectionalLightIntensity
               id={uuidv4()}
               tooltipTitle={
@@ -810,7 +810,7 @@ class Relight extends React.Component {
               }
             />
             {toolMenuMaterialControls}
-          </>
+          </div>
         );
       } else {
         toolMenuSliders = null;
@@ -818,31 +818,38 @@ class Relight extends React.Component {
 
       toolMenuLightControls = (
         <RelightLightControls>
-          <RelightLightDirection
-            id={this.relightLightDirectionID}
-            tooltipTitle={
-              'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
-            }
-            mouseX={this.state.threeCanvasProps.mouseX}
-            mouseY={this.state.threeCanvasProps.mouseY}
-            onMouseMove={(event) =>
-              this.onMouseMove(
-                event,
-                this.relightLightDirectionID,
-                this.rotation
-              )
-            }
-            onMouseDown={(event) => this.onMouseDown(event)}
-            onMouseUp={(event) => this.onMouseUp(event)}
-            onMouseLeave={(event) => this.onMouseLeave(event)}
-            onTouchMove={(event) =>
-              this.onMouseMove(
-                event,
-                this.relightLightDirectionID,
-                this.rotation
-              )
-            }
-          />
+          <div
+            style={{
+              maxWidth: 'fit-content',
+              marginInline: 'auto',
+            }}
+          >
+            <RelightLightDirection
+              id={this.relightLightDirectionID}
+              tooltipTitle={
+                'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
+              }
+              mouseX={this.state.threeCanvasProps.mouseX}
+              mouseY={this.state.threeCanvasProps.mouseY}
+              onMouseMove={(event) =>
+                this.onMouseMove(
+                  event,
+                  this.relightLightDirectionID,
+                  this.rotation
+                )
+              }
+              onMouseDown={(event) => this.onMouseDown(event)}
+              onMouseUp={(event) => this.onMouseUp(event)}
+              onMouseLeave={(event) => this.onMouseLeave(event)}
+              onTouchMove={(event) =>
+                this.onMouseMove(
+                  event,
+                  this.relightLightDirectionID,
+                  this.rotation
+                )
+              }
+            />
+          </div>
           {toolMenuSliders}
         </RelightLightControls>
       );

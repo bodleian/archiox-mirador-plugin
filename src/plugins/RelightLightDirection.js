@@ -33,8 +33,8 @@ class RelightLightDirection extends React.Component {
               border: '#000000',
               width: '100px',
               height: '100px',
+              marginBottom: '13px',
               borderRadius: '50px',
-              margin: '13px',
               background:
                 `radial-gradient(at ` +
                 mouseX +

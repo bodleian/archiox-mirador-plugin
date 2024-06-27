@@ -15,7 +15,7 @@ class RelightLightControls extends React.Component {
     return (
       <div
         style={{
-          display: 'flex',
+          display: 'block',
         }}
       >
         {children}

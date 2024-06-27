@@ -1,6 +1,6 @@
 import React from 'react';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
 import PropTypes from 'prop-types';
@@ -29,7 +29,7 @@ class RelightExpandSlidersButton extends React.Component {
         }
         onClick={onClick}
       >
-        {drawerOpen ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
+        {drawerOpen ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
       </MiradorMenuButton>
     );
   }
