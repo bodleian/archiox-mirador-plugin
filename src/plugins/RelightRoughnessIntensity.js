@@ -74,8 +74,8 @@ RelightRoughnessIntensity.propTypes = {
 };
 
 RelightRoughnessIntensity.defaultProps = {
-  intensity: 0.1,
-  defaultIntensity: 0.1,
+  intensity: 0.5,
+  defaultIntensity: 0.5,
   step: 0.1,
   min: 0.0,
   max: 1.0,
