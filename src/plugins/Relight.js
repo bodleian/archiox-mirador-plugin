@@ -683,7 +683,7 @@ class Relight extends React.Component {
           const sourceKey = event.data.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
           const tileTexture = new THREE.Texture(event.data);
-          const key = event.tile.cacheKey;
+          const key = event.tile.getUrl();
 
           canvas.width = event.data.width;
           canvas.height = event.data.height;
