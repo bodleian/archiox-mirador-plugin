@@ -326,3 +326,14 @@ export function reduceLayers(layers, maps, excludedMaps) {
 export function* setLayers(windowId, canvasId, updateLayers, payload) {
   yield put(updateLayers(windowId, canvasId, payload));
 }
+
+/**
+ * Gets the aspect of the window i.e. is it portrait or landscape, based on width and height
+ * **/
+export function getAspect() {
+  let aspect = 'portrait';
+  if (window.innerHeight < window.innerWidth) {
+    aspect = 'landscape';
+  }
+  return aspect;
+}

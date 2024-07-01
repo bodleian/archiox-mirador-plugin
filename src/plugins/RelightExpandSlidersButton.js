@@ -1,6 +1,8 @@
 import React from 'react';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
 import PropTypes from 'prop-types';
@@ -14,7 +16,14 @@ class RelightExpandSlidersButton extends React.Component {
     super(props);
   }
   render() {
-    const { drawerOpen, onClick } = this.props;
+    const { drawerOpen, aspect, onClick } = this.props;
+
+    let icon = drawerOpen ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />;
+
+    if (aspect === 'landscape') {
+      icon = drawerOpen ? <ArrowBackIcon /> : <ArrowForwardIcon />;
+    }
+
     return (
       <MiradorMenuButton
         style={{
@@ -29,7 +38,7 @@ class RelightExpandSlidersButton extends React.Component {
         }
         onClick={onClick}
       >
-        {drawerOpen ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+        {icon}
       </MiradorMenuButton>
     );
   }
@@ -38,6 +47,8 @@ class RelightExpandSlidersButton extends React.Component {
 RelightExpandSlidersButton.propTypes = {
   /** The drawerOpen prop tells the button to render as if the sliders are expanded or closed **/
   drawerOpen: PropTypes.bool.isRequired,
+  /** The aspect prop contains the current aspect of the window the element is in i.e. portrait or landscape **/
+  aspect: PropTypes.string.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,
 };

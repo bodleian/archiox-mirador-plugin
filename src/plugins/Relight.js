@@ -12,6 +12,7 @@ import {
   getRendererInstructions,
   getTileSets,
   reduceLayers,
+  getAspect,
 } from './RelightHelpers';
 import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
@@ -595,6 +596,7 @@ class Relight extends React.Component {
    * @returns {JSX.Element}
    */
   render() {
+    this.aspect = getAspect();
     // if the canvas object is available then grab define the albedo and normal maps and set them to state
     if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
       this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
@@ -745,6 +747,7 @@ class Relight extends React.Component {
           />
           <RelightExpandSlidersButton
             drawerOpen={this.state.drawerOpen}
+            aspect={this.aspect}
             onClick={() => this.drawerHandler()}
           />
         </RelightLightButtons>
@@ -786,8 +789,19 @@ class Relight extends React.Component {
         );
       }
       if (this.state.drawerOpen) {
+        let sliderStyle = {
+          textAlign: 'center',
+        };
+
+        if (this.aspect === 'landscape') {
+          sliderStyle = {
+            textAlign: 'center',
+            marginRight: '13px',
+          };
+        }
+
         toolMenuSliders = (
-          <div style={{ textAlign: 'center' }}>
+          <div style={sliderStyle}>
             <RelightDirectionalLightIntensity
               id={uuidv4()}
               tooltipTitle={
@@ -817,7 +831,7 @@ class Relight extends React.Component {
       }
 
       toolMenuLightControls = (
-        <RelightLightControls>
+        <RelightLightControls aspect={this.aspect}>
           <div
             style={{
               maxWidth: 'fit-content',
@@ -826,6 +840,7 @@ class Relight extends React.Component {
           >
             <RelightLightDirection
               id={this.relightLightDirectionID}
+              aspect={this.aspect}
               tooltipTitle={
                 'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
               }
