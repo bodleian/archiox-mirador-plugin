@@ -1,5 +1,4 @@
 import {
-  getCompanionAreaVisibility,
   getCurrentCanvas,
   getWindows,
 } from 'mirador/dist/es/src/state/selectors';
@@ -43,9 +42,24 @@ export function* setCanvas(action) {
 
       // get the current config
       let config = yield select(getConfig);
+      let sideBarOpen = true;
+      let imageToolsOpen = true;
 
       // override the default config with our own...
       config['window']['views'] = views;
+
+      // if there's enough width, open the sidebar in the companion window otherwise don't...
+      if (
+        Math.min(window.innerWidth) < 768 ||
+        navigator.userAgent.indexOf('Mobi') > -1
+      ) {
+        sideBarOpen = false;
+        imageToolsOpen = false;
+      }
+
+      config['window']['sideBarOpen'] = sideBarOpen;
+      config['window']['imageToolsEnabled'] = true;
+      config['window']['imageToolsOpen'] = imageToolsOpen;
 
       payload = reduceLayers(images, maps, excluded_maps);
       yield put(updateLayers(windowId, canvasId, payload));
@@ -54,23 +68,6 @@ export function* setCanvas(action) {
   }
 }
 
-/**
- * Saga for detecting when the window falls below a certain size, to close or open the sideBar/companionArea.
- * **/
-export function* setWindowSize(action) {
-  const setCompanionAreaOpen = actions.setCompanionAreaOpen;
-  const windowId = action.windowId;
-  let sideBarOpen = yield select(getCompanionAreaVisibility, { windowId });
-
-  sideBarOpen =
-    window.innerHeight < window.innerWidth && window.innerWidth > 1200;
-  // the below line, doesn't appear to work...
-  yield put(setCompanionAreaOpen(windowId, sideBarOpen));
-}
-
 export function* rootSaga() {
-  yield all([
-    takeEvery(ActionTypes.SET_CANVAS, setCanvas),
-    takeEvery(ActionTypes.UPDATE_VIEWPORT, setWindowSize),
-  ]);
+  yield all([takeEvery(ActionTypes.SET_CANVAS, setCanvas)]);
 }
