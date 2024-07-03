@@ -1,8 +1,10 @@
 import {
+  getCompanionAreaVisibility,
   getCurrentCanvas,
   getWindows,
 } from 'mirador/dist/es/src/state/selectors';
 import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
+import { PluginActionTypes } from '../state/actions';
 import { all, put, select, takeEvery } from 'redux-saga/effects';
 import { getImages, getMaps, reduceLayers } from '../RelightHelpers';
 import * as actions from 'mirador/dist/es/src/state/actions';
@@ -45,6 +47,9 @@ export function* setCanvas(action) {
 
       // override the default config with our own...
       config['window']['views'] = views;
+      config['window']['sideBarOpen'] = true;
+      config['window']['imageToolsOpen'] = false;
+      config['window']['imageToolsEnabled'] = true;
 
       payload = reduceLayers(images, maps, excluded_maps);
       yield put(updateLayers(windowId, canvasId, payload));
@@ -53,6 +58,47 @@ export function* setCanvas(action) {
   }
 }
 
+/**
+ * Saga for detecting when the window falls below a certain size, to close or open the sideBar/companionArea.
+ * **/
+export function* updateViewportSize(action) {
+  // it's possible now we have two events to differentiate between the two types of movement
+}
+
+export function* updateWindowSize(action) {
+  const setCompanionAreaOpen = actions.setCompanionAreaOpen;
+  const windowId = action.windowId;
+  const mosaicWindows = Array.from(
+    document.getElementsByClassName('mosaic-window-body')
+  );
+  let mosaicWindowSize;
+  let mosaicWindowSizes = mosaicWindows.map((mosaicWindow) => {
+    return {
+      [mosaicWindow.firstChild.id]: mosaicWindow.getBoundingClientRect(),
+    };
+  });
+  // reduce object to one object with keys
+  mosaicWindowSizes = Object.assign({}, ...mosaicWindowSizes);
+  mosaicWindowSize = mosaicWindowSizes[windowId];
+
+  let sideBarOpen = yield select(getCompanionAreaVisibility, { windowId });
+
+  if (
+    mosaicWindowSize.height < mosaicWindowSize.width &&
+    mosaicWindowSize.width > 1200
+  ) {
+    sideBarOpen = true;
+  } else {
+    sideBarOpen = false;
+  }
+
+  yield put(setCompanionAreaOpen(windowId, sideBarOpen));
+}
+
 export function* rootSaga() {
-  yield all([takeEvery(ActionTypes.SET_CANVAS, setCanvas)]);
+  yield all([
+    takeEvery(ActionTypes.SET_CANVAS, setCanvas),
+    takeEvery(PluginActionTypes.UPDATE_VIEWPORT_SIZE, updateViewportSize),
+    takeEvery(PluginActionTypes.UPDATE_WINDOW_SIZE, updateWindowSize),
+  ]);
 }

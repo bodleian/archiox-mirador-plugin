@@ -12,6 +12,7 @@ import {
   getRendererInstructions,
   getTileSets,
   reduceLayers,
+  getAspect,
 } from './RelightHelpers';
 import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
@@ -33,7 +34,8 @@ import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
-import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
+import { getLayers } from './state/selectors';
+
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
  * It is composed of a group of buttons and a group of controls that make up the relighting plug-in.
@@ -614,6 +616,7 @@ class Relight extends React.Component {
         ];
       }
 
+      // if more than one viewer is opened by add resource this.viewer becomes undefined...
       this.viewer = this.props.viewer;
       this.threeCanvas = document.createElement('div');
       this.threeCanvas.id = 'three-canvas-' + uuidv4(); // this needs to be unique
@@ -625,11 +628,12 @@ class Relight extends React.Component {
       typeof this.albedoMap !== 'undefined' &&
       typeof this.normalMap !== 'undefined'
     ) {
+      this.aspect = getAspect(this.props.windowId);
+      // if there are two viewers this.props.viewer is undefined... this has implications for the other code
       // if the loaded in state is false and the loadHandlerAdded state is false then add the tile-loaded event
       // handler, and update state this prevents the handler being added each time there is a re-render
       if (!this.state.loaded && !this.state.loadHandlerAdded) {
         this.setState({ loaded: true });
-
         const excluded_maps = ['composite', 'normal', 'albedo'];
         this.maps = getMaps(this.props.canvas.iiifImageResources);
         this.canvasId = this.props.canvas.id;
@@ -644,6 +648,14 @@ class Relight extends React.Component {
           excluded_maps,
           this.canvasId
         );
+
+        window.addEventListener('resize', (event) => {
+          this.props.updateWindowSize(this.props.windowId, window.innerWidth);
+        });
+
+        this.props.viewer.addHandler('after-resize', (event) => {
+          this.props.updateViewportSize(this.props.windowId, window.innerWidth);
+        });
 
         // add a rotate event handler
         this.props.viewer.addHandler('rotate', (event) => {
@@ -683,7 +695,7 @@ class Relight extends React.Component {
           const sourceKey = event.data.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
           const tileTexture = new THREE.Texture(event.data);
-          const key = event.tile.cacheKey;
+          const key = event.tile.getUrl();
 
           canvas.width = event.data.width;
           canvas.height = event.data.height;
@@ -745,6 +757,7 @@ class Relight extends React.Component {
           />
           <RelightExpandSlidersButton
             drawerOpen={this.state.drawerOpen}
+            aspect={this.aspect}
             onClick={() => this.drawerHandler()}
           />
         </RelightLightButtons>
@@ -786,8 +799,19 @@ class Relight extends React.Component {
         );
       }
       if (this.state.drawerOpen) {
+        let sliderStyle = {
+          textAlign: 'center',
+        };
+
+        if (this.aspect === 'landscape') {
+          sliderStyle = {
+            textAlign: 'center',
+            marginRight: '13px',
+          };
+        }
+
         toolMenuSliders = (
-          <>
+          <div style={sliderStyle}>
             <RelightDirectionalLightIntensity
               id={uuidv4()}
               tooltipTitle={
@@ -810,39 +834,47 @@ class Relight extends React.Component {
               }
             />
             {toolMenuMaterialControls}
-          </>
+          </div>
         );
       } else {
         toolMenuSliders = null;
       }
 
       toolMenuLightControls = (
-        <RelightLightControls>
-          <RelightLightDirection
-            id={this.relightLightDirectionID}
-            tooltipTitle={
-              'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
-            }
-            mouseX={this.state.threeCanvasProps.mouseX}
-            mouseY={this.state.threeCanvasProps.mouseY}
-            onMouseMove={(event) =>
-              this.onMouseMove(
-                event,
-                this.relightLightDirectionID,
-                this.rotation
-              )
-            }
-            onMouseDown={(event) => this.onMouseDown(event)}
-            onMouseUp={(event) => this.onMouseUp(event)}
-            onMouseLeave={(event) => this.onMouseLeave(event)}
-            onTouchMove={(event) =>
-              this.onMouseMove(
-                event,
-                this.relightLightDirectionID,
-                this.rotation
-              )
-            }
-          />
+        <RelightLightControls aspect={this.aspect}>
+          <div
+            style={{
+              maxWidth: 'fit-content',
+              marginInline: 'auto',
+            }}
+          >
+            <RelightLightDirection
+              id={this.relightLightDirectionID}
+              aspect={this.aspect}
+              tooltipTitle={
+                'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
+              }
+              mouseX={this.state.threeCanvasProps.mouseX}
+              mouseY={this.state.threeCanvasProps.mouseY}
+              onMouseMove={(event) =>
+                this.onMouseMove(
+                  event,
+                  this.relightLightDirectionID,
+                  this.rotation
+                )
+              }
+              onMouseDown={(event) => this.onMouseDown(event)}
+              onMouseUp={(event) => this.onMouseUp(event)}
+              onMouseLeave={(event) => this.onMouseLeave(event)}
+              onTouchMove={(event) =>
+                this.onMouseMove(
+                  event,
+                  this.relightLightDirectionID,
+                  this.rotation
+                )
+              }
+            />
+          </div>
           {toolMenuSliders}
         </RelightLightControls>
       );

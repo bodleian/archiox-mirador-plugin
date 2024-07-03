@@ -326,3 +326,27 @@ export function reduceLayers(layers, maps, excludedMaps) {
 export function* setLayers(windowId, canvasId, updateLayers, payload) {
   yield put(updateLayers(windowId, canvasId, payload));
 }
+/**
+ * Gets the aspect of the viewer parent window i.e. is it portrait or landscape, based on width and height.
+ * **/
+export function getAspect(windowId) {
+  // we need to get the viewer parent div width and height instead of using the global window variable
+  const mosaicWindows = Array.from(
+    document.getElementsByClassName('mosaic-window-body')
+  );
+  let mosaicWindowSize;
+  let mosaicWindowSizes = mosaicWindows.map((mosaicWindow) => {
+    return {
+      [mosaicWindow.firstChild.id]: mosaicWindow.getBoundingClientRect(),
+    };
+  });
+  //reduce object to one object with keys
+  mosaicWindowSizes = Object.assign({}, ...mosaicWindowSizes);
+  mosaicWindowSize = mosaicWindowSizes[windowId];
+
+  let aspect = 'portrait';
+  if (mosaicWindowSize.height < mosaicWindowSize.width) {
+    aspect = 'landscape';
+  }
+  return aspect;
+}
