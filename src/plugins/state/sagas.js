@@ -14,11 +14,12 @@ import { getConfig } from 'mirador/dist/es/src/state/selectors';
  * map type layers back on.
  * **/
 export function* setCanvas(action) {
+  const setCompanionAreaOpen = actions.setCompanionAreaOpen;
   const updateLayers = actions.updateLayers;
   const updateConfig = actions.updateConfig;
-  const windowId = action.windowId;
+  const initialWindowId = action.windowId;
   const excluded_maps = ['composite', 'normal', 'albedo'];
-  const windows = yield select(getWindows, windowId);
+  const windows = yield select(getWindows, initialWindowId);
   const windowIds = Object.keys(windows).map((item) => {
     return windows[item].id;
   });
@@ -43,26 +44,18 @@ export function* setCanvas(action) {
       // get the current config
       let config = yield select(getConfig);
       let sideBarOpen = true;
-      let imageToolsOpen = true;
 
-      // override the default config with our own...
-      config['window']['views'] = views;
-
-      // if there's enough width, open the sidebar in the companion window otherwise don't...
-      if (
-        Math.min(window.innerWidth) < 768 ||
-        navigator.userAgent.indexOf('Mobi') > -1
-      ) {
+      if (windowIds.length > 1 || navigator.userAgent.indexOf('Mobi') > -1) {
         sideBarOpen = false;
-        imageToolsOpen = false;
       }
 
+      config['window']['views'] = views;
       config['window']['sideBarOpen'] = sideBarOpen;
       config['window']['imageToolsEnabled'] = true;
-      config['window']['imageToolsOpen'] = imageToolsOpen;
 
       payload = reduceLayers(images, maps, excluded_maps);
       yield put(updateLayers(windowId, canvasId, payload));
+      yield put(setCompanionAreaOpen(windowId, sideBarOpen));
       yield put(updateConfig(config));
     }
   }
