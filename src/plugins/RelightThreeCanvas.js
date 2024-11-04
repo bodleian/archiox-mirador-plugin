@@ -91,6 +91,7 @@ class RelightThreeCanvas extends React.Component {
     this.scene.add(this.ambientLight);
     this.directionalLightHelper.visible = this.props.helperOn;
     this.target.visible = this.props.helperOn;
+    console.log(this.renderer.info);
   }
 
   /**
