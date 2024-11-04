@@ -425,6 +425,8 @@ class RelightThreeCanvas extends React.Component {
    */
   componentWillUnmount() {
     cancelAnimationFrame(this.animate_req);
+    this.renderer.forceContextLoss();
+    this.renderer.dispose();
   }
 
   /**
