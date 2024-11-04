@@ -570,6 +570,15 @@ class Relight extends React.Component {
     this.setState((prevState) => ({ drawerOpen: !prevState.drawerOpen }));
   }
 
+  disposeTextures(images) {
+    for (const key in images) {
+      if (images[key] instanceof THREE.Texture) {
+        images[key].dispose();
+        delete images[key];
+      }
+    }
+  }
+
   /**
    * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
    * props are updated.  Here we used it to re-render the overlay if there is a change in state detected.
@@ -588,6 +597,10 @@ class Relight extends React.Component {
           this.threeCanvas
         )
       : null;
+  }
+
+  componentWillUnmount() {
+    this.disposeTextures(this.images);
   }
 
   /**
@@ -704,6 +717,7 @@ class Relight extends React.Component {
               threeCanvasProps: this.threeCanvasProps,
             });
           }
+          console.log(Object.keys(this.images).length);
         });
       }
     }
