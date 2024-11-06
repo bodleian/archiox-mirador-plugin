@@ -56,7 +56,7 @@ export function generateTiles(
       const th = Math.min(tileHeight, scaledHeightRemaining);
 
       let tileFormat = 'jpg';
-
+      console.log(preferredFormats);
       if (preferredFormats) {
         tileFormat = preferredFormats[0];
       }
