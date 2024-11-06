@@ -614,7 +614,8 @@ class Relight extends React.Component {
     if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
       this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
       this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
-
+      console.log(this.albedoMap);
+      console.log(this.normalMap);
       // if albedo or normal maps are not present set visible state to false, this will prevent the plug-in from
       // rendering at all, which is what we want.
       if (
