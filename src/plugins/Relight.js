@@ -695,15 +695,15 @@ class Relight extends React.Component {
           this.tileLevels[event.tile.level] = event.tile.level;
           this.tileLevel = event.tile.level;
 
-          const sourceKey = event.image.currentSrc.split('/')[5];
+          const sourceKey = event.data.currentSrc.split('/')[5];
           const canvas = document.createElement('canvas');
-          const tileTexture = new THREE.Texture(event.image);
+          const tileTexture = new THREE.Texture(event.data);
           const key = event.tile.cacheKey;
 
-          canvas.width = event.image.width;
-          canvas.height = event.image.height;
+          canvas.width = event.data.width;
+          canvas.height = event.data.height;
           event.tile.context2D = canvas.getContext('2d');
-          event.tile.context2D.drawImage(event.image, 0, 0);
+          event.tile.context2D.drawImage(event.data, 0, 0);
 
           tileTexture.needsUpdate = true;
 
@@ -717,7 +717,6 @@ class Relight extends React.Component {
               threeCanvasProps: this.threeCanvasProps,
             });
           }
-          console.log(Object.keys(this.images).length);
         });
       }
     }
