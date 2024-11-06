@@ -128,7 +128,6 @@ export const getTiles = (mapURL, data, tilesIndex) => {
   let imageData = {};
   const id = mapURL;
   imageData.preferredFormats = _parseTiles(data, 'preferredFormats') || null;
-  console.log(mapURL);
   imageData.width = _parseTiles(data, 'width');
   imageData.height = _parseTiles(data, 'height');
   const tiles = _parseTiles(data, 'tiles')[0]; // tiles is index 0 of a singleton
