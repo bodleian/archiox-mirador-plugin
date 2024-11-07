@@ -56,7 +56,6 @@ export function generateTiles(
       const th = Math.min(tileHeight, scaledHeightRemaining);
 
       let tileFormat = 'jpg';
-      console.log(preferredFormats);
       if (preferredFormats) {
         tileFormat = preferredFormats[0];
       }
@@ -127,7 +126,7 @@ export function _getProperty(property, data) {
 export const getTiles = (mapURL, data, tilesIndex) => {
   let imageData = {};
   const id = mapURL;
-  imageData.preferredFormats = _parseTiles(data, 'preferredFormats') || null;
+  imageData.preferredFormats = ['webp'];
   imageData.width = _parseTiles(data, 'width');
   imageData.height = _parseTiles(data, 'height');
   const tiles = _parseTiles(data, 'tiles')[0]; // tiles is index 0 of a singleton
@@ -162,6 +161,8 @@ export function getMaps(annotationBodies) {
 
     if (service !== null) {
       layers[element.id] = service.__jsonld.mapType;
+    } else {
+      layers[element.id] = 'none';
     }
   });
   return layers;
@@ -301,12 +302,7 @@ export function reduceLayers(layers, maps, excludedMaps) {
   return layers.reduce(function (accumulator, layer, index) {
     let visibility;
     let mapType;
-    if (maps[layer.id] === undefined) {
-      mapType = 'undefined';
-    } else {
-      mapType = maps[layer.id].trim();
-    }
-
+    mapType = maps[layer.id].trim();
     visibility = excludedMaps.includes(mapType);
     accumulator[layer.id] = {
       index: index,

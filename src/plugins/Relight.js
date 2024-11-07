@@ -526,7 +526,7 @@ class Relight extends React.Component {
       'normal',
       'shaded',
       'depth',
-      'undefined',
+      'none',
     ];
     const layersInState = getLayers(this.props.state)[this.props.windowId][
       this.canvasId

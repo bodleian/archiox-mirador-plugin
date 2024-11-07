@@ -50,7 +50,6 @@ class RelightThreeCanvas extends React.Component {
       -1,
       1200
     );
-
     this.camera.position.set(0, 0, 1200);
 
     // only show a part of the orthographic camera that matches the zoom and intersection of OpenSeaDragon
@@ -91,7 +90,6 @@ class RelightThreeCanvas extends React.Component {
     this.scene.add(this.ambientLight);
     this.directionalLightHelper.visible = this.props.helperOn;
     this.target.visible = this.props.helperOn;
-    console.log(this.renderer.info);
   }
 
   /**
