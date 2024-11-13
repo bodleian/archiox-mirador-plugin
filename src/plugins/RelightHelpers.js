@@ -126,7 +126,7 @@ export function _getProperty(property, data) {
 export const getTiles = (mapURL, data, tilesIndex) => {
   let imageData = {};
   const id = mapURL;
-  imageData.preferredFormats = ['webp'];
+  imageData.preferredFormats = _parseTiles(data, 'preferredFormats');
   imageData.width = _parseTiles(data, 'width');
   imageData.height = _parseTiles(data, 'height');
   const tiles = _parseTiles(data, 'tiles')[0]; // tiles is index 0 of a singleton
