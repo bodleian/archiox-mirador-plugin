@@ -67,6 +67,7 @@ class Relight extends React.Component {
     this.tileLevels = {};
     this.helperOn = false;
     this.renderMode = true;
+    this.albedoInfo = {};
 
     if (!this.renderMode) {
       this.normalDepth = 10.0;
@@ -360,11 +361,10 @@ class Relight extends React.Component {
     this.threeCanvasProps.tileLevel = this.tileLevel;
     this.threeCanvasProps.minTileLevel = Math.min.apply(Math, this.tileLevels);
     this.threeCanvasProps.tileLevels = this.tileLevels;
-    this.threeCanvasProps.maxTileLevel =
-      this.props.viewer.source.scale_factors.length - 1;
+    this.threeCanvasProps.maxTileLevel = this.albedoInfo.sizes.length - 1;
     this.tileSets = getTileSets(
       this.threeCanvasProps.maxTileLevel,
-      this.props.viewer.source,
+      this.albedoInfo,
       this.threeCanvasProps.albedoMap,
       this.threeCanvasProps.normalMap
     );
@@ -429,6 +429,9 @@ class Relight extends React.Component {
    * to the view port.
    */
   torchHandler() {
+    // at this point in the cycle of the plug-in state should have the info.json responses available
+    this.albedoInfo = this.props.state.infoResponses[this.albedoMap].json;
+
     // toggle the active state of the torchButton
     this.setState((prevState) => ({ active: !prevState.active }));
 
