@@ -14,11 +14,12 @@ import { getConfig } from 'mirador/dist/es/src/state/selectors';
  * map type layers back on.
  * **/
 export function* setCanvas(action) {
+  const setCompanionAreaOpen = actions.setCompanionAreaOpen;
   const updateLayers = actions.updateLayers;
   const updateConfig = actions.updateConfig;
-  const windowId = action.windowId;
+  const initialWindowId = action.windowId;
   const excluded_maps = ['composite', 'normal', 'albedo'];
-  const windows = yield select(getWindows, windowId);
+  const windows = yield select(getWindows, initialWindowId);
   const windowIds = Object.keys(windows).map((item) => {
     return windows[item].id;
   });
@@ -42,12 +43,19 @@ export function* setCanvas(action) {
 
       // get the current config
       let config = yield select(getConfig);
+      let sideBarOpen = true;
 
-      // override the default config with our own...
+      if (windowIds.length > 1 || navigator.userAgent.indexOf('Mobi') > -1) {
+        sideBarOpen = false;
+      }
+
       config['window']['views'] = views;
+      config['window']['sideBarOpen'] = sideBarOpen;
+      config['window']['imageToolsEnabled'] = true;
 
       payload = reduceLayers(images, maps, excluded_maps);
       yield put(updateLayers(windowId, canvasId, payload));
+      yield put(setCompanionAreaOpen(windowId, sideBarOpen));
       yield put(updateConfig(config));
     }
   }

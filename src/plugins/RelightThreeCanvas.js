@@ -50,7 +50,6 @@ class RelightThreeCanvas extends React.Component {
       -1,
       1200
     );
-
     this.camera.position.set(0, 0, 1200);
 
     // only show a part of the orthographic camera that matches the zoom and intersection of OpenSeaDragon
@@ -298,15 +297,6 @@ class RelightThreeCanvas extends React.Component {
   }
 
   /**
-   * The animate method requests the next animation frame from itself but updates the renderer and textures each frame.
-   */
-  animate = () => {
-    this.animate_req = requestAnimationFrame(this.animate);
-    this.renderer.render(this.scene, this.camera);
-    this._updateTextures();
-  };
-
-  /**
    * The rerender method resizes the WebGL renderer to follow the intersection and zoom props and changes the camera
    * offsets to keep the OpenSeaDragon intersection matched to that of the Three canvas.
    */
@@ -363,6 +353,29 @@ class RelightThreeCanvas extends React.Component {
     this.directionalLightHelper.update();
   }
 
+  /** *
+   * The startAnimation method begins the animation prcoess
+   * */
+  startAnimation() {
+    const animate = () => {
+      this.animateReq = requestAnimationFrame(animate);
+      this.renderer.render(this.scene, this.camera);
+      this._updateTextures();
+    };
+
+    animate();
+  }
+
+  /** *
+   * The stopAnimation method ends the animation prcoess
+   * */
+  stopAnimation() {
+    if (this.animateReq !== null) {
+      cancelAnimationFrame(this.animateReq);
+      this.animateReq = null;
+    }
+  }
+
   /**
    * The componentDidMount method is a standard React class method that is used to run other methods when the
    * component is mounted.  Here we use it to apply the WebGL to the canvas-container html element and initiate
@@ -370,7 +383,7 @@ class RelightThreeCanvas extends React.Component {
    */
   componentDidMount() {
     document.getElementById(this.id).appendChild(this.renderer.domElement);
-    this.animate();
+    this.startAnimation();
   }
 
   /**
@@ -424,7 +437,9 @@ class RelightThreeCanvas extends React.Component {
    * the RelightThreeOverlay is removed.
    */
   componentWillUnmount() {
-    cancelAnimationFrame(this.animate_req);
+    this.stopAnimation();
+    this.renderer.forceContextLoss();
+    this.renderer.dispose();
   }
 
   /**
