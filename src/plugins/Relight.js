@@ -44,7 +44,7 @@ class Relight extends React.Component {
     super(props);
     this.state = {
       active: false,
-      open: false,
+      open: this.props.window.archioxPluginOpen || false,
       drawerOpen: false,
       visible: false,
       loaded: false,
