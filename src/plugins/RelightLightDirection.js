@@ -78,7 +78,7 @@ RelightLightDirection.propTypes = {
 };
 
 RelightLightDirection.defaultProps = {
-  mouseX: 50,
-  mouseY: 50,
+  //mouseX: 50,
+  //mouseY: 50,
 };
 export default RelightLightDirection;

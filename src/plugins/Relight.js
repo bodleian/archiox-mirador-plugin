@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import * as THREE from 'three';
-import { v4 as uuidv4 } from 'uuid';
 import {
   updateLayer,
   setLayers,
@@ -35,6 +34,7 @@ import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
 import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
+
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
  * It is composed of a group of buttons and a group of controls that make up the relighting plug-in.
@@ -53,8 +53,8 @@ class Relight extends React.Component {
     };
     this.threeCanvasProps = {};
     this.mouseDown = false;
-    this.mouseX = 0;
-    this.mouseY = 0;
+    this.mouseX = 50;
+    this.mouseY = 50;
     this.lightX = 0;
     this.lightY = 0;
     this.metalness = 0.0;
@@ -68,6 +68,7 @@ class Relight extends React.Component {
     this.helperOn = false;
     this.renderMode = true;
     this.albedoInfo = {};
+    this.style = '';
 
     if (!this.renderMode) {
       this.normalDepth = 10.0;
@@ -88,9 +89,8 @@ class Relight extends React.Component {
 
     let xMove;
     let yMove;
-    let style;
 
-    if (event.type === 'mousemove') {
+    if (event.type === 'mousemove' && this.mouseDown) {
       event.preventDefault();
       xMove = event.clientX - boundingBox.left;
       yMove = event.clientY - boundingBox.top;
@@ -104,65 +104,64 @@ class Relight extends React.Component {
     // to a relative number by using modulus...
     const rotationModulus = rotation % 360;
 
-    switch (rotationModulus) {
-      case 0:
-        this.mouseX = xMove;
-        this.mouseY = yMove;
-        this.lightX = (this.mouseX / 100) * 2 - 1;
-        this.lightY = (this.mouseY / 100) * 2 - 1;
-        this.lightX = this.flipped ? -this.lightX : this.lightX;
-        style =
-          `radial-gradient(at ` +
-          this.mouseX +
-          `% ` +
-          this.mouseY +
-          `%, #ffffff, #000000)`;
-        break;
-      case -270:
-      case 90:
-        this.mouseX = yMove;
-        this.mouseY = xMove;
-        this.lightX = (this.mouseX / 100) * 2 - 1;
-        this.lightY = -((this.mouseY / 100) * 2 - 1);
-        this.lightY = this.flipped ? -this.lightY : this.lightY;
-        style =
-          `radial-gradient(at ` +
-          this.mouseY +
-          `% ` +
-          this.mouseX +
-          `%, #ffffff, #000000)`;
-        break;
-      case -180:
-      case 180:
-        this.mouseX = xMove;
-        this.mouseY = yMove;
-        this.lightX = -((this.mouseX / 100) * 2 - 1);
-        this.lightY = -((this.mouseY / 100) * 2 - 1);
-        this.lightX = this.flipped ? -this.lightX : this.lightX;
-        style =
-          `radial-gradient(at ` +
-          this.mouseX +
-          `% ` +
-          this.mouseY +
-          `%, #ffffff, #000000)`;
-        break;
-      case -90:
-      case 270:
-        this.mouseX = yMove;
-        this.mouseY = xMove;
-        this.lightX = -((this.mouseX / 100) * 2 - 1);
-        this.lightY = (this.mouseY / 100) * 2 - 1;
-        this.lightY = this.flipped ? -this.lightY : this.lightY;
-        style =
-          `radial-gradient(at ` +
-          this.mouseY +
-          `% ` +
-          this.mouseX +
-          `%, #ffffff, #000000)`;
-    }
-
     if (this.mouseDown) {
-      document.getElementById(id).style.background = style;
+      switch (rotationModulus) {
+        case 0:
+          this.mouseX = xMove;
+          this.mouseY = yMove;
+          this.lightX = (this.mouseX / 100) * 2 - 1;
+          this.lightY = (this.mouseY / 100) * 2 - 1;
+          this.lightX = this.flipped ? -this.lightX : this.lightX;
+          this.style =
+            `radial-gradient(at ` +
+            this.mouseX +
+            `% ` +
+            this.mouseY +
+            `%, #ffffff, #000000)`;
+          break;
+        case -270:
+        case 90:
+          this.mouseX = yMove;
+          this.mouseY = xMove;
+          this.lightX = (this.mouseX / 100) * 2 - 1;
+          this.lightY = -((this.mouseY / 100) * 2 - 1);
+          this.lightY = this.flipped ? -this.lightY : this.lightY;
+          this.style =
+            `radial-gradient(at ` +
+            this.mouseY +
+            `% ` +
+            this.mouseX +
+            `%, #ffffff, #000000)`;
+          break;
+        case -180:
+        case 180:
+          this.mouseX = xMove;
+          this.mouseY = yMove;
+          this.lightX = -((this.mouseX / 100) * 2 - 1);
+          this.lightY = -((this.mouseY / 100) * 2 - 1);
+          this.lightX = this.flipped ? -this.lightX : this.lightX;
+          this.style =
+            `radial-gradient(at ` +
+            this.mouseX +
+            `% ` +
+            this.mouseY +
+            `%, #ffffff, #000000)`;
+          break;
+        case -90:
+        case 270:
+          this.mouseX = yMove;
+          this.mouseY = xMove;
+          this.lightX = -((this.mouseX / 100) * 2 - 1);
+          this.lightY = (this.mouseY / 100) * 2 - 1;
+          this.lightY = this.flipped ? -this.lightY : this.lightY;
+          this.style =
+            `radial-gradient(at ` +
+            this.mouseY +
+            `% ` +
+            this.mouseX +
+            `%, #ffffff, #000000)`;
+      }
+      control.style.background = this.style;
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
 
@@ -307,12 +306,12 @@ class Relight extends React.Component {
     } else {
       this.normalDepth = 1.0;
     }
-
     this.metalness = 0.0;
     this.roughness = 0.5;
     this.shininess = 30.0;
 
-    document.getElementById(id).style.background =
+    const lightDirectionControl = document.getElementById(id);
+    lightDirectionControl.style.background =
       `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
 
     this.initialiseThreeCanvasProps();
@@ -361,7 +360,8 @@ class Relight extends React.Component {
     this.threeCanvasProps.tileLevel = this.tileLevel;
     this.threeCanvasProps.minTileLevel = Math.min.apply(Math, this.tileLevels);
     this.threeCanvasProps.tileLevels = this.tileLevels;
-    this.threeCanvasProps.maxTileLevel = this.albedoInfo.sizes.length - 1;
+    this.threeCanvasProps.maxTileLevel =
+      this.albedoInfo.tiles[0].scaleFactors.length - 1;
     this.tileSets = getTileSets(
       this.threeCanvasProps.maxTileLevel,
       this.albedoInfo,
@@ -431,16 +431,8 @@ class Relight extends React.Component {
   torchHandler() {
     // at this point in the cycle of the plug-in state should have the info.json responses available
     this.albedoInfo = this.props.state.infoResponses[this.albedoMap].json;
-
     // toggle the active state of the torchButton
     this.setState((prevState) => ({ active: !prevState.active }));
-
-    if (!this.renderMode) {
-      this.normalDepth = 10.0;
-    } else {
-      this.normalDepth = 1.0;
-    }
-
     // always turn on albedo and normal regardless
     let excluded_maps;
 
@@ -511,7 +503,7 @@ class Relight extends React.Component {
    **/
   renderHandler() {
     this.renderMode = !this.renderMode;
-    this.resetHandler(this.relightLightDirectionID);
+    this.resetHandler(this.props.relightLightDirectionID);
     this.updateOverlay();
   }
 
@@ -633,7 +625,7 @@ class Relight extends React.Component {
 
       this.viewer = this.props.viewer;
       this.threeCanvas = document.createElement('div');
-      this.threeCanvas.id = 'three-canvas-' + uuidv4(); // this needs to be unique
+      this.threeCanvas.id = 'three-canvas-' + this.props.relightThreeCanvasID; // this needs to be unique
     }
 
     // if the viewer object, albedoMap and normalMap URLs are not available, do not render
@@ -729,12 +721,11 @@ class Relight extends React.Component {
     let toolMenuMaterialControls = null;
     let toolMenuSliders = null;
     let toolMenuLightControlsAmbientIntensity;
-    this.relightLightDirectionID = uuidv4();
 
     if (this.renderMode) {
       toolMenuLightControlsAmbientIntensity = (
         <RelightAmbientLightIntensity
-          id={uuidv4()}
+          id={this.props.relightAmbientLightIntensityID}
           tooltipTitle={
             'Change the ambient light intensity (the incidental light): increasing this can help you to see the colours of the object more clearly'
           }
@@ -750,7 +741,9 @@ class Relight extends React.Component {
       toolMenuLightButtons = (
         <RelightLightButtons>
           <RelightResetLights
-            onClick={() => this.resetHandler(this.relightLightDirectionID)}
+            onClick={() =>
+              this.resetHandler(this.props.relightLightDirectionID)
+            }
           />
           <RelightLightHelper
             helperOn={this.helperOn}
@@ -772,7 +765,7 @@ class Relight extends React.Component {
         toolMenuMaterialControls = (
           <>
             <RelightRoughnessIntensity
-              id={uuidv4()}
+              id={this.props.relightRoughnessIntensityID}
               tooltipTitle={
                 'Change material roughness: change the roughness to model how polished the material is, glass is highly polished (low roughness) and a corroded piece of metal is not (high roughness).'
               }
@@ -780,7 +773,7 @@ class Relight extends React.Component {
               onChange={(event, value) => this.onRoughnessChange(event, value)}
             />
             <RelightMetalnessIntensity
-              id={uuidv4()}
+              id={this.props.relightMetalnessIntensityID}
               tooltipTitle={
                 'Change material metalness: change the metalness to model how metalic the material is, generally a metal has a metalness of 1, however I highly corroded metal and a none metal would have a metalness of 0.'
               }
@@ -793,7 +786,7 @@ class Relight extends React.Component {
         toolMenuMaterialControls = (
           <>
             <RelightShininessIntensity
-              id={uuidv4()}
+              id={this.props.relightShininessIntensityID}
               tooltipTitle={
                 'Change the shininess of the object: increasing this can enhance the reflective highlights to bring out more features'
               }
@@ -818,7 +811,7 @@ class Relight extends React.Component {
         toolMenuSliders = (
           <div style={sliderStyle}>
             <RelightDirectionalLightIntensity
-              id={uuidv4()}
+              id={this.props.relightDirectionalLightIntensityID}
               tooltipTitle={
                 'Change the directional light intensity (the torch): decreasing this can help you to see more features if the light is over saturated'
               }
@@ -829,7 +822,7 @@ class Relight extends React.Component {
             />
             {toolMenuLightControlsAmbientIntensity}
             <RelightNormalDepth
-              id={uuidv4()}
+              id={this.props.relightNormalDepthID}
               tooltipTitle={
                 'Change normal map depth: increasing this exagerates the depth of the details helping to bring out more features'
               }
@@ -854,17 +847,17 @@ class Relight extends React.Component {
             }}
           >
             <RelightLightDirection
-              id={this.relightLightDirectionID}
+              id={this.props.relightLightDirectionID}
               aspect={this.aspect}
               tooltipTitle={
                 'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
               }
-              mouseX={this.state.threeCanvasProps.mouseX}
-              mouseY={this.state.threeCanvasProps.mouseY}
+              mouseX={this.mouseX} // mouseX isn't a part of this.state.threeCanvasProps...
+              mouseY={this.mouseY} // mouseY isn't a part of this.state.threeCanvasProps...
               onMouseMove={(event) =>
                 this.onMouseMove(
                   event,
-                  this.relightLightDirectionID,
+                  this.props.relightLightDirectionID,
                   this.rotation
                 )
               }
@@ -874,7 +867,7 @@ class Relight extends React.Component {
               onTouchMove={(event) =>
                 this.onMouseMove(
                   event,
-                  this.relightLightDirectionID,
+                  this.props.relightLightDirectionID,
                   this.rotation
                 )
               }
@@ -888,27 +881,27 @@ class Relight extends React.Component {
     if (this.state.visible && this.state.open) {
       toolMenu = (
         <RelightToolMenu
-          id={uuidv4()}
+          id={this.props.relightToolMenuID}
           visible={this.state.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
-          <RelightMenuButtons id={uuidv4()}>
+          <RelightMenuButtons id={this.props.relightMenuButtonsID}>
             <RelightMenuButton
               onClick={() => this.menuHandler()}
               open={this.state.open}
             />
             <RelightTorchButton
-              id={uuidv4()}
+              id={this.props.relightTorchButtonID}
               onClick={() => this.torchHandler()}
               active={this.state.active}
             />
             {/*<RelightAnnotationButton*/}
-            {/*  id={uuidv4()}*/}
+            {/*  id={this.props.relightAnnotationButtonID}*/}
             {/*  onClick={() => this.annotationsHandler()}*/}
             {/*  active={this.annotationsOn}*/}
             {/*/>*/}
             <RelightCycleDefaultLayer
-              id={uuidv4()}
+              id={this.props.relightCycleDefaultLayerID}
               onClick={() => this.defaultLayerHandler()}
               active={this.state.active}
             />
@@ -920,7 +913,7 @@ class Relight extends React.Component {
     } else if (this.state.visible && !this.state.open) {
       toolMenu = (
         <RelightToolMenu
-          id={uuidv4()}
+          id={this.props.relightToolMenuID}
           visible={this.state.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
@@ -955,6 +948,32 @@ Relight.propTypes = {
   canvas: PropTypes.object.isRequired,
   /** The state prop is the Mirador state from the redux store **/
   state: PropTypes.object.isRequired,
+  /** The relightLightDirectionID prop is the ID for the control **/
+  relightLightDirectionID: PropTypes.string.isRequired,
+  /** The relightThreeCanvasID prop is the ID for the control **/
+  relightThreeCanvasID: PropTypes.string.isRequired,
+  /** The relightAmbientLightIntensityID prop is the ID for the control **/
+  relightAmbientLightIntensityID: PropTypes.string.isRequired,
+  /** The relightRougnessIntensityID prop is the ID for the control **/
+  relightRoughnessIntensityID: PropTypes.string.isRequired,
+  /** The relightMetalnessIntensityID prop is the ID for the control **/
+  relightMetalnessIntensityID: PropTypes.string.isRequired,
+  /** The relightShininessIntensityID prop is the ID for the control **/
+  relightShininessIntensityID: PropTypes.string.isRequired,
+  /** The relightDirectionalLightIntensityID prop is the ID for the control **/
+  relightDirectionalLightIntensityID: PropTypes.string.isRequired,
+  /** The relighNormalDepthID prop is the ID for the control **/
+  relightNormalDepthID: PropTypes.string.isRequired,
+  /** The relightToolMenuID prop is the ID for the control **/
+  relightToolMenuID: PropTypes.string.isRequired,
+  /** The relightMenuButtonID prop is the ID for the control **/
+  relightMenuButtonsID: PropTypes.string.isRequired,
+  /** The relightTorchButtonID prop is the ID for the control **/
+  relightTorchButtonID: PropTypes.string.isRequired,
+  /** The relightAnnotationButtonID prop is the ID for the control **/
+  relightAnnotationButtonID: PropTypes.string.isRequired,
+  /** The relightCycleDefaultLayerID prop is the ID for the control **/
+  relightCycleDefaultLayerID: PropTypes.string.isRequired,
 };
 
 export default Relight;
