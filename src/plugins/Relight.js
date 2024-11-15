@@ -68,7 +68,6 @@ class Relight extends React.Component {
     this.helperOn = false;
     this.renderMode = true;
     this.albedoInfo = {};
-    this.style = '';
 
     if (!this.renderMode) {
       this.normalDepth = 10.0;
@@ -84,8 +83,8 @@ class Relight extends React.Component {
    * this also updates the props passed to the Three canvas.
    * */
   onMouseMove(event, id, rotation) {
-    const control = document.getElementById(id);
-    const boundingBox = control.getBoundingClientRect();
+    const lightDirectionControl = document.getElementById(id);
+    const boundingBox = lightDirectionControl.getBoundingClientRect();
 
     let xMove;
     let yMove;
@@ -100,11 +99,11 @@ class Relight extends React.Component {
       yMove = event.touches[0].clientY - boundingBox.top;
     }
 
-    // rotation is the total degrees the canvas has rotated, i.e. it stacks, we need to get this back
-    // to a relative number by using modulus...
-    const rotationModulus = rotation % 360;
-
     if (this.mouseDown) {
+      // rotation is the total degrees the canvas has rotated, i.e. it stacks, we need to get this back
+      // to a relative number by using modulus...
+      const rotationModulus = rotation % 360;
+
       switch (rotationModulus) {
         case 0:
           this.mouseX = xMove;
@@ -112,12 +111,6 @@ class Relight extends React.Component {
           this.lightX = (this.mouseX / 100) * 2 - 1;
           this.lightY = (this.mouseY / 100) * 2 - 1;
           this.lightX = this.flipped ? -this.lightX : this.lightX;
-          this.style =
-            `radial-gradient(at ` +
-            this.mouseX +
-            `% ` +
-            this.mouseY +
-            `%, #ffffff, #000000)`;
           break;
         case -270:
         case 90:
@@ -126,12 +119,6 @@ class Relight extends React.Component {
           this.lightX = (this.mouseX / 100) * 2 - 1;
           this.lightY = -((this.mouseY / 100) * 2 - 1);
           this.lightY = this.flipped ? -this.lightY : this.lightY;
-          this.style =
-            `radial-gradient(at ` +
-            this.mouseY +
-            `% ` +
-            this.mouseX +
-            `%, #ffffff, #000000)`;
           break;
         case -180:
         case 180:
@@ -140,12 +127,6 @@ class Relight extends React.Component {
           this.lightX = -((this.mouseX / 100) * 2 - 1);
           this.lightY = -((this.mouseY / 100) * 2 - 1);
           this.lightX = this.flipped ? -this.lightX : this.lightX;
-          this.style =
-            `radial-gradient(at ` +
-            this.mouseX +
-            `% ` +
-            this.mouseY +
-            `%, #ffffff, #000000)`;
           break;
         case -90:
         case 270:
@@ -154,14 +135,7 @@ class Relight extends React.Component {
           this.lightX = -((this.mouseX / 100) * 2 - 1);
           this.lightY = (this.mouseY / 100) * 2 - 1;
           this.lightY = this.flipped ? -this.lightY : this.lightY;
-          this.style =
-            `radial-gradient(at ` +
-            this.mouseY +
-            `% ` +
-            this.mouseX +
-            `%, #ffffff, #000000)`;
       }
-      control.style.background = this.style;
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
 
@@ -871,6 +845,7 @@ class Relight extends React.Component {
                   this.rotation
                 )
               }
+              rotation={this.rotation}
             />
           </div>
           {toolMenuSliders}

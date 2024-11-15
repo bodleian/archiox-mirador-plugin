@@ -12,6 +12,49 @@ import PropTypes from 'prop-types';
 class RelightLightDirection extends React.Component {
   constructor(props) {
     super(props);
+    // todo: figure out rotation and style here, so there's no conflicts...
+  }
+  calculateBackgroundStyle(rotation, mouseX, mouseY) {
+    const rotationModulus = rotation % 360;
+    let style;
+
+    switch (rotationModulus) {
+      case 0:
+        style =
+          `radial-gradient(at ` +
+          mouseX +
+          `% ` +
+          mouseY +
+          `%, #ffffff, #000000)`;
+        break;
+      case -270:
+      case 90:
+        style =
+          `radial-gradient(at ` +
+          mouseY +
+          `% ` +
+          mouseX +
+          `%, #ffffff, #000000)`;
+        break;
+      case -180:
+      case 180:
+        style =
+          `radial-gradient(at ` +
+          mouseX +
+          `% ` +
+          mouseY +
+          `%, #ffffff, #000000)`;
+        break;
+      case -90:
+      case 270:
+        style =
+          `radial-gradient(at ` +
+          mouseY +
+          `% ` +
+          mouseX +
+          `%, #ffffff, #000000)`;
+    }
+    return style;
   }
   render() {
     const {
@@ -23,6 +66,7 @@ class RelightLightDirection extends React.Component {
       onMouseDown,
       onMouseUp,
       onMouseLeave,
+      rotation,
     } = this.props;
     return (
       <>
@@ -35,12 +79,11 @@ class RelightLightDirection extends React.Component {
               height: '100px',
               margin: '13px',
               borderRadius: '50px',
-              background:
-                `radial-gradient(at ` +
-                mouseX +
-                `% ` +
-                mouseY +
-                `%, #ffffff, #000000)`,
+              background: this.calculateBackgroundStyle(
+                rotation,
+                mouseX,
+                mouseY
+              ),
             }}
             aria-label="Change light direction"
             aria-expanded="False"
@@ -75,6 +118,12 @@ RelightLightDirection.propTypes = {
   mouseX: PropTypes.number,
   /** The mouseY prop is the current y coordinate of the mouse or touch event **/
   mouseY: PropTypes.number,
+  /** The rotation prop is the current rotation of the viewer**/
+  rotation: PropTypes.number,
 };
 
+RelightLightDirection.defaultProps = {
+  mouseX: 50,
+  mouseY: 50,
+};
 export default RelightLightDirection;
