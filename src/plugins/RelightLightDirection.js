@@ -1,6 +1,7 @@
 import React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
 import PropTypes from 'prop-types';
+import { ReactComponent as Angles } from './public/angles.svg';
 
 /**
  * The RelightLightDirection component is a circular div component that is styled to look like a hemisphere being lit
@@ -8,60 +9,125 @@ import PropTypes from 'prop-types';
  * pointing (as it is just a 2D html object).  It will also detect various mouse events that allow the user to use it
  * to also change the direction of the directional light in the Three canvas scene.  The movement of x and y is mapped
  * to the direction of the directional light in the Three canvas scene.
- */
+ **/
 class RelightLightDirection extends React.Component {
   constructor(props) {
     super(props);
-    // todo: figure out rotation and style here, so there's no conflicts...
+    this.rotation = this.props.rotation % 360;
+    this.currentAngle = 0;
+    this.transform = `rotate(${this.rotation}deg)`;
+    this.calculatedBackgroundStyle =
+      `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
   }
-  calculateBackgroundStyle(rotation, mouseX, mouseY) {
-    const rotationModulus = rotation % 360;
-    let style;
 
-    switch (rotationModulus) {
+  calculatePolarAngleFromCSS(cssValue) {
       case 0:
-        style =
-          `radial-gradient(at ` +
-          mouseX +
-          `% ` +
-          mouseY +
-          `%, #ffffff, #000000)`;
-        break;
+    const regex = /(\d+(\.\d+)?)% (\d+(\.\d+)?)/;
+    const matches = cssValue.match(regex);
+
+    if (!matches) {
+      throw new Error('Invalid CSS radial-gradient format');
+    }
+
       case -270:
-      case 90:
-        style =
+    const x = parseFloat(matches[1]);
+    const y = parseFloat(matches[3]);
           `radial-gradient(at ` +
           mouseY +
-          `% ` +
-          mouseX +
+    const cx = 50; // Center X (50%)
+    const cy = 50; // Center Y (50%)
           `%, #ffffff, #000000)`;
         break;
-      case -180:
-      case 180:
+    let dx = x - cx; // Horizontal distance from center
+    let dy = y - cy; // Vertical distance from center
         style =
           `radial-gradient(at ` +
-          mouseX +
+    let angleInRadians = Math.atan2(dy, dx);
           `% ` +
           mouseY +
-          `%, #ffffff, #000000)`;
+    let angleInDegrees = angleInRadians * (180 / Math.PI);
         break;
       case -90:
-      case 270:
-        style =
+    angleInDegrees = (angleInDegrees + 90) % 360;
+
           `radial-gradient(at ` +
-          mouseY +
-          `% ` +
-          mouseX +
-          `%, #ffffff, #000000)`;
+    if (angleInDegrees < 0) {
+      angleInDegrees += 360;
     }
-    return style;
+
+    return Math.round(angleInDegrees);
   }
+
+  /**
+   *
+   * **/
+  rotatePoint(x, y, rotate, currentAngle = 0) {
+    let angle;
+    let residualAngle = currentAngle;
+
+    console.log('Current angle inside function: ', currentAngle);
+
+    if (rotate) {
+      angle = residualAngle + 90; // Ensure the angle stays within 0-360 degrees
+      console.log(angle);
+    } else {
+      angle = 0;
+    }
+    const radians = (angle * Math.PI) / 180;
+    const cx = 50;
+    const cy = 50;
+    let dx = x - cx;
+    let dy = y - cy;
+    const rotatedX = dx * Math.cos(radians) - dy * Math.sin(radians);
+    const rotatedY = dx * Math.sin(radians) + dy * Math.cos(radians);
+    const newX = rotatedX + cx;
+    const newY = rotatedY + cy;
+
+    return `radial-gradient(circle at ${newX}% ${newY}%, #ffffff, #000000)`;
+  }
+
+  /**
+   *
+   * **/
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.rotation !== this.props.rotation) {
+      console.log('Current angle: ', this.currentAngle);
+      const currentCalculatedBackgroundStyle = document.getElementById(
+        this.props.id
+      ).style.background;
+      this.currentAngle = this.calculatePolarAngleFromCSS(
+        currentCalculatedBackgroundStyle
+      );
+      this.calculatedBackgroundStyle = this.rotatePoint(
+        this.props.moveX,
+        this.props.moveY,
+        true,
+        this.currentAngle
+      );
+    }
+    if (
+      prevProps.moveX !== this.props.moveX ||
+      prevProps.moveY !== this.props.moveY
+    ) {
+      this.calculatedBackgroundStyle = this.rotatePoint(
+        this.props.moveX,
+        this.props.moveY,
+        false,
+        this.currentAngle
+      );
+      const currentCalculatedBackgroundStyle = document.getElementById(
+        this.props.id
+      ).style.background;
+      this.currentAngle = this.calculatePolarAngleFromCSS(
+        currentCalculatedBackgroundStyle
+      );
+    }
+  }
+
   render() {
     const {
       id,
       tooltipTitle,
-      mouseX,
-      mouseY,
       onMouseMove,
       onMouseDown,
       onMouseUp,
@@ -79,11 +145,8 @@ class RelightLightDirection extends React.Component {
               height: '100px',
               margin: '13px',
               borderRadius: '50px',
-              background: this.calculateBackgroundStyle(
-                rotation,
-                mouseX,
-                mouseY
-              ),
+              background: this.calculatedBackgroundStyle,
+              //transform: this.transform
             }}
             aria-label="Change light direction"
             aria-expanded="False"
@@ -92,7 +155,9 @@ class RelightLightDirection extends React.Component {
             onMouseUp={onMouseUp}
             onMouseLeave={onMouseLeave}
             onTouchMove={onMouseMove}
-          />
+          >
+            <Angles width="100px" height="100px" alt="" />
+          </div>
         </Tooltip>
       </>
     );
@@ -104,6 +169,10 @@ RelightLightDirection.propTypes = {
   id: PropTypes.string.isRequired,
   /** The tooltipTitle prop is used to define the text that appears in the hover over component tooltip **/
   tooltipTitle: PropTypes.string.isRequired,
+  /** The moveX prop is the raw mouse X position over the component needed for styling changes **/
+  moveX: PropTypes.number.isRequired,
+  /** The moveY prop is the raw mouse Y position over the component needed for styling changes **/
+  moveY: PropTypes.number.isRequired,
   /** The onMouseMove prop is a function used to manage the component behaviour when the mouse is moved over **/
   onMouseMove: PropTypes.func.isRequired,
   /** The onMouseDown prop is a function used to manage the component behaviour when the mouse button is pressed **/
@@ -123,7 +192,9 @@ RelightLightDirection.propTypes = {
 };
 
 RelightLightDirection.defaultProps = {
+  /** **/
   mouseX: 50,
+  /** **/
   mouseY: 50,
 };
 export default RelightLightDirection;
