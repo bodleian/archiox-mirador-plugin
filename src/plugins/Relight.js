@@ -33,7 +33,7 @@ import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
-import { getLayers } from 'archiox-mirador-plugin/src/plugins/state/selectors';
+import { getLayers } from './state/selectors';
 
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
@@ -44,6 +44,7 @@ class Relight extends React.Component {
     super(props);
     this.state = {
       active: false,
+      flipped: false,
       open: this.props.window.archioxPluginOpen || false,
       drawerOpen: false,
       visible: false,
@@ -55,6 +56,8 @@ class Relight extends React.Component {
     this.mouseDown = false;
     this.mouseX = 50;
     this.mouseY = 50;
+    this.moveX = 50;
+    this.moveY = 50;
     this.lightX = 0;
     this.lightY = 0;
     this.metalness = 0.0;
@@ -81,57 +84,57 @@ class Relight extends React.Component {
    * The threeCanvasProps are updated in state to cause a re-render each time the mouse is moved whilst the button
    * is pressed over the component, this tracks the current rotation and flipped status of the canvas,
    * this also updates the props passed to the Three canvas.
+   * @param {event} event – event being emitted when the mouse moves over the RelightLightDirection component.
+   * @param {number} id – ID of the RelightLightDirection component.
+   * @param {number} rotation - number of degrees the OpenSeaDragon canvas has been rotated.
    * */
   onMouseMove(event, id, rotation) {
     const lightDirectionControl = document.getElementById(id);
     const boundingBox = lightDirectionControl.getBoundingClientRect();
 
-    let xMove;
-    let yMove;
-
     if (event.type === 'mousemove' && this.mouseDown) {
       event.preventDefault();
-      xMove = event.clientX - boundingBox.left;
-      yMove = event.clientY - boundingBox.top;
+      this.moveX = event.clientX - boundingBox.left;
+      this.moveY = event.clientY - boundingBox.top;
     } else if (event.type === 'touchmove') {
       this.mouseDown = true;
-      xMove = event.touches[0].clientX - boundingBox.left;
-      yMove = event.touches[0].clientY - boundingBox.top;
+      this.moveX = event.touches[0].clientX - boundingBox.left;
+      this.moveY = event.touches[0].clientY - boundingBox.top;
     }
 
-    if (this.mouseDown) {
-      // rotation is the total degrees the canvas has rotated, i.e. it stacks, we need to get this back
-      // to a relative number by using modulus...
-      const rotationModulus = rotation % 360;
+    // rotation is the total degrees the canvas has rotated, i.e. it stacks, we need to get this back
+    // to a relative number by using modulus...
+    const rotationModulus = rotation % 360;
 
+    if (this.mouseDown) {
       switch (rotationModulus) {
         case 0:
-          this.mouseX = xMove;
-          this.mouseY = yMove;
+          this.mouseX = this.moveX;
+          this.mouseY = this.moveY;
           this.lightX = (this.mouseX / 100) * 2 - 1;
           this.lightY = (this.mouseY / 100) * 2 - 1;
           this.lightX = this.flipped ? -this.lightX : this.lightX;
           break;
         case -270:
         case 90:
-          this.mouseX = yMove;
-          this.mouseY = xMove;
+          this.mouseX = this.moveY;
+          this.mouseY = this.moveX;
           this.lightX = (this.mouseX / 100) * 2 - 1;
           this.lightY = -((this.mouseY / 100) * 2 - 1);
           this.lightY = this.flipped ? -this.lightY : this.lightY;
           break;
         case -180:
         case 180:
-          this.mouseX = xMove;
-          this.mouseY = yMove;
+          this.mouseX = this.moveX;
+          this.mouseY = this.moveY;
           this.lightX = -((this.mouseX / 100) * 2 - 1);
           this.lightY = -((this.mouseY / 100) * 2 - 1);
           this.lightX = this.flipped ? -this.lightX : this.lightX;
           break;
         case -90:
         case 270:
-          this.mouseX = yMove;
-          this.mouseY = xMove;
+          this.mouseX = this.moveY;
+          this.mouseY = this.moveX;
           this.lightX = -((this.mouseX / 100) * 2 - 1);
           this.lightY = (this.mouseY / 100) * 2 - 1;
           this.lightY = this.flipped ? -this.lightY : this.lightY;
@@ -264,6 +267,7 @@ class Relight extends React.Component {
    * The resetHandler method resets the values of the light control components when the RelightResetLights component
    * is pressed.  It updates the threeCanvasProps to state causing a re-render; the appearance and values of the light
    * controls to return to their default values; and the light positions and intensities in the Three canvas to reset.
+   * @param  {string} id ID of the RelightLightDirection component to be reset.
    */
   resetHandler(id) {
     if (!this.state.active) {
@@ -283,6 +287,8 @@ class Relight extends React.Component {
     this.metalness = 0.0;
     this.roughness = 0.5;
     this.shininess = 30.0;
+    this.moveX = 50;
+    this.moveY = 50;
 
     const lightDirectionControl = document.getElementById(id);
     lightDirectionControl.style.background =
@@ -441,7 +447,6 @@ class Relight extends React.Component {
       this.overlay.update(
         this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
-
       // We need to call forceRedraw each time we update the overlay, if this line is remove, the overlay will
       // glitch and not re-render until we cause the viewport-change event to trigger
       this.props.viewer.forceRedraw();
@@ -551,7 +556,6 @@ class Relight extends React.Component {
   /**
    * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
    * props are updated.  Here we used it to re-render the overlay if there is a change in state detected.
-   * ever an update of state.  Here we use it to keep th
    * @param prevProps the previous props sent to the Relight component
    * @param prevState the previous state set in the Relight component
    * @param snapshot a snapshot of the component before the next render cycle, you can use the React class method
@@ -568,6 +572,11 @@ class Relight extends React.Component {
       : null;
   }
 
+  /**
+   * The componentWillUnmount method is a standard React class method that is used to run other methods whenever the
+   * component is about to be unmounted.  Here we use it to dispose of the textures so the memory they occupy can be
+   * re-used.
+   */
   componentWillUnmount() {
     this.disposeTextures(this.images);
   }
@@ -612,7 +621,6 @@ class Relight extends React.Component {
       // handler, and update state this prevents the handler being added each time there is a re-render
       if (!this.state.loaded && !this.state.loadHandlerAdded) {
         this.setState({ loaded: true });
-
         const excluded_maps = ['composite', 'normal', 'albedo'];
         this.maps = getMaps(this.props.canvas.iiifImageResources);
         this.canvasId = this.props.canvas.id;
@@ -636,6 +644,7 @@ class Relight extends React.Component {
         // add a flip event handler
         this.props.viewer.addHandler('flip', (event) => {
           this.flipped = event.flipped;
+          this.setState({ flipped: this.flipped });
         });
 
         // add a custom event handler that listens for the emission of the OpenSeaDragon close event to clean up
@@ -826,8 +835,11 @@ class Relight extends React.Component {
               tooltipTitle={
                 'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
               }
+              moveX={this.moveX}
+              moveY={this.moveY}
               mouseX={this.mouseX} // mouseX isn't a part of this.state.threeCanvasProps...
               mouseY={this.mouseY} // mouseY isn't a part of this.state.threeCanvasProps...
+              flipped={this.state.flipped}
               onMouseMove={(event) =>
                 this.onMouseMove(
                   event,

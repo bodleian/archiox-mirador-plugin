@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" width="505" height="505" viewBox="-252.5 -252.5 505 505" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <circle r="250" opacity=".05"/>
+  <g id="scale" stroke="#808080" stroke-linecap="round">
+    <path id="deg10" d="m0-250v40 m0,420v40 m-250-250h40 m420,0h40"/>
+    <path id="deg5" transform="rotate(5)" d="m0-250v20 m0,460v20 m-250-250h20 m460,0h20"/>
+    <path id="deg1" transform="rotate(1)" d="m0-250v10 m0,480v10 m-250-250h10 m480,0h10"/>
+    <use xlink:href="#deg1" transform="rotate(1)"/>
+    <use xlink:href="#deg1" transform="rotate(2)"/>
+    <use xlink:href="#deg1" transform="rotate(3)"/>
+    <use xlink:href="#deg1" transform="rotate(5)"/>
+    <use xlink:href="#deg1" transform="rotate(6)"/>
+    <use xlink:href="#deg1" transform="rotate(7)"/>
+    <use xlink:href="#deg1" transform="rotate(8)"/>
+  </g>
+  <use xlink:href="#scale" transform="rotate(10)"/>
+  <use xlink:href="#scale" transform="rotate(20)"/>
+  <use xlink:href="#scale" transform="rotate(30)"/>
+  <use xlink:href="#scale" transform="rotate(40)"/>
+  <use xlink:href="#scale" transform="rotate(50)"/>
+  <use xlink:href="#scale" transform="rotate(60)"/>
+  <use xlink:href="#scale" transform="rotate(70)"/>
+  <use xlink:href="#scale" transform="rotate(80)"/>
+  <g fill="none" stroke="#808080">
+    <path d="m-250,0h500 m-250-250v500" stroke="#008000"/>
+    <path d="m-250,0h500 m-250-250v500" stroke="#f00" transform="rotate(45)"/>
+    <circle r="200"/>
+    <circle r="150"/>
+    <circle r="100"/>
+    <circle r="50"/>
+    <circle r="250" stroke="#000"/>
+  </g>
+</svg>
