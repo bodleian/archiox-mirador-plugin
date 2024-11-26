@@ -56,7 +56,6 @@ export function generateTiles(
       const th = Math.min(tileHeight, scaledHeightRemaining);
 
       let tileFormat = 'jpg';
-
       if (preferredFormats) {
         tileFormat = preferredFormats[0];
       }
@@ -162,6 +161,8 @@ export function getMaps(annotationBodies) {
 
     if (service !== null) {
       layers[element.id] = service.__jsonld.mapType;
+    } else {
+      layers[element.id] = 'none';
     }
   });
   return layers;
@@ -301,12 +302,7 @@ export function reduceLayers(layers, maps, excludedMaps) {
   return layers.reduce(function (accumulator, layer, index) {
     let visibility;
     let mapType;
-    if (maps[layer.id] === undefined) {
-      mapType = 'undefined';
-    } else {
-      mapType = maps[layer.id].trim();
-    }
-
+    mapType = maps[layer.id].trim();
     visibility = excludedMaps.includes(mapType);
     accumulator[layer.id] = {
       index: index,
@@ -325,4 +321,15 @@ export function reduceLayers(layers, maps, excludedMaps) {
  * **/
 export function* setLayers(windowId, canvasId, updateLayers, payload) {
   yield put(updateLayers(windowId, canvasId, payload));
+}
+
+/**
+ * Gets the aspect of the window i.e. is it portrait or landscape, based on width and height
+ * **/
+export function getAspect() {
+  let aspect = 'portrait';
+  if (window.innerHeight < window.innerWidth) {
+    aspect = 'landscape';
+  }
+  return aspect;
 }

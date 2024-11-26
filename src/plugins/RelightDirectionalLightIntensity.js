@@ -32,9 +32,8 @@ class RelightDirectionalLightIntensity extends React.Component {
           style={{
             marginTop: '20px',
             marginBottom: '20px',
-            marginLeft: '8px',
-            marginRight: '8px',
             height: '87px',
+            padding: '0px 15px',
           }}
           size={size}
           orientation={orientation}
