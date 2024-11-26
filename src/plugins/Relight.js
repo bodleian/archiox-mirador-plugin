@@ -287,6 +287,8 @@ class Relight extends React.Component {
     this.metalness = 0.0;
     this.roughness = 0.5;
     this.shininess = 30.0;
+    this.moveX = 50;
+    this.moveY = 50;
 
     const lightDirectionControl = document.getElementById(id);
     lightDirectionControl.style.background =
