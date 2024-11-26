@@ -14,116 +14,117 @@ class RelightLightDirection extends React.Component {
   constructor(props) {
     super(props);
     this.rotation = this.props.rotation % 360;
+    this.adjustedAngle = 0;
     this.currentAngle = 0;
     this.transform = `rotate(${this.rotation}deg)`;
-    this.calculatedBackgroundStyle =
-      `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`;
-  }
-
-  calculatePolarAngleFromCSS(cssValue) {
-      case 0:
-    const regex = /(\d+(\.\d+)?)% (\d+(\.\d+)?)/;
-    const matches = cssValue.match(regex);
-
-    if (!matches) {
-      throw new Error('Invalid CSS radial-gradient format');
-    }
-
-      case -270:
-    const x = parseFloat(matches[1]);
-    const y = parseFloat(matches[3]);
-          `radial-gradient(at ` +
-          mouseY +
-    const cx = 50; // Center X (50%)
-    const cy = 50; // Center Y (50%)
-          `%, #ffffff, #000000)`;
-        break;
-    let dx = x - cx; // Horizontal distance from center
-    let dy = y - cy; // Vertical distance from center
-        style =
-          `radial-gradient(at ` +
-    let angleInRadians = Math.atan2(dy, dx);
-          `% ` +
-          mouseY +
-    let angleInDegrees = angleInRadians * (180 / Math.PI);
-        break;
-      case -90:
-    angleInDegrees = (angleInDegrees + 90) % 360;
-
-          `radial-gradient(at ` +
-    if (angleInDegrees < 0) {
-      angleInDegrees += 360;
-    }
-
-    return Math.round(angleInDegrees);
+    this.state = {
+      calculatedBackgroundStyle:
+        `radial-gradient(at ` + 50 + `% ` + 50 + `%, #ffffff, #000000)`,
+    };
   }
 
   /**
-   *
-   * **/
-  rotatePoint(x, y, rotate, currentAngle = 0) {
-    let angle;
-    let residualAngle = currentAngle;
-
-    console.log('Current angle inside function: ', currentAngle);
-
-    if (rotate) {
-      angle = residualAngle + 90; // Ensure the angle stays within 0-360 degrees
-      console.log(angle);
-    } else {
-      angle = 0;
+   * The rotatePoint method re-positions the RelightLightDirection based on rotation of the OpenSeaDragon canvas
+   * flip is currently not supported.
+   * @param {number} x The current x mouse position over the component
+   * @param {number} y The current y mouse position over the component
+   * @param {boolean} rotate If the canvas was rotated
+   * @param {boolean} flipped If the canvas is currently flipped
+   * @param {number} angle The current angle that the OpenSeaDragon canvas is rotated by
+   * */
+  rotatePoint(x, y, rotate, flipped, angle = 0) {
+    if (!rotate) {
+      switch (angle) {
+        case 0:
+          this.adjustedAngle = 0;
+          break;
+        case -270:
+        case 90:
+          this.adjustedAngle = 90;
+          break;
+        case -180:
+        case 180:
+          this.adjustedAngle = 180;
+          break;
+        case -90:
+        case 270:
+          this.adjustedAngle = 270;
+          break;
+      }
     }
-    const radians = (angle * Math.PI) / 180;
+    const radians = (Math.PI / 180) * (angle - this.adjustedAngle);
     const cx = 50;
     const cy = 50;
-    let dx = x - cx;
-    let dy = y - cy;
-    const rotatedX = dx * Math.cos(radians) - dy * Math.sin(radians);
-    const rotatedY = dx * Math.sin(radians) + dy * Math.cos(radians);
-    const newX = rotatedX + cx;
-    const newY = rotatedY + cy;
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    const nx = cos * (x - cx) - sin * (y - cy) + cx;
+    const ny = cos * (y - cy) + sin * (x - cx) + cy;
 
-    return `radial-gradient(circle at ${newX}% ${newY}%, #ffffff, #000000)`;
+    if (rotate || flipped) {
+      this.setState({
+        calculatedBackgroundStyle:
+          `radial-gradient(at ` +
+          Math.abs(nx) +
+          `% ` +
+          Math.abs(ny) +
+          `%, #ffffff, #000000)`,
+      });
+    } else {
+      this.setState({
+        calculatedBackgroundStyle:
+          `radial-gradient(at ` +
+          Math.abs(x) +
+          `% ` +
+          Math.abs(y) +
+          `%, #ffffff, #000000)`,
+      });
+    }
   }
 
   /**
-   *
+   * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
+   * props are updated.  Here we used it to re-render the RelightLightDirection control if there is a change in state detected.
+   * @param prevProps the previous props sent to the Relight component
+   * @param prevState the previous state set in the Relight component
+   * @param snapshot a snapshot of the component before the next render cycle, you can use the React class method
+   * getSnapShotBeforeUpdate to create this
    * **/
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.rotation !== this.props.rotation) {
-      console.log('Current angle: ', this.currentAngle);
-      const currentCalculatedBackgroundStyle = document.getElementById(
-        this.props.id
-      ).style.background;
-      this.currentAngle = this.calculatePolarAngleFromCSS(
-        currentCalculatedBackgroundStyle
-      );
-      this.calculatedBackgroundStyle = this.rotatePoint(
+      this.rotatePoint(
         this.props.moveX,
         this.props.moveY,
         true,
-        this.currentAngle
+        this.props.flipped,
+        this.props.rotation % 360
       );
     }
     if (
       prevProps.moveX !== this.props.moveX ||
       prevProps.moveY !== this.props.moveY
     ) {
-      this.calculatedBackgroundStyle = this.rotatePoint(
+      this.rotatePoint(
         this.props.moveX,
         this.props.moveY,
         false,
-        this.currentAngle
+        this.props.flipped,
+        this.props.rotation % 360
       );
-      const currentCalculatedBackgroundStyle = document.getElementById(
-        this.props.id
-      ).style.background;
-      this.currentAngle = this.calculatePolarAngleFromCSS(
-        currentCalculatedBackgroundStyle
+    }
+    if (prevProps.flipped !== this.props.flipped) {
+      this.rotatePoint(
+        this.props.moveX,
+        this.props.moveY,
+        false,
+        this.props.flipped,
+        this.props.rotation % 360
       );
     }
   }
-
+  /**
+   Render the RelightLightDirection component
+   @returns {JSX.Element}
+   */
   render() {
     const {
       id,
@@ -132,7 +133,6 @@ class RelightLightDirection extends React.Component {
       onMouseDown,
       onMouseUp,
       onMouseLeave,
-      rotation,
     } = this.props;
     return (
       <>
@@ -145,8 +145,7 @@ class RelightLightDirection extends React.Component {
               height: '100px',
               margin: '13px',
               borderRadius: '50px',
-              background: this.calculatedBackgroundStyle,
-              //transform: this.transform
+              background: this.state.calculatedBackgroundStyle,
             }}
             aria-label="Change light direction"
             aria-expanded="False"
@@ -184,17 +183,17 @@ RelightLightDirection.propTypes = {
   /** The onTouchMove prop is a function used to manage the component behaviour when a finger moved over **/
   onTouchMove: PropTypes.func.isRequired,
   /** The mouseX prop is the current x coordinate of the mouse or touch event **/
-  mouseX: PropTypes.number,
+  mouseX: PropTypes.number.isRequired,
   /** The mouseY prop is the current y coordinate of the mouse or touch event **/
-  mouseY: PropTypes.number,
-  /** The rotation prop is the current rotation of the viewer**/
-  rotation: PropTypes.number,
+  mouseY: PropTypes.number.isRequired,
+  /** The rotation prop is the current rotation of the viewer **/
+  flipped: PropTypes.bool.isRequired,
+  /** The flipped prop is the current flip state of the OpenSeaDragon viewer  **/
+  rotation: PropTypes.number.isRequired,
 };
 
 RelightLightDirection.defaultProps = {
-  /** **/
   mouseX: 50,
-  /** **/
   mouseY: 50,
 };
 export default RelightLightDirection;
