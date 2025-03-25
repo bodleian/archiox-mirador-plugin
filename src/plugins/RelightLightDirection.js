@@ -1,5 +1,5 @@
 import React from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
 import { ReactComponent as Angles } from './public/angles.svg';
 

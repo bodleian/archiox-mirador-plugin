@@ -1,7 +1,7 @@
 import React from 'react';
-import ReplaySharpIcon from '@material-ui/icons/ReplaySharp';
+import ReplaySharpIcon from '@mui/icons-material/ReplaySharp';
 import PropTypes from 'prop-types';
-import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
+import { MiradorMenuButton } from 'mirador';
 
 /**
  * The RelightResetLights component is a plug-in button that will reset the state and appearance of the light controls

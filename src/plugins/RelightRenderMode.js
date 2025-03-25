@@ -1,8 +1,8 @@
 import React from 'react';
-import LocalMoviesIcon from '@material-ui/icons/LocalMovies';
-import FlareIcon from '@material-ui/icons/Flare';
+import LocalMoviesIcon from '@mui/icons-material/LocalMovies';
+import FlareIcon from '@mui/icons-material/Flare';
 import PropTypes from 'prop-types';
-import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
+import { MiradorMenuButton } from 'mirador';
 
 /**
  * The RelightRenderMode component is a plug-in button that will toggle the render mode between PBR and specular

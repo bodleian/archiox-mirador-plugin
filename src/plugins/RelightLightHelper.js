@@ -1,8 +1,8 @@
 import React from 'react';
-import Help from '@material-ui/icons/Help';
-import HelpOutline from '@material-ui/icons/HelpOutline';
+import Help from '@mui/icons-material/Help';
+import HelpOutline from '@mui/icons-material/HelpOutline';
 import PropTypes from 'prop-types';
-import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
+import { MiradorMenuButton } from 'mirador';
 
 /**
  * The RelightResetLights component is a plug-in button that will reset the state and appearance of the light controls

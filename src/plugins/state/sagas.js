@@ -1,12 +1,14 @@
-import {
-  getCurrentCanvas,
-  getWindows,
-} from 'mirador/dist/es/src/state/selectors';
-import ActionTypes from 'mirador/dist/es/src/state/actions/action-types';
 import { all, put, select, takeEvery } from 'redux-saga/effects';
 import { getImages, getMaps, reduceLayers } from '../RelightHelpers';
-import * as actions from 'mirador/dist/es/src/state/actions';
-import { getConfig } from 'mirador/dist/es/src/state/selectors';
+import { 
+  ActionTypes,
+  getConfig, 
+  setCompanionAreaOpen, 
+  updateLayers, 
+  updateConfig,  
+  getCurrentCanvas,
+  getWindows,
+} from 'mirador';
 
 /**
  * Saga for when the Mirador setCanvas action is triggered, such as by adding resources, layers that are switched off
@@ -14,9 +16,9 @@ import { getConfig } from 'mirador/dist/es/src/state/selectors';
  * map type layers back on.
  * **/
 export function* setCanvas(action) {
-  const setCompanionAreaOpen = actions.setCompanionAreaOpen;
-  const updateLayers = actions.updateLayers;
-  const updateConfig = actions.updateConfig;
+  const _setCompanionAreaOpen = setCompanionAreaOpen;
+  const _updateLayers = updateLayers;
+  const _updateConfig = updateConfig;
   const initialWindowId = action.windowId;
   const excluded_maps = ['composite', 'normal', 'albedo'];
   const windows = yield select(getWindows, initialWindowId);
@@ -55,8 +57,9 @@ export function* setCanvas(action) {
 
       payload = reduceLayers(images, maps, excluded_maps);
       yield put(updateLayers(windowId, canvasId, payload));
-      yield put(setCompanionAreaOpen(windowId, sideBarOpen));
-      yield put(updateConfig(config));
+      yield put(_updateLayers(windowId, canvasId, payload));
+      yield put(_setCompanionAreaOpen(windowId, sideBarOpen));
+      yield put(_updateConfig(config));
     }
   }
 }

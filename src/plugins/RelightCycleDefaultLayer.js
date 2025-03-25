@@ -1,7 +1,7 @@
 import React from 'react';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 import PropTypes from 'prop-types';
-import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
+import { MiradorMenuButton } from "mirador";
 
 /**
  * The RelightRenderMode component is a plug-in button that will toggle the render mode between PBR and specular

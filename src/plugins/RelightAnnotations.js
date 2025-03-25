@@ -1,8 +1,8 @@
 import React from 'react';
-import SpeakerNotes from '@material-ui/icons/SpeakerNotes';
-import SpeakerNotesOff from '@material-ui/icons/SpeakerNotesOff';
+import SpeakerNotes from '@mui/icons-material/SpeakerNotes';
+import SpeakerNotesOff from '@mui/icons-material/SpeakerNotesOff';
 import PropTypes from 'prop-types';
-import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
+import { MiradorMenuButton } from 'mirador';
 
 /**
  * The RelightAnnotationButton component is a plug-in sub-menu button used to toggle on or off canvas annotations.
