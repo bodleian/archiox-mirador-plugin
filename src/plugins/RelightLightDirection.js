@@ -1,7 +1,7 @@
 import React from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
-import { ReactComponent as Angles } from './public/angles.svg';
+import Angles from './public/angles.svg?react';
 
 /**
  * The RelightLightDirection component is a circular div component that is styled to look like a hemisphere being lit
