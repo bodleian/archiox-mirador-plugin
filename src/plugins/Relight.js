@@ -47,8 +47,6 @@ class Relight extends React.Component {
       flipped: false,
       open: this.props.window.archioxPluginOpen || false,
       drawerOpen: false,
-      visible: false,
-      loaded: false,
       loadHandlerAdded: false,
       threeCanvasProps: {},
     };
@@ -71,6 +69,8 @@ class Relight extends React.Component {
     this.helperOn = false;
     this.renderMode = true;
     this.albedoInfo = {};
+    this.loaded = false;
+    this.visible = false;
 
     if (!this.renderMode) {
       this.normalDepth = 10.0;
@@ -589,17 +589,17 @@ class Relight extends React.Component {
   render() {
     this.aspect = getAspect();
     // if the canvas object is available then grab define the albedo and normal maps and set them to state
-    if (typeof this.props.canvas !== 'undefined' && !this.state.visible) {
+    if (typeof this.props.canvas !== 'undefined' && !this.visible) {
       this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
       this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
-      // if albedo or normal maps are not present set visible state to false, this will prevent the plug-in from
+      // if albedo or normal maps are not present set visible to false, this will prevent the plug-in from
       // rendering at all, which is what we want.
       if (
         typeof this.albedoMap !== 'undefined' &&
         typeof this.normalMap !== 'undefined' &&
-        !this.state.visible
+        !this.visible
       ) {
-        this.setState((prevState) => ({ visible: !prevState.visible }));
+        this.visible = true;
         this.map_ids = [
           this.albedoMap.split('/').pop(),
           this.normalMap.split('/').pop(),
@@ -619,8 +619,8 @@ class Relight extends React.Component {
     ) {
       // if the loaded in state is false and the loadHandlerAdded state is false then add the tile-loaded event
       // handler, and update state this prevents the handler being added each time there is a re-render
-      if (!this.state.loaded && !this.state.loadHandlerAdded) {
-        this.setState({ loaded: true });
+      if (!this.loaded && !this.state.loadHandlerAdded) {
+        this.loaded = true;
         const excluded_maps = ['composite', 'normal', 'albedo'];
         this.maps = getMaps(this.props.canvas.iiifImageResources);
         this.canvasId = this.props.canvas.id;
@@ -659,8 +659,8 @@ class Relight extends React.Component {
             this.canvasId
           );
           this.generateMapData();
-
-          this.setState({ active: false, visible: false });
+          this.visible = false;
+          this.setState({ active: false });
           // remove all handlers so viewport-change isn't activated!
           this.props.viewer.removeAllHandlers('viewport-change');
         });
@@ -865,11 +865,11 @@ class Relight extends React.Component {
       );
     }
 
-    if (this.state.visible && this.state.open) {
+    if (this.visible && this.state.open) {
       toolMenu = (
         <RelightToolMenu
           id={this.props.relightToolMenuID}
-          visible={this.state.visible}
+          visible={this.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
           <RelightMenuButtons id={this.props.relightMenuButtonsID}>
@@ -897,11 +897,11 @@ class Relight extends React.Component {
           {toolMenuLightControls}
         </RelightToolMenu>
       );
-    } else if (this.state.visible && !this.state.open) {
+    } else if (this.visible && !this.state.open) {
       toolMenu = (
         <RelightToolMenu
           id={this.props.relightToolMenuID}
-          visible={this.state.visible}
+          visible={this.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
           <RelightMenuButton
@@ -910,7 +910,7 @@ class Relight extends React.Component {
           />
         </RelightToolMenu>
       );
-    } else if (!this.state.visible) {
+    } else if (!this.visible) {
       toolMenu = null;
     }
 
@@ -920,47 +920,47 @@ class Relight extends React.Component {
 
 Relight.propTypes = {
   /** The onClick prop is a method passed to clickable child components to handle the click event **/
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   /** The ambientIntensity prop is the intensity level currently set for the ambient light source **/
-  ambientIntensity: PropTypes.number.isRequired,
+  ambientIntensity: PropTypes.number,
   /** The updateLayers prop is the Mirador updateLayers action to be able to set the state of layer objects **/
-  updateLayers: PropTypes.func.isRequired,
+  updateLayers: PropTypes.func,
   /** The windowId prop is the Mirador window ID of the current instance of Mirador **/
-  windowId: PropTypes.number.isRequired,
+  windowId: PropTypes.string,
   /** The viewer prop is the OpenSeaDragon viewer instance in the current instance of Mirador **/
-  viewer: PropTypes.object.isRequired,
+  viewer: PropTypes.object,
   /** The window prop is the Mirador window instance in the current instance of Mirador **/
-  window: PropTypes.object.isRequired,
+  window: PropTypes.object,
   /** The canvas prop is the Mirador canvas instance in the current instance of Mirador **/
-  canvas: PropTypes.object.isRequired,
+  canvas: PropTypes.object,
   /** The state prop is the Mirador state from the redux store **/
-  state: PropTypes.object.isRequired,
+  state: PropTypes.object,
   /** The relightLightDirectionID prop is the ID for the control **/
-  relightLightDirectionID: PropTypes.string.isRequired,
+  relightLightDirectionID: PropTypes.string,
   /** The relightThreeCanvasID prop is the ID for the control **/
-  relightThreeCanvasID: PropTypes.string.isRequired,
+  relightThreeCanvasID: PropTypes.string,
   /** The relightAmbientLightIntensityID prop is the ID for the control **/
-  relightAmbientLightIntensityID: PropTypes.string.isRequired,
+  relightAmbientLightIntensityID: PropTypes.string,
   /** The relightRougnessIntensityID prop is the ID for the control **/
-  relightRoughnessIntensityID: PropTypes.string.isRequired,
+  relightRoughnessIntensityID: PropTypes.string,
   /** The relightMetalnessIntensityID prop is the ID for the control **/
-  relightMetalnessIntensityID: PropTypes.string.isRequired,
+  relightMetalnessIntensityID: PropTypes.string,
   /** The relightShininessIntensityID prop is the ID for the control **/
-  relightShininessIntensityID: PropTypes.string.isRequired,
+  relightShininessIntensityID: PropTypes.string,
   /** The relightDirectionalLightIntensityID prop is the ID for the control **/
-  relightDirectionalLightIntensityID: PropTypes.string.isRequired,
+  relightDirectionalLightIntensityID: PropTypes.string,
   /** The relighNormalDepthID prop is the ID for the control **/
-  relightNormalDepthID: PropTypes.string.isRequired,
+  relightNormalDepthID: PropTypes.string,
   /** The relightToolMenuID prop is the ID for the control **/
-  relightToolMenuID: PropTypes.string.isRequired,
+  relightToolMenuID: PropTypes.string,
   /** The relightMenuButtonID prop is the ID for the control **/
-  relightMenuButtonsID: PropTypes.string.isRequired,
+  relightMenuButtonsID: PropTypes.string,
   /** The relightTorchButtonID prop is the ID for the control **/
-  relightTorchButtonID: PropTypes.string.isRequired,
+  relightTorchButtonID: PropTypes.string,
   /** The relightAnnotationButtonID prop is the ID for the control **/
-  relightAnnotationButtonID: PropTypes.string.isRequired,
+  relightAnnotationButtonID: PropTypes.string,
   /** The relightCycleDefaultLayerID prop is the ID for the control **/
-  relightCycleDefaultLayerID: PropTypes.string.isRequired,
+  relightCycleDefaultLayerID: PropTypes.string,
 };
 
 export default Relight;
