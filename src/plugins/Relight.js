@@ -324,6 +324,7 @@ class Relight extends React.Component {
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
       this.props
     );
+    this.threeCanvasProps.id = this.props.relightThreeCanvasID;
     this.threeCanvasProps.zoom = this.props.viewer.world
       .getItemAt(0)
       .viewportToImageZoom(zoom_level);

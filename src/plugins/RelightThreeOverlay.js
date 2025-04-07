@@ -1,8 +1,5 @@
 import RelightThreeCanvas from './RelightThreeCanvas';
 import React from 'react';
-
-import * as THREE from 'three';
-
 import PropTypes, { shape } from 'prop-types';
 
 /**
@@ -16,6 +13,7 @@ class RelightThreeOverlay extends React.Component {
   }
   render() {
     const {
+      id,
       images,
       zoom,
       rendererInstructions,
@@ -38,6 +36,7 @@ class RelightThreeOverlay extends React.Component {
     } = this.props.threeCanvasProps;
     return (
       <RelightThreeCanvas
+        id={id}
         images={images}
         zoom={zoom}
         intersection={rendererInstructions.intersection}
@@ -65,14 +64,10 @@ class RelightThreeOverlay extends React.Component {
 RelightThreeOverlay.propTypes = {
   /** The threeCanvasProps object containing all the information we need to send to the Three canvas from Relight **/
   threeCanvasProps: shape({
-    images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
+    id: PropTypes.string.isRequired,
+    images: PropTypes.object.isRequired,
     zoom: PropTypes.number.isRequired,
-    intersection: PropTypes.shape({
-      height: PropTypes.number.isRequired,
-      width: PropTypes.number.isRequired,
-      x: PropTypes.number.isRequired,
-      y: PropTypes.number.isRequired,
-    }).isRequired,
+    rendererInstructions: PropTypes.object.isRequired,
     contentWidth: PropTypes.number.isRequired,
     contentHeight: PropTypes.number.isRequired,
     lightX: PropTypes.number.isRequired,
@@ -85,8 +80,8 @@ RelightThreeOverlay.propTypes = {
     ambientIntensity: PropTypes.number.isRequired,
     tileLevel: PropTypes.number.isRequired,
     maxTileLevel: PropTypes.number.isRequired,
-    tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
-    tileLevels: PropTypes.arrayOf(PropTypes.number).isRequired,
+    tileSets: PropTypes.object.isRequired,
+    tileLevels: PropTypes.object.isRequired,
     helperOn: PropTypes.bool.isRequired,
     renderMode: PropTypes.bool.isRequired,
   }),

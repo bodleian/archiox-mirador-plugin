@@ -34,7 +34,7 @@ class RelightRenderMode extends React.Component {
 }
 
 RelightRenderMode.propTypes = {
-  /** bla bla bla **/
+  /** The mode prop is a boolean value that indicates which render mode is currently active **/
   mode: PropTypes.bool.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,
