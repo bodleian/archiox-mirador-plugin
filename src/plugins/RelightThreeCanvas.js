@@ -1,7 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
 import PropTypes from 'prop-types';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * The RelightThreeCanvas component is a Three canvas object containing a scene with orthographic camera, ambient and
@@ -26,7 +25,7 @@ class RelightThreeCanvas extends React.Component {
       x: this.props.intersection.x,
       y: this.props.intersection.y,
     };
-    this.id = 'canvas-container-' + uuidv4();
+    this.id = this.props.id;
     this.threeResources = {};
     this.groups = {};
     this.scene = new THREE.Scene();
@@ -502,9 +501,9 @@ RelightThreeCanvas.propTypes = {
     y: PropTypes.number.isRequired,
   }).isRequired,
   /** The images prop is an array of all the required tile images that have been loaded from OpenSeaDragon **/
-  images: PropTypes.arrayOf(THREE.Texture.type).isRequired,
+  images: PropTypes.object.isRequired,
   /** The tileSets prop is an array of all the albedo/normal tile levels, image tile dimensions, and tile image urls **/
-  tileSets: PropTypes.arrayOf(PropTypes.any).isRequired,
+  tileSets: PropTypes.object.isRequired,
   /** The helperOn prop is a boolean value telling the ThreeCanvas whether or not to render the directional light helper **/
   helperOn: PropTypes.bool.isRequired,
   /** The renderMode prop is a boolean value telling the ThreeCanvas to swap between PBR and Phong materials **/

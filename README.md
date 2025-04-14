@@ -161,161 +161,189 @@ The view config we inject is identical to the exerpt below:
 Make sure you have node.js and npm installed.  It might also be good to install nvm to allow you to switch versions of
 node.js more easily.
 
-Change the default version of node, node version 16+ is compatible.
+Change the default version of node, node version 22+ is compatible.
 
 ```bash
-nvm install 16
+nvm install 20.19.0
 ```
 
 Make nvm use whatever version is compatible.
 
 ```bash
-nvm use 16
+nvm use 20
 ```
 
-To add and install the plug-in into you Mirador instance run the following commands from the root directory of your 
-Mirador build repository.
+To build Mirador bundled with our plug-in, run the following commands from the root directory of your 
+Mirador build repository:
 
-First add the plugin to your dependencies.
+Install the dependencies.
 
 ```bash
-npm install https://github.com/bodleian/archiox-mirador-plugin.git
+npm install mirador@3.4.2  
 ```
 
-Then install all your package dependencies including the plug-in.
+Then add the following dependencies verbatim to the dependencies dictionary of the package.json file so that it looks
+like the example below:
+
+```json
+"dependencies": {
+    "mirador": "3.4.3",
+    "archiox-mirador-plugin": "github:bodleian/archiox-mirador-plugin.git",
+    "mirador-image-tools": "0.11",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "react-i18next": "^15.4.1",
+    "url-loader": "^4.1.1",
+    "vite": "^6.2.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite-plugin-svgr": "^4.3.0"
+}
+```
+Then delete the package-lock.json file and re-run the install command as follows:
 
 ```bash
 npm install
 ```
 
-Make sure you have the following npm packages installed in your mirador instance:
+Create a `/src` folder with a new `index.js` in it, copy-paste the following into it (edit for your needs):
+**NB: ** This example is configured for the Bodleian Library set up of using content negotiation to serve 
+either v2/v3 IIIF image and or presentation API requests.  Replace `your_iiif_manifest.json` with the uri to the 
+manifest you wish to serve Mirador viewer.
 
-* @babel/core 
-* @babel/preset-env
-* @babel/preset-react    
-* babel-loader
-
-Make sure you have a `babel.config.js` file in your mirador instance containing the following, this is so you can
-transpile the code into something that can run on any machine:
-
-```ecmascript 6
-module.exports = {
-    presets:[
-        "@babel/preset-env",
-        "@babel/preset-react"
-    ]
-}
-```
-
-Make sure you add the following to your `webpack.config.js` file to enable experimental JSX usage in React files,
-otherwise the plug-in will not build correctly:
-
-```ecmascript 6
-module: {
-    rules: [
-      {
-        test: /\.(js|jsx)$/,
-        loader: 'babel-loader',
-        options: { presets: ['@babel/env','@babel/preset-react'] },
-      }
-    ]
-  }
-```
-
-Add the plug-in to the `index.js` file of your Mirador instance as follows:
-
-```ecmascript 6
-import Mirador from 'mirador/dist/es/src/index';
-import { miradorImageToolsPlugin } from 'mirador-image-tools';
-import { relightMiradorPlugin } from "archiox-mirador-plugin";
+```javascript
+import Mirador from 'mirador';
+import { relightMiradorPlugin } from 'archiox-mirador-plugin';
+import { miradorImageToolsPlugin } from "mirador-image-tools/es/index";
 
 const MiradorPlugins = {
-  relightMiradorPlugin: relightMiradorPlugin,
-  miradorImageToolsPlugin: miradorImageToolsPlugin
+    relightMiradorPlugin: relightMiradorPlugin,
+    miradorImageToolsPlugin: miradorImageToolsPlugin
 };
 
-export default {Mirador, MiradorPlugins};
+document.addEventListener('DOMContentLoaded', function() {
+  let sideBarOpen = true;
+
+  if (Math.min(window.innerWidth) < 1500 || navigator.userAgent.indexOf("Mobi") > -1){
+    sideBarOpen = false;
+  }
+
+  const config = {
+    id: 'viewer',
+    windows: [{
+      // enable and show the image tools plugin controls
+      imageToolsEnabled: true,
+      normalsInverted: true,
+      imageToolsOpen: false,
+      sideBarOpen: sideBarOpen,
+      archioxPluginOpen: true,
+      manifestId: 'your_iiif_manifest.json'
+    }],
+    requests: {
+      // Manipulate IIIF HTTP requests (info.json, IIIF presentation manifests, annotations, etc) to add an Accept header so we use our v3 manifests
+      preprocessors: [
+        (url, options) => ({...options,
+          headers: {
+            ...options.headers,
+            Accept: url.endsWith('/info.json')
+                ? 'application/ld+json;profile="http://iiif.io/api/image/3/context.json"'
+                : 'application/ld+json;profile="http://iiif.io/api/presentation/3/context.json"',
+            ...(url.endsWith('/info.json') && { 'Cache-Control': 'no-cache' })
+          }
+        })
+      ],
+    },
+    theme: {
+      palette: {
+        primary: {
+          main: '#1967d2',
+        },
+      },
+    },
+    osdConfig:{
+      crossOriginPolicy: "Anonymous",
+      subPixelRoundingForTransparency: 1,
+      overlayPreserveContentDirection: false,
+    },
+  };
+  Mirador.viewer(config, Object.values(MiradorPlugins).flatMap((e) => ([...e])));
+});
 ```
 
-In your Mirador `package.json` file add the following to your scripts as follows:
+In your `package.json` file add the following to your scripts as follows:
 
 ```json
  "scripts": {
-    "webpack": "webpack --config webpack/webpack.config.js --mode=production"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
 ```
 
-In your `index.html` file in your webpack folder add something like the below example:
+In the root folder create a new `index.html` and copy-paste the following example:
 
 ```html
 <!doctype html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- By default Mirador uses Roboto font. Be sure to load this or change the font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
     <title>Mirador Example</title>
-      <!-- this will be different depending on your Mirador build folder and if it is in its own repository -->
-      <script src="dist/mirador-with-plugins.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const config = {
-          id: 'viewer',
-          windows: [{
-            // enable and show the image tools plug-in controls
-            imageToolsEnabled: true,
-            imageToolsOpen: true,
-            // open a specific manifest (optional)
-            manifestId: 'some url for a manifest id'
-          }],
-            requests: {
-                // Manipulate IIIF HTTP requests (info.json, IIIF presentation manifests, annotations, etc) to add an Accept header so we use our v3 manifests
-                preprocessors: [
-                    (url, options) => ({...options,
-                        headers: {
-                            ...options.headers,
-                            Accept: url.endsWith('/info.json')
-                                    ? 'application/ld+json;profile=http://iiif.io/api/image/3/context.json'
-                                    : 'application/ld+json;profile="http://iiif.io/api/presentation/3/context.json"'
-                        }
-                    })
-                ],
-            },
-            theme: {
-                palette: {
-                    primary: {
-                        main: '#1967d2',
-                    },
-                },
-            },
-            osdConfig:{
-                crossOriginPolicy: "Anonymous",
-                subPixelRoundingForTransparency: 2,
-                immediateRender: true
-            },
-        };
-        // this includes all of the plug-ins under MiradorPlugins
-        // it's the equivalent of [ ...MiradorPlugins.pluginA, ...MiradorPlugins.pluginB, ...MiradorPlugins.pluginC] 
-          // for all plug-ins in MiradorPlugins
-        Mirador.viewer(config, Object.values(MiradorPlugins).flatMap((e) => ([...e])));
-      });
-    </script>
-  </head>
-  <body>
-    <!-- Container element of Mirador whose id should be passed to the instantiating call as "id" -->
-    <div id="viewer"></div>
-  </body>
+</head>
+<body>
+<!-- Container element of Mirador whose id should be passed to the instantiating call as "id" -->
+<div id="viewer"></div>
+<script src="./src/index.js" type="module"></script>
+</body>
 </html>
 ```
 
-To build Mirador with the plug-ins installed, run the following command:
+In the root folder create an empty `vite.config.js` file and copy-paste the following config that
+allows transpiling of JSX and exporting of SVGs as components.
 
-```bash
-npm run webpack
+```javascript
+import { defineConfig } from 'vite';
+import svgr from 'vite-plugin-svgr';
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+    plugins: [
+        react(),
+        svgr()
+    ],
+    esbuild: {
+        loader: 'jsx',
+            include: /.*\.jsx?$/,
+            exclude: []
+    },
+    optimizeDeps: {
+        esbuildOptions: {
+            loader: {
+                '.js': 'jsx',
+            },
+        },
+    },
+    build: {
+        sourcemap: true,
+    },
+    base: './',
+});
 ```
 
-You should now be able to open the `index.html` file in your local browser and see your working Mirador build with
-plug-ins.
+To build Mirador with the plug-ins installed, run the following script:
+
+```bash
+npm run build
+```
+
+To serve a preview of your Mirador build locally on the localhost, run the following strip:
+
+```bash
+npm run preview
+```
 
 # Development  Rules
 All new features should be placed in feature branches and not pushed direct to the `qa` or `master` branches as per our 
@@ -323,7 +351,7 @@ other repos.  That way we can test new features without breaking anything.
 
 # Developing locally
 To develop the application locally you can work on and edit the code in your Mirador build folders `node_modules`
-directory under `node_modules/archiox-mirador-plugin/src/plugins` and rebuild the application using `npm run webpack`.
+directory under `node_modules/archiox-mirador-plugin/src/plugins` and rebuild the application using `npm run build`.
 
 Any changes you get working in this way can be then added to commits as a feature branch of the `archiox-mirador-plugin`
 repository.
@@ -360,7 +388,8 @@ npm ci
 ```
 
 ## es-lint and Prettier
-To lint and autoformat your code locally, run the following command:
+To lint and autoformat your code locally, run the following script from this repositories root directory, 
+not your Mirador build, after installing the relevant dependencies in the normal way:
 
 ```bash
 npm run lint

@@ -26,7 +26,6 @@ class RelightLightHelper extends React.Component {
           clear: 'both',
         }}
         onClick={onClick}
-        helperOn={helperOn}
       >
         {helperOn ? <Help /> : <HelpOutline />}
       </MiradorMenuButton>
