@@ -33,6 +33,7 @@ import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
+import RelightSnapshotButton from './RelightSnapshotButton';
 import { getLayers } from './state/selectors';
 
 /**
@@ -873,7 +874,7 @@ class Relight extends React.Component {
           visible={this.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
-          <RelightMenuButtons id={this.props.relightMenuButtonsID}>
+          <RelightMenuButtons id={this.props.relightMenuButtonsAID}>
             <RelightMenuButton
               onClick={() => this.menuHandler()}
               open={this.state.open}
@@ -894,6 +895,26 @@ class Relight extends React.Component {
               active={this.state.active}
             />
           </RelightMenuButtons>
+          <RelightMenuButtons id={this.props.relightMenuButtonsBID}>
+            <RelightSnapshotButton
+              id={this.props.relightSnapshotButtonID}
+              onClick={() => {
+                alert('Snapshot');
+              }}
+              active={this.state.active}
+            />
+          </RelightMenuButtons>
+          <div
+            style={{
+              gridRow: 1,
+              width: '49px',
+              height: '48px',
+              lineHeight: '48px',
+              textAlign: 'center',
+            }}
+          >
+            2.5D
+          </div>
           {toolMenuLightButtons}
           {toolMenuLightControls}
         </RelightToolMenu>
@@ -954,14 +975,18 @@ Relight.propTypes = {
   relightNormalDepthID: PropTypes.string,
   /** The relightToolMenuID prop is the ID for the control **/
   relightToolMenuID: PropTypes.string,
-  /** The relightMenuButtonID prop is the ID for the control **/
-  relightMenuButtonsID: PropTypes.string,
+  /** The relightMenuButtonsAID prop is the ID for the control **/
+  relightMenuButtonsAID: PropTypes.string,
+  /** The relightMenuButtonsBID prop is the ID for the control **/
+  relightMenuButtonsBID: PropTypes.string,
   /** The relightTorchButtonID prop is the ID for the control **/
   relightTorchButtonID: PropTypes.string,
   /** The relightAnnotationButtonID prop is the ID for the control **/
   relightAnnotationButtonID: PropTypes.string,
   /** The relightCycleDefaultLayerID prop is the ID for the control **/
   relightCycleDefaultLayerID: PropTypes.string,
+  /** The relightSnapshotButtonID prop is the ID for the control **/
+  relightSnapshotButtonID: PropTypes.string,
 };
 
 export default Relight;

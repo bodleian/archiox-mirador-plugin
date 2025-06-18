@@ -16,6 +16,7 @@ class RelightMenuButtons extends React.Component {
       <div
         style={{
           display: 'flex',
+          gridRow: 1,
           borderRight: '1px solid rgba(0,0,0,0.2)',
           borderImageSlice: 1,
           borderImageSource:

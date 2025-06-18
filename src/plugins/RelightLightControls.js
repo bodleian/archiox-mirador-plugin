@@ -23,6 +23,8 @@ class RelightLightControls extends React.Component {
       <div
         style={{
           display: display,
+          gridRow: 3,
+          gridColumn: '1/5',
         }}
       >
         {children}

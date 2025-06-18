@@ -1,5 +1,5 @@
 import React from 'react';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
+import CollectionsOutlined from '@material-ui/icons/CollectionsOutlined';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
@@ -26,7 +26,7 @@ class RelightCycleDefaultLayer extends React.Component {
         onClick={onClick}
         disabled={active}
       >
-        <SkipNextIcon />
+        <CollectionsOutlined />
       </MiradorMenuButton>
     );
   }
