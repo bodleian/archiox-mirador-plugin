@@ -1,8 +1,8 @@
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import React from 'react';
 
-import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
-import WbIncandescentOutlinedIcon from '@material-ui/icons/WbIncandescentOutlined';
+import HighLight from '@material-ui/icons/Highlight';
+import HighLightOutlined from '@material-ui/icons/HighlightOutlined';
 
 import PropTypes from 'prop-types';
 
@@ -16,20 +16,21 @@ class RelightTorchButton extends React.Component {
   render() {
     const { active, onClick, id } = this.props;
     return (
-      <MiradorMenuButton
-        id={id}
-        aria-label={
-          active
-            ? 'Turn off the 3D overlay to return to the default Mirador view'
-            : 'Turn on the 3D overlay to relight this object virtually'
-        }
-        style={{
-          clear: 'both',
-        }}
-        onClick={onClick}
-      >
-        {active ? <WbIncandescentIcon /> : <WbIncandescentOutlinedIcon />}
-      </MiradorMenuButton>
+        <MiradorMenuButton
+            id={id}
+            aria-label={
+              active
+                  ? 'Turn off the 3D overlay to return to the default Mirador view'
+                  : 'Turn on the 3D overlay to relight this object virtually'
+            }
+            style={{
+              backgroundColor:  active ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0)',
+              clear: 'both',
+            }}
+            onClick={onClick}
+        >
+          {active ? <HighLight /> : <HighLightOutlined />}
+        </MiradorMenuButton>
     );
   }
 }

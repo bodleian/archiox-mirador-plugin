@@ -1,5 +1,5 @@
 import React from 'react';
-import HighlightIcon from '@material-ui/icons/Highlight';
+import BuildOutlined from '@material-ui/icons/BuildOutlined';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import PropTypes from 'prop-types';
@@ -15,20 +15,20 @@ class RelightMenuButton extends React.Component {
   render() {
     const { open, onClick } = this.props;
     return (
-      <MiradorMenuButton
-        aria-label={
-          open
-            ? 'Collapse relighting tools'
-            : 'Expand relighting tools to access controls that allow 3D rendering of this object in your browser'
-        }
-        style={{
-          float: 'left',
-          clear: 'both',
-        }}
-        onClick={onClick}
-      >
-        {open ? <CloseSharpIcon /> : <HighlightIcon />}
-      </MiradorMenuButton>
+        <MiradorMenuButton
+            aria-label={
+              open
+                  ? 'Collapse relighting tools'
+                  : 'Expand relighting tools to access controls that allow 3D rendering of this object in your browser'
+            }
+            style={{
+              float: 'left',
+              clear: 'both',
+            }}
+            onClick={onClick}
+        >
+          {open ? <CloseSharpIcon /> : <BuildOutlined />}
+        </MiradorMenuButton>
     );
   }
 }

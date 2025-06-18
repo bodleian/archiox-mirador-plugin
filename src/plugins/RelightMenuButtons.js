@@ -12,7 +12,12 @@ class RelightMenuButtons extends React.Component {
   render() {
     // children is used so that parent props can be passed to the children components inside its tags
     const { children } = this.props;
-    return <div style={{ display: 'inline-block' }}>{children}</div>;
+    return <div style={{
+      display: 'flex',
+      borderRight: '1px solid rgba(0,0,0,0.2)',
+      borderImageSlice: 1,
+      borderImageSource: 'linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.2) 20% 80%, rgba(0, 0, 0, 0) 80% )'
+    }}>{children}</div>;
   }
 }
 
