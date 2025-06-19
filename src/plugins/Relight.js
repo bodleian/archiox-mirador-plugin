@@ -35,7 +35,6 @@ import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
 import RelightSnapshotButton from './RelightSnapshotButton';
 import { getLayers } from './state/selectors';
-
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
  * It is composed of a group of buttons and a group of controls that make up the relighting plug-in.
@@ -555,6 +554,16 @@ class Relight extends React.Component {
     }
   }
 
+  screenshotButtonHandler() {
+    const canvas = document.querySelector('#container div canvas');
+    const dataURL = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataURL;
+    // todo: put in more meaningful file name here...
+    link.download = 'archiox_view_download.png';
+    link.click();
+  }
+
   /**
    * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
    * props are updated.  Here we used it to re-render the overlay if there is a change in state detected.
@@ -898,9 +907,7 @@ class Relight extends React.Component {
           <RelightMenuButtons id={this.props.relightMenuButtonsBID}>
             <RelightSnapshotButton
               id={this.props.relightSnapshotButtonID}
-              onClick={() => {
-                alert('Snapshot');
-              }}
+              onClick={() => this.screenshotButtonHandler()}
               active={this.state.active}
             />
           </RelightMenuButtons>

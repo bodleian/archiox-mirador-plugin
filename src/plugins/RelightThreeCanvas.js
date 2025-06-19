@@ -29,7 +29,10 @@ class RelightThreeCanvas extends React.Component {
     this.threeResources = {};
     this.groups = {};
     this.scene = new THREE.Scene();
-    this.renderer = new THREE.WebGLRenderer({ alpha: false });
+    this.renderer = new THREE.WebGLRenderer({
+      alpha: false,
+      preserveDrawingBuffer: true,
+    });
     this.renderer.setSize(
       this.state.width * this.state.zoom,
       this.state.height * this.state.zoom
