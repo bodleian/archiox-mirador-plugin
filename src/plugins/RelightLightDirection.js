@@ -2,6 +2,7 @@ import React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
 import PropTypes from 'prop-types';
 import Angles from './public/angles.svg?react';
+import ControlCamera from '@material-ui/icons/ControlCamera';
 
 /**
  * The RelightLightDirection component is a circular div component that is styled to look like a hemisphere being lit
@@ -138,24 +139,32 @@ class RelightLightDirection extends React.Component {
       <>
         <Tooltip title={tooltipTitle}>
           <div
-            id={id}
             style={{
-              border: '#000000',
-              width: '100px',
-              height: '100px',
-              margin: '13px',
-              borderRadius: '50px',
-              background: this.state.calculatedBackgroundStyle,
+              display: 'inline-block',
+              textAlign: 'center',
             }}
-            aria-label="Change light direction"
-            aria-expanded="False"
-            onMouseMove={onMouseMove}
-            onMouseDown={onMouseDown}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseLeave}
-            onTouchMove={onMouseMove}
           >
-            <Angles width="100px" height="100px" alt="" />
+            <div
+              id={id}
+              style={{
+                border: '#000000',
+                width: '100px',
+                height: '100px',
+                margin: '13px',
+                borderRadius: '50px',
+                background: this.state.calculatedBackgroundStyle,
+              }}
+              aria-label="Change light direction"
+              aria-expanded="False"
+              onMouseMove={onMouseMove}
+              onMouseDown={onMouseDown}
+              onMouseUp={onMouseUp}
+              onMouseLeave={onMouseLeave}
+              onTouchMove={onMouseMove}
+            >
+              <Angles width="100px" height="100px" alt="" />
+            </div>
+            <ControlCamera />
           </div>
         </Tooltip>
       </>
