@@ -11,7 +11,6 @@ import {
   getRendererInstructions,
   getTileSets,
   reduceLayers,
-  getAspect,
 } from './RelightHelpers';
 import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
@@ -35,6 +34,7 @@ import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
 import RelightSnapshotButton from './RelightSnapshotButton';
 import { getLayers } from './state/selectors';
+import './public/styles.css';
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
  * It is composed of a group of buttons and a group of controls that make up the relighting plug-in.
@@ -598,7 +598,6 @@ class Relight extends React.Component {
    * @returns {JSX.Element}
    */
   render() {
-    this.aspect = getAspect();
     // if the canvas object is available then grab define the albedo and normal maps and set them to state
     if (typeof this.props.canvas !== 'undefined' && !this.visible) {
       this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
@@ -749,7 +748,6 @@ class Relight extends React.Component {
           />
           <RelightExpandSlidersButton
             drawerOpen={this.state.drawerOpen}
-            aspect={this.aspect}
             onClick={() => this.drawerHandler()}
           />
         </RelightLightButtons>
@@ -795,7 +793,7 @@ class Relight extends React.Component {
           textAlign: 'center',
         };
 
-        if (this.aspect === 'landscape') {
+        if (window.innerWidth >= 768) {
           sliderStyle = {
             textAlign: 'center',
             marginRight: '13px',
@@ -833,7 +831,7 @@ class Relight extends React.Component {
       }
 
       toolMenuLightControls = (
-        <RelightLightControls aspect={this.aspect}>
+        <RelightLightControls>
           <div
             style={{
               maxWidth: 'fit-content',
@@ -842,7 +840,6 @@ class Relight extends React.Component {
           >
             <RelightLightDirection
               id={this.props.relightLightDirectionID}
-              aspect={this.aspect}
               tooltipTitle={
                 'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
               }
@@ -872,6 +869,7 @@ class Relight extends React.Component {
             />
           </div>
           {toolMenuSliders}
+          {toolMenuLightButtons}
         </RelightLightControls>
       );
     }
@@ -922,7 +920,6 @@ class Relight extends React.Component {
           >
             2.5D
           </div>
-          {toolMenuLightButtons}
           {toolMenuLightControls}
         </RelightToolMenu>
       );

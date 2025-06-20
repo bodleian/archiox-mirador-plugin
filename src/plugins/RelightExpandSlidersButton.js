@@ -16,11 +16,11 @@ class RelightExpandSlidersButton extends React.Component {
     super(props);
   }
   render() {
-    const { drawerOpen, aspect, onClick } = this.props;
+    const { drawerOpen, onClick } = this.props;
 
     let icon = drawerOpen ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />;
 
-    if (aspect === 'landscape') {
+    if (window.innerWidth >= 768) {
       icon = drawerOpen ? <ArrowBackIcon /> : <ArrowForwardIcon />;
     }
 
@@ -28,6 +28,7 @@ class RelightExpandSlidersButton extends React.Component {
       <MiradorMenuButton
         style={{
           clear: 'both',
+          display: 'block',
         }}
         aria-label={
           drawerOpen

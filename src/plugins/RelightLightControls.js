@@ -11,25 +11,9 @@ class RelightLightControls extends React.Component {
   }
   render() {
     // children is used so that parent props can be passed to the children components inside its tags
-    const { children, aspect } = this.props;
+    const { children } = this.props;
 
-    let display = 'block';
-
-    if (aspect === 'landscape') {
-      display = 'flex';
-    }
-
-    return (
-      <div
-        style={{
-          display: display,
-          gridRow: 3,
-          gridColumn: '1/5',
-        }}
-      >
-        {children}
-      </div>
-    );
+    return <div className="relightLightControls">{children}</div>;
   }
 }
 

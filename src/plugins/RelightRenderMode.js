@@ -24,6 +24,7 @@ class RelightRenderMode extends React.Component {
         }
         style={{
           clear: 'both',
+          display: 'block',
         }}
         onClick={onClick}
       >
