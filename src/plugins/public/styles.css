@@ -1,0 +1,22 @@
+.relightLightControls {
+    display: flex;
+    grid-row: 3;
+    grid-column: 1/5;
+    border-top: 1px solid rgba(0,0,0,0.2);
+    border-image-slice: 1;
+    border-image-source: linear-gradient(to left, rgba(0, 0, 0, 0) 1%, rgba(0, 0, 0, 0.2) 1% 98%, rgba(0, 0, 0, 0) 98% );
+}
+.relightLightButtons {
+    display: inline-block;
+    grid-row: 2;
+    grid-column: 1/5;
+}
+@media (max-width: 768px) {
+    .relightLightControls {
+        display: inline-block;
+        text-align: center;
+    }
+    .relightLightButtons {
+        display: flex;
+    }
+}
