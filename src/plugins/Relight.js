@@ -35,6 +35,8 @@ import RelightRoughnessIntensity from './RelightRoughnessIntensity';
 import RelightSnapshotButton from './RelightSnapshotButton';
 import { getLayers } from './state/selectors';
 import './public/styles.css';
+import RelightHelpButton from './RelightHelpButton';
+import RelightHelpDialog from './RelightHelpDialog';
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
  * It is composed of a group of buttons and a group of controls that make up the relighting plug-in.
@@ -49,6 +51,7 @@ class Relight extends React.Component {
       drawerOpen: false,
       loadHandlerAdded: false,
       threeCanvasProps: {},
+      helpOn: false,
     };
     this.threeCanvasProps = {};
     this.mouseDown = false;
@@ -67,6 +70,7 @@ class Relight extends React.Component {
     this.tileSets = {};
     this.tileLevels = {};
     this.helperOn = false;
+    this.helpOn = false;
     this.renderMode = true;
     this.albedoInfo = {};
     this.loaded = false;
@@ -564,6 +568,16 @@ class Relight extends React.Component {
     link.click();
   }
 
+  helpOpenHandler() {
+    this.setState({ helpOn: true });
+    console.log('Open');
+  }
+
+  helpCloseHanlder() {
+    this.setState({ helpOn: false });
+    console.log('Close');
+  }
+
   /**
    * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
    * props are updated.  Here we used it to re-render the overlay if there is a change in state detected.
@@ -745,6 +759,15 @@ class Relight extends React.Component {
           <RelightRenderMode
             mode={this.renderMode}
             onClick={() => this.renderHandler()}
+          />
+          <RelightHelpButton
+            id={this.props.relightHelpButtonID}
+            onClick={() => this.helpOpenHandler()}
+          />
+          <RelightHelpDialog
+            id={'foo'}
+            helpOn={this.state.helpOn}
+            onClose={() => this.helpCloseHanlder()}
           />
           <RelightExpandSlidersButton
             drawerOpen={this.state.drawerOpen}
@@ -991,6 +1014,8 @@ Relight.propTypes = {
   relightCycleDefaultLayerID: PropTypes.string,
   /** The relightSnapshotButtonID prop is the ID for the control **/
   relightSnapshotButtonID: PropTypes.string,
+  /** The relightHelpButtonID prop is the IS for the control **/
+  relightHelpButtonID: PropTypes.string,
 };
 
 export default Relight;

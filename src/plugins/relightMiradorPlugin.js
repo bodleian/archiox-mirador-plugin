@@ -27,6 +27,7 @@ export default [
         relightMenuButtonsBID: uuidv4(),
         relightSnapShotButtonID: uuidv4(),
         relightTorchButtonID: uuidv4(),
+        relightHelpButtonID: uuidv4(),
         relightAnnotationButtonID: uuidv4(),
         relightCycleDefaultLayerID: uuidv4(),
         canvas: getCurrentCanvas(state, { windowId }),
