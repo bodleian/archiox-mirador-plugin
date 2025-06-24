@@ -11,14 +11,16 @@ class RelightSnapshotButton extends React.Component {
   render() {
     const { active, id, onClick } = this.props;
     return (
-      <MiradorMenuButton
-        id={id}
-        aria-label="Take a screenshot of the current rendered view"
-        onClick={onClick}
-        disabled={!active}
-      >
-        <PhotoCameraOutlined />
-      </MiradorMenuButton>
+      <div className="relightMenuButton">
+        <MiradorMenuButton
+          id={id}
+          aria-label="Take a screenshot of the current rendered view"
+          onClick={onClick}
+          disabled={!active}
+        >
+          <PhotoCameraOutlined />
+        </MiradorMenuButton>
+      </div>
     );
   }
 }

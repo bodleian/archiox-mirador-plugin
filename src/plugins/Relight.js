@@ -16,7 +16,6 @@ import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
 import RelightDirectionalLightIntensity from './RelightDirectionalLightIntensity';
 import RelightLightDirection from './RelightLightDirection';
-import RelightLightControls from './RelightLightControls';
 import RelightToolMenu from './RelightToolMenu';
 import RelightResetLights from './RelightResetLights';
 import RelightLightButtons from './RelightLightButtons';
@@ -24,7 +23,6 @@ import RelightTorchButton from './RelightTorchButton';
 import RelightExpandSlidersButton from './RelightExpandSlidersButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
-//import RelightAnnotationButton from './RelightAnnotations';  // disabled until we can get annotation data
 import RelightMenuButtons from './RelightMenuButtons';
 import RelightLightHelper from './RelightLightHelper';
 import RelightRenderMode from './RelightRenderMode';
@@ -48,7 +46,7 @@ class Relight extends React.Component {
       active: false,
       flipped: false,
       open: this.props.window.archioxPluginOpen || false,
-      drawerOpen: false,
+      drawerOpen: true,
       loadHandlerAdded: false,
       threeCanvasProps: {},
       helpOn: false,
@@ -573,9 +571,16 @@ class Relight extends React.Component {
     console.log('Open');
   }
 
-  helpCloseHanlder() {
+  helpCloseHandler() {
     this.setState({ helpOn: false });
     console.log('Close');
+  }
+
+  resizeHandler() {
+    const isNowWide = window.innerWidth > 768;
+    if (isNowWide) {
+      this.setState({ drawerOpen: true });
+    }
   }
 
   /**
@@ -597,12 +602,17 @@ class Relight extends React.Component {
       : null;
   }
 
+  componentDidMount() {
+    window.addEventListener('resize', () => this.resizeHandler());
+  }
+
   /**
    * The componentWillUnmount method is a standard React class method that is used to run other methods whenever the
    * component is about to be unmounted.  Here we use it to dispose of the textures so the memory they occupy can be
    * re-used.
    */
   componentWillUnmount() {
+    window.removeEventListener('resize', () => this.resizeHandler());
     this.disposeTextures(this.images);
   }
 
@@ -767,7 +777,7 @@ class Relight extends React.Component {
           <RelightHelpDialog
             id={'foo'}
             helpOn={this.state.helpOn}
-            onClose={() => this.helpCloseHanlder()}
+            onClose={() => this.helpCloseHandler()}
           />
           <RelightExpandSlidersButton
             drawerOpen={this.state.drawerOpen}
@@ -812,19 +822,8 @@ class Relight extends React.Component {
         );
       }
       if (this.state.drawerOpen) {
-        let sliderStyle = {
-          textAlign: 'center',
-        };
-
-        if (window.innerWidth >= 768) {
-          sliderStyle = {
-            textAlign: 'center',
-            marginRight: '13px',
-          };
-        }
-
         toolMenuSliders = (
-          <div style={sliderStyle}>
+          <div className="relightLightSliders">
             <RelightDirectionalLightIntensity
               id={this.props.relightDirectionalLightIntensityID}
               tooltipTitle={
@@ -854,46 +853,40 @@ class Relight extends React.Component {
       }
 
       toolMenuLightControls = (
-        <RelightLightControls>
-          <div
-            style={{
-              maxWidth: 'fit-content',
-              marginInline: 'auto',
-            }}
+        <>
+          <RelightLightDirection
+            id={this.props.relightLightDirectionID}
+            tooltipTitle={
+              'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
+            }
+            moveX={this.moveX}
+            moveY={this.moveY}
+            mouseX={this.mouseX} // mouseX isn't a part of this.state.threeCanvasProps...
+            mouseY={this.mouseY} // mouseY isn't a part of this.state.threeCanvasProps...
+            flipped={this.state.flipped}
+            onMouseMove={(event) =>
+              this.onMouseMove(
+                event,
+                this.props.relightLightDirectionID,
+                this.rotation
+              )
+            }
+            onMouseDown={(event) => this.onMouseDown(event)}
+            onMouseUp={(event) => this.onMouseUp(event)}
+            onMouseLeave={(event) => this.onMouseLeave(event)}
+            onTouchMove={(event) =>
+              this.onMouseMove(
+                event,
+                this.props.relightLightDirectionID,
+                this.rotation
+              )
+            }
+            rotation={this.rotation}
           >
-            <RelightLightDirection
-              id={this.props.relightLightDirectionID}
-              tooltipTitle={
-                'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
-              }
-              moveX={this.moveX}
-              moveY={this.moveY}
-              mouseX={this.mouseX} // mouseX isn't a part of this.state.threeCanvasProps...
-              mouseY={this.mouseY} // mouseY isn't a part of this.state.threeCanvasProps...
-              flipped={this.state.flipped}
-              onMouseMove={(event) =>
-                this.onMouseMove(
-                  event,
-                  this.props.relightLightDirectionID,
-                  this.rotation
-                )
-              }
-              onMouseDown={(event) => this.onMouseDown(event)}
-              onMouseUp={(event) => this.onMouseUp(event)}
-              onMouseLeave={(event) => this.onMouseLeave(event)}
-              onTouchMove={(event) =>
-                this.onMouseMove(
-                  event,
-                  this.props.relightLightDirectionID,
-                  this.rotation
-                )
-              }
-              rotation={this.rotation}
-            />
-          </div>
-          {toolMenuSliders}
+            {toolMenuSliders}
+          </RelightLightDirection>
           {toolMenuLightButtons}
-        </RelightLightControls>
+        </>
       );
     }
 
@@ -924,25 +917,13 @@ class Relight extends React.Component {
               onClick={() => this.defaultLayerHandler()}
               active={this.state.active}
             />
-          </RelightMenuButtons>
-          <RelightMenuButtons id={this.props.relightMenuButtonsBID}>
             <RelightSnapshotButton
               id={this.props.relightSnapshotButtonID}
               onClick={() => this.screenshotButtonHandler()}
               active={this.state.active}
             />
+            <div className="relightLabel">2.5D</div>
           </RelightMenuButtons>
-          <div
-            style={{
-              gridRow: 1,
-              width: '49px',
-              height: '48px',
-              lineHeight: '48px',
-              textAlign: 'center',
-            }}
-          >
-            2.5D
-          </div>
           {toolMenuLightControls}
         </RelightToolMenu>
       );

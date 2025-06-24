@@ -128,6 +128,7 @@ class RelightLightDirection extends React.Component {
    */
   render() {
     const {
+      children,
       id,
       tooltipTitle,
       onMouseMove,
@@ -138,33 +139,31 @@ class RelightLightDirection extends React.Component {
     return (
       <>
         <Tooltip title={tooltipTitle}>
-          <div
-            style={{
-              display: 'inline-block',
-              textAlign: 'center',
-            }}
-          >
-            <div
-              id={id}
-              style={{
-                border: '#000000',
-                width: '100px',
-                height: '100px',
-                margin: '13px',
-                borderRadius: '50px',
-                background: this.state.calculatedBackgroundStyle,
-              }}
-              aria-label="Change light direction"
-              aria-expanded="False"
-              onMouseMove={onMouseMove}
-              onMouseDown={onMouseDown}
-              onMouseUp={onMouseUp}
-              onMouseLeave={onMouseLeave}
-              onTouchMove={onMouseMove}
-            >
-              <Angles width="100px" height="100px" alt="" />
+          <div className="relightLightDirectionContainer">
+            <div className="relightLightDirection">
+              <div
+                id={id}
+                style={{
+                  border: '#000000',
+                  width: '100px',
+                  height: '100px',
+                  margin: '13px',
+                  borderRadius: '50px',
+                  background: this.state.calculatedBackgroundStyle,
+                }}
+                aria-label="Change light direction"
+                aria-expanded="False"
+                onMouseMove={onMouseMove}
+                onMouseDown={onMouseDown}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseLeave}
+                onTouchMove={onMouseMove}
+              >
+                <Angles width="100px" height="100px" alt="" />
+              </div>
+              <ControlCamera />
             </div>
-            <ControlCamera />
+            <div>{children}</div>
           </div>
         </Tooltip>
       </>
@@ -173,6 +172,11 @@ class RelightLightDirection extends React.Component {
 }
 
 RelightLightDirection.propTypes = {
+  /** The children prop carries all the props passed to the parent component **/
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
   /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
   id: PropTypes.string.isRequired,
   /** The tooltipTitle prop is used to define the text that appears in the hover over component tooltip **/
