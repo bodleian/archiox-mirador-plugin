@@ -11,9 +11,9 @@ class RelightHelpDialog extends React.Component {
     super(props);
   }
   render() {
-    const { helpOn, onClose } = this.props;
+    const { id, helpOn, onClose } = this.props;
     return (
-      <Dialog onClose={onClose} open={helpOn}>
+      <Dialog id={id} onClose={onClose} open={helpOn}>
         <div className="relightHelpDialog">
           <MiradorMenuButton aria-label={'Click here to close help'}>
             <Close onClick={onClose} />

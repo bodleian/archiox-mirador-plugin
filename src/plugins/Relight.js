@@ -4,13 +4,10 @@ import ReactDOM from 'react-dom';
 import * as THREE from 'three';
 import {
   updateLayer,
-  setLayers,
   getMaps,
-  getImages,
   getMap,
   getRendererInstructions,
   getTileSets,
-  reduceLayers,
 } from './RelightHelpers';
 import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
@@ -26,15 +23,17 @@ import RelightMenuButton from './RelightMenuButton';
 import RelightMenuButtons from './RelightMenuButtons';
 import RelightLightHelper from './RelightLightHelper';
 import RelightRenderMode from './RelightRenderMode';
-import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
+import RelightLayersMenuButton from './RelightLayersMenuButton';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
 import RelightSnapshotButton from './RelightSnapshotButton';
-import { getLayers } from './state/selectors';
 import './public/styles.css';
 import RelightHelpButton from './RelightHelpButton';
 import RelightHelpDialog from './RelightHelpDialog';
+import RelightLayersMenu from './RelightLayersMenu';
+import RelightDownloadCurrentLayerButton from './RelightDownloadCurrentLayerButton';
+
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
  * It is composed of a group of buttons and a group of controls that make up the relighting plug-in.
@@ -50,6 +49,7 @@ class Relight extends React.Component {
       loadHandlerAdded: false,
       threeCanvasProps: {},
       helpOn: false,
+      layersOpen: false,
     };
     this.threeCanvasProps = {};
     this.mouseDown = false;
@@ -496,48 +496,7 @@ class Relight extends React.Component {
    * the order of the choices layers, and this function will preserve that order when shuffling.
    **/
   defaultLayerHandler() {
-    // make all the layers visible...
-    const excluded_maps = [
-      'composite',
-      'albedo',
-      'normal',
-      'shaded',
-      'depth',
-      'none',
-    ];
-    const layersInState = getLayers(this.props.state)[this.props.windowId][
-      this.canvasId
-    ];
-    let items;
-    let imagesFromState;
-
-    if (layersInState) {
-      // get the current state and extract the current index values and visibilities into a sorted array
-      items = Object.entries(layersInState)
-        .map(([url, { index, visibility }]) => ({ url, index, visibility }))
-        .sort((a, b) => a.index - b.index); // sort items based on the index property
-
-      // transform the sorted items into the desired output format for use as a payload body for Mirador
-      imagesFromState = items.map(({ url }) => ({ id: url }));
-    }
-
-    const maps = getMaps(this.props.canvas.iiifImageResources);
-
-    if (this.layers === undefined && !layersInState) {
-      this.layers = getImages(this.props.canvas.iiifImageResources);
-    } else {
-      this.layers = imagesFromState;
-    }
-
-    this.layers.push(this.layers.shift());
-    const payload = reduceLayers(this.layers, maps, excluded_maps);
-
-    setLayers(
-      this.props.windowId,
-      this.canvasId,
-      this.props.updateLayers,
-      payload
-    ).next();
+    this.setState((prevState) => ({ layersOpen: !prevState.layersOpen }));
   }
 
   /**
@@ -556,7 +515,7 @@ class Relight extends React.Component {
     }
   }
 
-  screenshotButtonHandler() {
+  snapshotButtonHandler() {
     const canvas = document.querySelector('#container div canvas');
     const dataURL = canvas.toDataURL('image/png');
     const link = document.createElement('a');
@@ -568,12 +527,10 @@ class Relight extends React.Component {
 
   helpOpenHandler() {
     this.setState({ helpOn: true });
-    console.log('Open');
   }
 
   helpCloseHandler() {
     this.setState({ helpOn: false });
-    console.log('Close');
   }
 
   resizeHandler() {
@@ -737,6 +694,7 @@ class Relight extends React.Component {
     let toolMenuLightButtons = null;
     let toolMenuMaterialControls = null;
     let toolMenuSliders = null;
+    let toolMenuLayersMenu = null;
     let toolMenuLightControlsAmbientIntensity;
 
     if (this.renderMode) {
@@ -752,6 +710,24 @@ class Relight extends React.Component {
       );
     } else {
       toolMenuLightControlsAmbientIntensity = null;
+    }
+
+    if (this.state.layersOpen) {
+      toolMenuLayersMenu = (
+        <>
+          <RelightLayersMenu
+            id={this.props.relightLayersMenuID}
+            choices={this.props.canvas.iiifImageResources}
+            windowId={this.props.windowId}
+            canvasId={this.canvasId}
+            updateLayers={this.props.updateLayers}
+            state={this.props.state}
+            canvas={this.props.canvas}
+          />
+        </>
+      );
+    } else {
+      toolMenuLayersMenu = null;
     }
 
     if (this.state.active) {
@@ -775,7 +751,7 @@ class Relight extends React.Component {
             onClick={() => this.helpOpenHandler()}
           />
           <RelightHelpDialog
-            id={'foo'}
+            id={this.props.relightHelpDialogID}
             helpOn={this.state.helpOn}
             onClose={() => this.helpCloseHandler()}
           />
@@ -888,6 +864,29 @@ class Relight extends React.Component {
           {toolMenuLightButtons}
         </>
       );
+    } else if (this.state.layersOpen) {
+      toolMenuLightControls = (
+        <>
+          {toolMenuLayersMenu}
+          <div className="relightLayersMenuHelp">
+            <RelightHelpButton
+              id={this.props.relightHelpButtonID}
+              onClick={() => this.helpOpenHandler()}
+            />
+            <RelightHelpDialog
+              id={this.props.relightHelpDialogID}
+              helpOn={this.state.helpOn}
+              onClose={() => this.helpCloseHandler()}
+            />
+            <RelightDownloadCurrentLayerButton
+              id={this.props.relightDownloadCurrentLayerButtonID}
+              state={this.props.state}
+              windowId={this.props.windowId}
+              canvasId={this.canvasId}
+            />
+          </div>
+        </>
+      );
     }
 
     if (this.visible && this.state.open) {
@@ -897,7 +896,10 @@ class Relight extends React.Component {
           visible={this.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
-          <RelightMenuButtons id={this.props.relightMenuButtonsAID}>
+          <RelightMenuButtons
+            id={this.props.relightMenuButtonsID}
+            active={this.state.active}
+          >
             <RelightMenuButton
               onClick={() => this.menuHandler()}
               open={this.state.open}
@@ -907,19 +909,15 @@ class Relight extends React.Component {
               onClick={() => this.torchHandler()}
               active={this.state.active}
             />
-            {/*<RelightAnnotationButton*/}
-            {/*  id={this.props.relightAnnotationButtonID}*/}
-            {/*  onClick={() => this.annotationsHandler()}*/}
-            {/*  active={this.annotationsOn}*/}
-            {/*/>*/}
-            <RelightCycleDefaultLayer
-              id={this.props.relightCycleDefaultLayerID}
+            <RelightLayersMenuButton
+              id={this.props.relightLayersMenuButtonID}
               onClick={() => this.defaultLayerHandler()}
               active={this.state.active}
+              layersOpen={this.state.layersOpen}
             />
             <RelightSnapshotButton
               id={this.props.relightSnapshotButtonID}
-              onClick={() => this.screenshotButtonHandler()}
+              onClick={() => this.snapshotButtonHandler()}
               active={this.state.active}
             />
             <div className="relightLabel">2.5D</div>
@@ -983,20 +981,24 @@ Relight.propTypes = {
   relightNormalDepthID: PropTypes.string,
   /** The relightToolMenuID prop is the ID for the control **/
   relightToolMenuID: PropTypes.string,
-  /** The relightMenuButtonsAID prop is the ID for the control **/
-  relightMenuButtonsAID: PropTypes.string,
-  /** The relightMenuButtonsBID prop is the ID for the control **/
-  relightMenuButtonsBID: PropTypes.string,
+  /** The relightMenuButtonsID prop is the ID for the control **/
+  relightMenuButtonsID: PropTypes.string,
   /** The relightTorchButtonID prop is the ID for the control **/
   relightTorchButtonID: PropTypes.string,
   /** The relightAnnotationButtonID prop is the ID for the control **/
   relightAnnotationButtonID: PropTypes.string,
-  /** The relightCycleDefaultLayerID prop is the ID for the control **/
-  relightCycleDefaultLayerID: PropTypes.string,
+  /** The relightLayersMenuID prop is the ID for the control **/
+  relightLayersMenuID: PropTypes.string,
+  /** The relightLayersMenuButtonID prop is the ID for the control **/
+  relightLayersMenuButtonID: PropTypes.string,
   /** The relightSnapshotButtonID prop is the ID for the control **/
   relightSnapshotButtonID: PropTypes.string,
-  /** The relightHelpButtonID prop is the IS for the control **/
+  /** The relightHelpButtonID prop is the ID for the control **/
   relightHelpButtonID: PropTypes.string,
+  /** The relightHelpDialogID prop is the ID for the control **/
+  relightHelpDialogID: PropTypes.string,
+  /** The relightDownloadCurrentLayerButtonID prop is the ID for the control **/
+  relightDownloadCurrentLayerButtonID: PropTypes.string,
 };
 
 export default Relight;

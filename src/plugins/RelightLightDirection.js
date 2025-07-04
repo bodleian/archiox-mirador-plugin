@@ -138,8 +138,8 @@ class RelightLightDirection extends React.Component {
     } = this.props;
     return (
       <>
-        <Tooltip title={tooltipTitle}>
-          <div className="relightLightDirectionContainer">
+        <div className="relightLightDirectionContainer">
+          <Tooltip title={tooltipTitle}>
             <div className="relightLightDirection">
               <div
                 id={id}
@@ -163,9 +163,9 @@ class RelightLightDirection extends React.Component {
               </div>
               <ControlCamera />
             </div>
-            <div>{children}</div>
-          </div>
-        </Tooltip>
+          </Tooltip>
+          <div>{children}</div>
+        </div>
       </>
     );
   }
