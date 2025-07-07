@@ -376,18 +376,6 @@ class Relight extends React.Component {
   }
 
   /**
-   *
-   **/
-  generateMapData() {
-    this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
-    this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
-    this.map_ids = [
-      this.albedoMap.split('/').pop(),
-      this.normalMap.split('/').pop(),
-    ];
-  }
-
-  /**
    * The updateThreeCanvasProps method is used by the viewport-change event handler to keep the overlay dimensions and
    * Three camera view in sync with OpenSeaDragon and make sure the updated Three textures are sent to Three canvas.
    */
@@ -506,6 +494,10 @@ class Relight extends React.Component {
     this.setState((prevState) => ({ drawerOpen: !prevState.drawerOpen }));
   }
 
+  /**
+   * The disposeTextures method when called will empty the loaded images from memory.
+   * @param {object} images the image tiles currently loaded as threejs textures in memory.
+   * **/
   disposeTextures(images) {
     for (const key in images) {
       if (images[key] instanceof THREE.Texture) {
@@ -515,7 +507,11 @@ class Relight extends React.Component {
     }
   }
 
-  snapshotButtonHandler() {
+  /**
+   * The snapshotButtonHandler method is called when the RelightSnapshotButton is pressed, it grabs the Threejs canvas
+   * and downloads the render that is currently on screen.
+   * @param {string} manifestTitle the title of the current manifest loaded in the Mirador window instance.
+   * **/
     const canvas = document.querySelector('#container div canvas');
     const dataURL = canvas.toDataURL('image/png');
     const link = document.createElement('a');
@@ -525,14 +521,23 @@ class Relight extends React.Component {
     link.click();
   }
 
+  /**
+   * The helpOpenHandler method sets the helpOn value in state to true.
+   * **/
   helpOpenHandler() {
     this.setState({ helpOn: true });
   }
 
+  /**
+   * The helpCloseHandler method sets the helpOn value in state to false.
+   * **/
   helpCloseHandler() {
     this.setState({ helpOn: false });
   }
 
+  /**
+   * The resizeHandler method sets the state of drawerOpen to true if the window innerWidth is greater than 768px.
+   * **/
   resizeHandler() {
     const isNowWide = window.innerWidth > 768;
     if (isNowWide) {
@@ -547,7 +552,7 @@ class Relight extends React.Component {
    * @param prevState the previous state set in the Relight component
    * @param snapshot a snapshot of the component before the next render cycle, you can use the React class method
    * getSnapShotBeforeUpdate to create this
-   */
+   **/
   //  track of values stored in state and if they change if runs
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -559,6 +564,10 @@ class Relight extends React.Component {
       : null;
   }
 
+  /**
+   * The componentDidMount method is a standard React class method that is used to run other methods whenever the
+   * component has mounted. Here we use it to add an event listener for window resizing.
+   **/
   componentDidMount() {
     window.addEventListener('resize', () => this.resizeHandler());
   }
@@ -566,7 +575,7 @@ class Relight extends React.Component {
   /**
    * The componentWillUnmount method is a standard React class method that is used to run other methods whenever the
    * component is about to be unmounted.  Here we use it to dispose of the textures so the memory they occupy can be
-   * re-used.
+   * re-used and remove an event listner for window resizing.
    */
   componentWillUnmount() {
     window.removeEventListener('resize', () => this.resizeHandler());

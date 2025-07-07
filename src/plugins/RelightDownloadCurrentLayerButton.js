@@ -5,18 +5,35 @@ import { getLayers } from './state/selectors';
 
 import GetAppOutlined from '@material-ui/icons/GetAppOutlined';
 
+/**
+ * The RelightDownloadCurrentLayerButton is a plug-in button that will get the current IIIF choices layer  at index 0
+ * (on top) and prepare it to download at 40% of its original width when it is clicked.
+ * **/
 class RelightDownloadCurrentLayerButton extends React.Component {
   constructor(props) {
     super(props);
   }
 
+  /**
+   * The getDownloadUrl method takes the IIIF choices ID and converts it into a URL to instruct IIP to get a downsized
+   * version of the image.
+   * @param {string} iiifUrl IIIF choices ID URL
+   * @param {string} fileName the name we want to download the image as
+   * **/
   getDownloadUrl(iiifUrl, fileName) {
     return `${
       iiifUrl.split('/full')[0]
     }/full/pct:40/0/default.jpg?filename=${fileName}.webp`;
   }
 
-  onClick(state, windowId, canvasId) {
+  /**
+   * The onClick method gets the current top layer and prepares it for download via the browser.
+   * @param {object} state the Mirador state object
+   * @param {string} windowId the WindowId of the current Mirador instance
+   * @param {string} canvasId the CanvasId of the current Mirador instance
+   * @param {object} choices the Choices object of the current Mirador instance
+   * @param {string} manifestTitle the title of the current manifest of the current Mirador instance
+   * **/
     let layers;
     const layersInState = getLayers(state)[windowId][canvasId];
 

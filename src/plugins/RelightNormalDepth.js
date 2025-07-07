@@ -5,9 +5,9 @@ import Height from '@material-ui/icons/Height';
 import PropTypes from 'prop-types';
 
 /**
- * The RelightNormalDepth component is a component that is used to render a slider component to change the
- * normalmap depth of the Three canvas scene.
- */
+ * The RelightNormalDepth component is a plug-in slider that allows the user to change the
+ * normalmap depth property of the Three canvas scene shader.
+ **/
 class RelightNormalDepth extends React.Component {
   constructor(props) {
     super(props);

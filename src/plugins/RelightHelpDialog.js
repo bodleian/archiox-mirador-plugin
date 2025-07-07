@@ -6,6 +6,10 @@ import Close from '@material-ui/icons/Close';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import PropTypes from 'prop-types';
 
+/**
+ * The RelightHelpDialog component is a plug-in dialog box that contains detailed instructions on how to use the
+ * plug-in to allow users who are unfamiliar with the terminology.
+ **/
 class RelightHelpDialog extends React.Component {
   constructor(props) {
     super(props);

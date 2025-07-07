@@ -3,6 +3,10 @@ import HelpOultined from '@material-ui/icons/HelpOutlined';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import PropTypes from 'prop-types';
 
+/**
+ * The RelightHelpButton component is a plug-in button that will toggle the state of helpOn which determines if the help
+ * dialog will be rendered as open of not.
+ **/
 class RelightHelpButton extends React.Component {
   constructor(props) {
     super(props);

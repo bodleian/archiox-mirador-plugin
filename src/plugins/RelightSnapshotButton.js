@@ -3,6 +3,11 @@ import React from 'react';
 import PhotoCameraOutlined from '@material-ui/icons/PhotoCameraOutlined';
 import PropTypes from 'prop-types';
 
+/**
+ * The RelightSnapshotButton component is a plug-in button that when pressed will capture the current portion of the
+ * three.js WebGL renderer that is on screen and download it from the browser.  The button is only enabled when the
+ * three.js overlay is active.
+ **/
 class RelightSnapshotButton extends React.Component {
   constructor(props) {
     super(props);

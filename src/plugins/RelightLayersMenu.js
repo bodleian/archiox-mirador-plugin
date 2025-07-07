@@ -4,6 +4,13 @@ import { getMaps, getImages, setLayers, reduceLayers } from './RelightHelpers';
 import { getLayers } from './state/selectors';
 import Tooltip from '@material-ui/core/Tooltip';
 
+/**
+ * The RelightLayersMenu component is a plug-in tool menu that allows the user to select the current top layer in
+ * Mirador, it uses the same Redux Saga functions that moving layers through other methods does.  When a user selects
+ * a thumbnail representation of the layer they wish to be on top, we grab the layers from state and rotate them until
+ * the desired one is on top of the stack.  There is also a button to allow users to download the current layer at 40%,
+ * which is the current size allowed for restricted resolution downloads without being signed in to Digital Bodleian.
+ * **/
 class RelightLayersMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -12,6 +19,13 @@ class RelightLayersMenu extends React.Component {
     };
   }
 
+  /**
+   * The rotateUntilMatch method takes the current layers from state and rotates the order of the layers until the top
+   * one matches the provided id.
+   * @param {array} layers is an array of the iiifImageResources
+   * @param {string} id is the id of the image we want to be at index 0 of the layers array
+   * @returns {array} the layers array in the requested ordering
+   **/
   rotateUntilMatch(layers, id) {
     const exists = layers.some((layer) => layer.id === id);
     if (!exists) return layers;
@@ -22,6 +36,18 @@ class RelightLayersMenu extends React.Component {
     return layers;
   }
 
+  /**
+   * The onClick method gets the state of layers, re-orders them and puts them back into the Mirador state using
+   * the Redux/Saga system according to the user selection of the layer they want moving to the top of the layers
+   * stack
+   * @param {string} url a string containing the IIIF image id/URL of the layer
+   * @param {number} id a number containing the order index of the layer
+   * @param {object} state the Mirador state object
+   * @param {string} windowId the WindowId of the current Mirador instance
+   * @param {string} canvasId the CanvasId of the current Mirador instance
+   * @param {object} canvas the current Mirador instance canvas object
+   * @param updateLayers the Mirador saga method for updating layers in Mirador state
+   **/
   onClick(url, id, state, windowId, canvasId, canvas, updateLayers) {
     this.setState({ lastClicked: id });
     const excluded_maps = [
@@ -62,6 +88,12 @@ class RelightLayersMenu extends React.Component {
     setLayers(windowId, canvasId, updateLayers, payload).next();
   }
 
+  /**
+   * The getThumbnailUrl method formats the supplied image id/URL into a URL that can be used to request a 120px wide
+   * thumbnail image from the image server.
+   * @param {string} iiifUrl a string containing the original IIIF image id/URL
+   * @returns {string} the formatted URL used for making an image thumbnail request from the image server
+   **/
   getThumbnailUrl(iiifUrl) {
     return `${iiifUrl.split('/full')[0]}/full/120,/0/default.jpg`;
   }
