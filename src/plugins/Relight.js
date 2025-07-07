@@ -512,12 +512,14 @@ class Relight extends React.Component {
    * and downloads the render that is currently on screen.
    * @param {string} manifestTitle the title of the current manifest loaded in the Mirador window instance.
    * **/
+  snapshotButtonHandler(manifestTitle) {
     const canvas = document.querySelector('#container div canvas');
     const dataURL = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.href = dataURL;
     // todo: put in more meaningful file name here...
-    link.download = 'archiox_view_download.png';
+    link.download =
+      manifestTitle.replace(/\s+/g, '-') + '_live_render_region.jpg';
     link.click();
   }
 
@@ -605,7 +607,6 @@ class Relight extends React.Component {
           this.normalMap.split('/').pop(),
         ];
       }
-
       this.viewer = this.props.viewer;
       this.threeCanvas = document.createElement('div');
       this.threeCanvas.id = 'three-canvas-' + this.props.relightThreeCanvasID; // this needs to be unique
@@ -658,7 +659,6 @@ class Relight extends React.Component {
             excluded_maps,
             this.canvasId
           );
-          this.generateMapData();
           this.visible = false;
           this.setState({ active: false });
           // remove all handlers so viewport-change isn't activated!
@@ -889,6 +889,8 @@ class Relight extends React.Component {
             />
             <RelightDownloadCurrentLayerButton
               id={this.props.relightDownloadCurrentLayerButtonID}
+              choices={this.props.canvas.iiifImageResources}
+              manifestTitle={this.props.manifestTitle}
               state={this.props.state}
               windowId={this.props.windowId}
               canvasId={this.canvasId}
@@ -926,7 +928,9 @@ class Relight extends React.Component {
             />
             <RelightSnapshotButton
               id={this.props.relightSnapshotButtonID}
-              onClick={() => this.snapshotButtonHandler()}
+              onClick={() =>
+                this.snapshotButtonHandler(this.props.manifestTitle)
+              }
               active={this.state.active}
             />
             <div className="relightLabel">2.5D</div>
@@ -1008,6 +1012,8 @@ Relight.propTypes = {
   relightHelpDialogID: PropTypes.string,
   /** The relightDownloadCurrentLayerButtonID prop is the ID for the control **/
   relightDownloadCurrentLayerButtonID: PropTypes.string,
+  /** The manifestTitle prop is the title of the manifest loaded into the current Mirador window instance **/
+  manifestTitle: PropTypes.string,
 };
 
 export default Relight;

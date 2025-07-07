@@ -1,6 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getMaps, getImages, setLayers, reduceLayers } from './RelightHelpers';
+import {
+  getMaps,
+  getImages,
+  setLayers,
+  reduceLayers,
+  getLabels,
+} from './RelightHelpers';
 import { getLayers } from './state/selectors';
 import Tooltip from '@material-ui/core/Tooltip';
 
@@ -98,27 +104,17 @@ class RelightLayersMenu extends React.Component {
     return `${iiifUrl.split('/full')[0]}/full/120,/0/default.jpg`;
   }
 
-  getLabels(choices) {
-    return choices.reduce((accumulator, item) => {
-      const key = item.__jsonld.id;
-      const value = item.__jsonld.label.en[0];
-      accumulator[key] = value;
-      return accumulator;
-    }, {});
-  }
-
   render() {
     const { id, choices, windowId, canvasId, state, canvas, updateLayers } =
       this.props;
     const urls = Object.keys(getMaps(choices));
-    const labels = this.getLabels(choices);
+    const labels = getLabels(choices);
     return (
       <div id={id} className="relightLayersMenu">
         {urls.map((url, index) => (
-          <Tooltip title={labels[url]}>
+          <Tooltip title={labels[url]} key={index}>
             <button
               className="relightLayerButton"
-              key={index}
               style={{
                 background:
                   this.state.lastClicked === index
@@ -153,6 +149,8 @@ class RelightLayersMenu extends React.Component {
 RelightLayersMenu.propTypes = {
   /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
   id: PropTypes.string.isRequired,
+  /** The choices prop are the canvas.iiifImageResources object from the current instance of the window in Mirador **/
+  choices: PropTypes.object.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
   onClick: PropTypes.func.isRequired,
   /** The windowId prop is the Mirador window ID of the current instance of Mirador **/
@@ -165,8 +163,6 @@ RelightLayersMenu.propTypes = {
   canvas: PropTypes.object.isRequired,
   /** The update layers prop is the Mirador function for updating the layers in state **/
   updateLayers: PropTypes.func.isRequired,
-  /** The choices prop are the canvas.iiifImageResources object from the current instance of the window in Mirador **/
-  choices: PropTypes.object.isRequired,
 };
 
 export default RelightLayersMenu;
