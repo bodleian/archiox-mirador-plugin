@@ -33,6 +33,9 @@ class RelightThreeOverlay extends React.Component {
       tileLevels,
       helperOn,
       renderMode,
+      viewer,
+      mouseMoving,
+      rotation,
     } = this.props.threeCanvasProps;
     return (
       <RelightThreeCanvas
@@ -56,6 +59,9 @@ class RelightThreeOverlay extends React.Component {
         tileLevels={tileLevels}
         helperOn={helperOn}
         renderMode={renderMode}
+        viewer={viewer}
+        mouseMoving={mouseMoving}
+        rotation={rotation}
       />
     );
   }

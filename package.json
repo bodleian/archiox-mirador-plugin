@@ -4,6 +4,7 @@
   "description": "An experimental plugin to display depth information captured with Lucida or Selene scanners from FactumARTE. However, the plug-in can present any normal map/albedo map combination produced from any technique.\n\nTopics\n",
   "private": true,
   "scripts": {
+    "dev": "npm run lint || true && vite dev",
     "lint": "eslint --fix . && echo 'Lint complete.'",
     "test": "mocha --require @babel/register"
   },
@@ -30,8 +31,9 @@
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
     "lodash": "^4.17.21",
-    "prop-types": "^15.8.1",
     "mirador": "^3.4.3",
+    "prop-types": "^15.8.1",
+    "react-draggable": "^4.5.0",
     "three": "^0.178.0",
     "uuid": "^9.0.1"
   },

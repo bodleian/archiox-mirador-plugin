@@ -3,8 +3,8 @@ import { relightMiradorPlugin } from '../src';
 import { miradorImageToolsPlugin } from 'mirador-image-tools/es/index';
 
 const MiradorPlugins = {
-  relightMiradorPlugin: relightMiradorPlugin,
   miradorImageToolsPlugin: miradorImageToolsPlugin,
+  relightMiradorPlugin: relightMiradorPlugin,
 };
 
 export { Mirador, MiradorPlugins };

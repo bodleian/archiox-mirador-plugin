@@ -33,6 +33,8 @@ import RelightHelpButton from './RelightHelpButton';
 import RelightHelpDialog from './RelightHelpDialog';
 import RelightLayersMenu from './RelightLayersMenu';
 import RelightDownloadCurrentLayerButton from './RelightDownloadCurrentLayerButton';
+import OpenSeadragon from 'openseadragon';
+import RelightDraggableLightButton from './RelightDraggableLightButton';
 
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
@@ -73,6 +75,7 @@ class Relight extends React.Component {
     this.albedoInfo = {};
     this.loaded = false;
     this.visible = false;
+    this.mouseMoving = false;
 
     if (!this.renderMode) {
       this.normalDepth = 10.0;
@@ -95,13 +98,20 @@ class Relight extends React.Component {
     const boundingBox = lightDirectionControl.getBoundingClientRect();
 
     if (event.type === 'mousemove' && this.mouseDown) {
+      this.mouseMoving = true;
+      this.threeCanvasProps.mouseMoving = this.mouseMoving;
       event.preventDefault();
       this.moveX = event.clientX - boundingBox.left;
       this.moveY = event.clientY - boundingBox.top;
     } else if (event.type === 'touchmove') {
       this.mouseDown = true;
+      this.mouseMoving = true;
+      this.threeCanvasProps.mouseMoving = this.mouseMoving;
       this.moveX = event.touches[0].clientX - boundingBox.left;
       this.moveY = event.touches[0].clientY - boundingBox.top;
+    } else {
+      this.mouseMoving = false;
+      this.threeCanvasProps.mouseMoving = this.mouseMoving;
     }
 
     // rotation is the total degrees the canvas has rotated, i.e. it stacks, we need to get this back
@@ -143,7 +153,6 @@ class Relight extends React.Component {
       }
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
-
       this.setState({
         threeCanvasProps: this.threeCanvasProps,
       });
@@ -321,6 +330,9 @@ class Relight extends React.Component {
   initialiseThreeCanvasProps() {
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps = {};
+    this.threeCanvasProps.rotation = this.rotation;
+    this.threeCanvasProps.mouseMoving = this.mouseMoving;
+    this.threeCanvasProps.viewer = this.props.viewer;
     this.threeCanvasProps.helperOn = this.helperOn;
     this.threeCanvasProps.renderMode = this.renderMode;
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
@@ -381,7 +393,8 @@ class Relight extends React.Component {
    */
   updateThreeCanvasProps() {
     this.threeCanvasProps.renderMode = this.renderMode;
-
+    this.threeCanvasProps.rotation = this.rotation;
+    this.threeCanvasProps.mouseMoving = this.mouseMoving;
     this.threeCanvasProps.helperOn = this.helperOn;
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
@@ -434,7 +447,6 @@ class Relight extends React.Component {
       // this tells the overlay where to begin in terms of x, y coordinates
       this.props.viewer.addOverlay(this.threeCanvas);
       this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
-
       this.overlay.update(
         this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
@@ -637,9 +649,16 @@ class Relight extends React.Component {
           this.canvasId
         );
 
+        // disable click to zoom
+        //this.props.viewer.zoomPerClick = 1;
+        // disable mouseNav
+
+        //this.props.viewer.set;
+
         // add a rotate event handler
         this.props.viewer.addHandler('rotate', (event) => {
           this.rotation = event.degrees;
+          this.threeCanvasProps.rotation = this.rotation;
         });
 
         // add a flip event handler
@@ -696,6 +715,15 @@ class Relight extends React.Component {
           }
         });
       }
+    }
+    const osdCanvasBounds = document.querySelector('.openseadragon-canvas'); //.getBoundingClientRect()
+    let draggableWidth = null;
+    let draggableHeight = null;
+    if (osdCanvasBounds) {
+      const osdCanvasBoundingClientRect =
+        osdCanvasBounds.getBoundingClientRect();
+      draggableWidth = osdCanvasBoundingClientRect.width - 45; // might need to figure out how to exactly calculate these offsets
+      draggableHeight = osdCanvasBoundingClientRect.height - 142; // might need to figure out how to exactly calculate these offsets
     }
 
     let toolMenu = null;
@@ -768,6 +796,7 @@ class Relight extends React.Component {
             drawerOpen={this.state.drawerOpen}
             onClick={() => this.drawerHandler()}
           />
+          <RelightDraggableLightButton threeCanvasId={this.threeCanvas.id} />
         </RelightLightButtons>
       );
 
@@ -954,8 +983,20 @@ class Relight extends React.Component {
     } else if (!this.visible) {
       toolMenu = null;
     }
-
-    return <>{toolMenu}</>;
+    //width: osdCanvasBounds.width, height: osdCanvasBounds.height
+    console.log(osdCanvasBounds);
+    return (
+      <>
+        {toolMenu}
+        <div
+          className="draggable-container"
+          style={{
+            height: draggableHeight ? draggableHeight + 'px' : 0,
+            width: draggableWidth ? draggableWidth + 'px' : 0,
+          }}
+        ></div>
+      </>
+    );
   }
 }
 
