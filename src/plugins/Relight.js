@@ -52,6 +52,8 @@ class Relight extends React.Component {
       threeCanvasProps: {},
       helpOn: false,
       layersOpen: false,
+      isOver: false,
+      isDragging: false,
     };
     this.threeCanvasProps = {};
     this.mouseDown = false;
@@ -76,6 +78,8 @@ class Relight extends React.Component {
     this.loaded = false;
     this.visible = false;
     this.mouseMoving = false;
+    this.draggableWidth = null;
+    this.draggableHeight = null;
 
     if (!this.renderMode) {
       this.normalDepth = 10.0;
@@ -559,6 +563,70 @@ class Relight extends React.Component {
     }
   }
 
+  onDraggableLightButtonDragHandler(event) {
+    this.mouseMoving = true;
+    const rotationModulus = this.rotation % 360;
+    this.mouseX = event.clientX - this.osdCanvasBoundingClientRect.left;
+    this.mouseY = event.clientY - this.osdCanvasBoundingClientRect.top;
+    this.lightX =
+      (this.mouseX / this.osdCanvasBoundingClientRect.width) * 2 - 1; // need to calculate based on bounding box...
+    this.lightY =
+      (this.mouseY / this.osdCanvasBoundingClientRect.height) * 2 - 1;
+    this.lightX = this.flipped ? -this.lightX : this.lightX;
+
+    // switch (rotationModulus) {
+    //   case 0:
+    //     this.mouseX = event.clientX;
+    //     this.mouseY = event.clientY;
+    //     this.lightX = this.mouseX * 2 - 1;
+    //     this.lightY = this.mouseY * 2 - 1;
+    //     this.lightX = this.flipped ? -this.lightX : this.lightX;
+    //     break;
+    //   case -270:
+    //   case 90:
+    //     this.mouseX = event.clientY;
+    //     this.mouseY = event.clientX;
+    //     this.lightX = this.mouseX * 2 - 1;
+    //     this.lightY = -(this.mouseY * 2 - 1);
+    //     this.lightY = this.flipped ? -this.lightY : this.lightY;
+    //     break;
+    //   case -180:
+    //   case 180:
+    //     this.mouseX = event.clientX;
+    //     this.mouseY = event.clientY;
+    //     this.lightX = -(this.mouseX * 2 - 1);
+    //     this.lightY = -(this.mouseY * 2 - 1);
+    //     this.lightX = this.flipped ? -this.lightX : this.lightX;
+    //     break;
+    //   case -90:
+    //   case 270:
+    //     this.mouseX = event.clientY;
+    //     this.mouseY = event.clientX;
+    //     this.lightX = -(this.mouseX * 2 - 1);
+    //     this.lightY = this.mouseY * 2 - 1;
+    //     this.lightY = this.flipped ? -this.lightY : this.lightY;
+    // }
+    this.threeCanvasProps.lightX = this.lightX;
+    this.threeCanvasProps.lightY = this.lightY;
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
+    this.setState({ isDragging: true });
+  }
+
+  onDraggableLightButtonStopHandler(event) {
+    this.mouseMoving = false;
+    this.setState({ isDragging: false });
+  }
+
+  onDraggableLightButtonMouseOverHandler(event) {
+    this.setState({ isOver: true });
+  }
+
+  onDraggableLightButtonMouseLeaveHandler(event) {
+    this.setState({ isOver: false });
+  }
+
   /**
    * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
    * props are updated.  Here we used it to re-render the overlay if there is a change in state detected.
@@ -717,13 +785,16 @@ class Relight extends React.Component {
       }
     }
     const osdCanvasBounds = document.querySelector('.openseadragon-canvas'); //.getBoundingClientRect()
-    let draggableWidth = null;
-    let draggableHeight = null;
+
     if (osdCanvasBounds) {
-      const osdCanvasBoundingClientRect =
+      this.osdCanvasBoundingClientRect =
         osdCanvasBounds.getBoundingClientRect();
-      draggableWidth = osdCanvasBoundingClientRect.width - 45; // might need to figure out how to exactly calculate these offsets
-      draggableHeight = osdCanvasBoundingClientRect.height - 142; // might need to figure out how to exactly calculate these offsets
+      // draggableWidth bound will change depending on if the sidebar is open...
+      this.draggableWidth = this.props.state.windows[this.props.windowId]
+        .sideBarOpen
+        ? this.osdCanvasBoundingClientRect.width - 45 // 48 + 24
+        : this.osdCanvasBoundingClientRect.width - 16;
+      this.draggableHeight = this.osdCanvasBoundingClientRect.height - 142; // might need to figure out how to exactly calculate these offsets
     }
 
     let toolMenu = null;
@@ -796,7 +867,19 @@ class Relight extends React.Component {
             drawerOpen={this.state.drawerOpen}
             onClick={() => this.drawerHandler()}
           />
-          <RelightDraggableLightButton threeCanvasId={this.threeCanvas.id} />
+          <RelightDraggableLightButton
+            threeCanvasId={this.threeCanvas.id}
+            onDrag={(event) => this.onDraggableLightButtonDragHandler(event)}
+            onStop={(event) => this.onDraggableLightButtonStopHandler(event)}
+            onMouseOver={(event) =>
+              this.onDraggableLightButtonMouseOverHandler(event)
+            }
+            onMouseLeave={(event) =>
+              this.onDraggableLightButtonMouseLeaveHandler(event)
+            }
+            isDragging={this.state.isDragging}
+            isOver={this.state.isOver}
+          />
         </RelightLightButtons>
       );
 
@@ -983,16 +1066,14 @@ class Relight extends React.Component {
     } else if (!this.visible) {
       toolMenu = null;
     }
-    //width: osdCanvasBounds.width, height: osdCanvasBounds.height
-    console.log(osdCanvasBounds);
     return (
       <>
         {toolMenu}
         <div
           className="draggable-container"
           style={{
-            height: draggableHeight ? draggableHeight + 'px' : 0,
-            width: draggableWidth ? draggableWidth + 'px' : 0,
+            height: this.draggableHeight ? this.draggableHeight + 'px' : 0,
+            width: this.draggableWidth ? this.draggableWidth + 'px' : 0,
           }}
         ></div>
       </>

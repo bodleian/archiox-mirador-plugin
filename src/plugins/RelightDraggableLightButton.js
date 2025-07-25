@@ -7,41 +7,23 @@ import Draggable from 'react-draggable';
 class RelightDraggableLightButton extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isOver: false,
-      isDragging: false,
-    };
-  }
-
-  onDrag(event) {
-    this.setState({ isDragging: true });
-  }
-
-  onStop(event) {
-    this.setState({ isDragging: false });
-  }
-
-  onMouseOver(event) {
-    this.setState({ isOver: true });
-  }
-
-  onMouseLeave(event) {
-    this.setState({ isOver: false });
   }
 
   render() {
+    const { onDrag, onStop, onMouseOver, onMouseLeave, isDragging, isOver } =
+      this.props;
     return (
       <Draggable
-        onDrag={(event) => this.onDrag(event)}
-        onStop={(event) => this.onStop(event)}
+        onDrag={(event) => onDrag(event)}
+        onStop={(event) => onStop(event)}
         bounds=".draggable-container"
       >
         <div
-          onMouseOver={(event) => this.onMouseOver(event)}
-          onMouseLeave={(event) => this.onMouseLeave(event)}
+          onMouseOver={(event) => onMouseOver(event)}
+          onMouseLeave={(event) => onMouseLeave(event)}
         >
           <Tooltip
-            open={this.state.isDragging || !this.state.isOver ? false : true}
+            open={isDragging || !isOver ? false : true}
             title={'Drag this button to move the directional light around'}
           >
             <div className="draggable-torch-button">
@@ -54,7 +36,6 @@ class RelightDraggableLightButton extends Component {
   }
 }
 
-// Add PropTypes
 RelightDraggableLightButton.propTypes = {
   label: PropTypes.string,
 };
