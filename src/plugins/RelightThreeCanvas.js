@@ -1,6 +1,5 @@
 import React from 'react';
 import * as THREE from 'three';
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import PropTypes from 'prop-types';
 
 /**
@@ -29,7 +28,6 @@ class RelightThreeCanvas extends React.Component {
       controlLocation: new THREE.Vector3(0, 0, 999),
     };
     this.id = this.props.id;
-    this.viewer = this.props.viewer;
     this.threeResources = {};
     this.groups = {};
     this.scene = new THREE.Scene();
@@ -87,47 +85,6 @@ class RelightThreeCanvas extends React.Component {
       '#1967d2'
     );
 
-    this.controls = new TransformControls(
-      this.camera,
-      this.renderer.domElement
-    );
-
-    // configure the controls, for example define the space as global so rotation doesn't mess it up...
-    //this.controls.space = "local";
-    this.controls.showZ = false;
-
-    this.controls.addEventListener('mouseDown', (event) => {
-      this.viewer.setMouseNavEnabled(false);
-    });
-
-    this.controls.addEventListener('mouseUp', (event) => {
-      this.viewer.setMouseNavEnabled(true);
-    });
-
-    this.controls.addEventListener('dragging-changed', (event) => {
-      this.setState({ isDragging: event.value });
-    });
-
-    this.controls.addEventListener('change', (event) => {
-      this.setState({ controlLocation: this.helperFollower.position.clone() });
-    });
-
-    this.helperFollower = new THREE.Mesh(
-      new THREE.SphereGeometry(100, 16, 16),
-      new THREE.MeshBasicMaterial({
-        transparent: true,
-        color: 0x00ff00,
-        opacity: 0.5,
-      })
-    );
-    this.helperFollower.position.set(0, 0, 999);
-    this.controls.attach(this.helperFollower);
-
-    this.helperControl = this.controls.getHelper();
-    this.controls.visible = this.props.helperOn;
-    this.scene.add(this.helperFollower);
-    this.helperFollower.visible = this.props.helperOn;
-    this.scene.add(this.helperFollower);
     this.directionalLight.castShadow = true;
     this.scene.add(this.target);
     this.scene.add(this.directionalLightHelper);
@@ -386,17 +343,7 @@ class RelightThreeCanvas extends React.Component {
    * The moveLight method updates the direction the directionalLight is pointing.
    */
   moveLight() {
-    if (this.state.isDragging) {
-      this.directionalLight.position.set(
-        this.state.controlLocation.x,
-        this.state.controlLocation.y,
-        999
-      );
-      this.directionalLight.updateMatrixWorld();
-      this.target.updateMatrixWorld();
-      this.directionalLightHelper.updateMatrixWorld();
-      this.directionalLightHelper.update();
-    } else if (this.props.mouseMoving) {
+    if (this.props.mouseMoving && !this.state.isDragging) {
       let vector = new THREE.Vector3(this.props.lightX, -this.props.lightY, 0);
       let dir = vector.sub(this.camera.position).normalize();
       let distance = -this.camera.position.z / dir.z;
@@ -469,24 +416,8 @@ class RelightThreeCanvas extends React.Component {
       this.directionalLightHelper.update();
     }
 
-    if (prevProps.rotation !== this.props.rotation) {
-      console.log(this.props.rotation % 360);
-      // this.helperControl.rotation.y -= Math.PI / 2;
-      // this.helperControl.rotation.x -= Math.PI / 2;
-      // this.helperControl.rotation.z -= Math.PI / 2;
-    }
-
     if (prevProps.renderMode !== this.props.renderMode) {
       this.generateTiles();
-    }
-
-    if (prevProps.helperOn !== this.props.helperOn) {
-      this.helperFollower.visible = this.props.helperOn;
-      if (!this.props.helperOn) {
-        this.scene.remove(this.helperControl);
-      } else {
-        this.scene.add(this.helperControl);
-      }
     }
 
     if (
@@ -594,6 +525,8 @@ RelightThreeCanvas.propTypes = {
   helperOn: PropTypes.bool.isRequired,
   /** The renderMode prop is a boolean value telling the ThreeCanvas to swap between PBR and Phong materials **/
   renderMode: PropTypes.bool.isRequired,
+  /** The mouseMoving prop is a booplean value telling the ThreeCanvas when the mouse is moving either on drag or over the sphere tool **/
+  mouseMoving: PropTypes.bool.isRequired,
 };
 
 export default RelightThreeCanvas;

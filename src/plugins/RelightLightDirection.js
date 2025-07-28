@@ -90,7 +90,7 @@ class RelightLightDirection extends React.Component {
    * @param snapshot a snapshot of the component before the next render cycle, you can use the React class method
    * getSnapShotBeforeUpdate to create this
    * **/
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps, _prevState, _snapshot) {
     if (prevProps.rotation !== this.props.rotation) {
       this.rotatePoint(
         this.props.moveX,

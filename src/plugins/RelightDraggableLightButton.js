@@ -37,11 +37,18 @@ class RelightDraggableLightButton extends Component {
 }
 
 RelightDraggableLightButton.propTypes = {
-  label: PropTypes.string,
-};
-
-RelightDraggableLightButton.defaultProps = {
-  label: 'Toggle',
+  /** The onDrag function is the event handler passed from Relight to this component **/
+  onDrag: PropTypes.func.isRequired,
+  /** The onStop function is the event handler passed from Relight to this component **/
+  onStop: PropTypes.func.isRequired,
+  /** The onMouseOver function is the event handler passed from Relight to this component **/
+  onMouseOver: PropTypes.func.isRequired,
+  /** The onMouseLeave function is the event handler passed from Relight to this component **/
+  onMouseLeave: PropTypes.func.isRequired,
+  /** The isDragging prop is a boolean value telling the component if it's currently being dragged or not **/
+  isDragging: PropTypes.bool.isRequired,
+  /** The isOver prop is a boolean value telling the component if the mouse is over it or not **/
+  isOver: PropTypes.bool.isRequired,
 };
 
 export default RelightDraggableLightButton;

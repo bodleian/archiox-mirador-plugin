@@ -33,7 +33,6 @@ import RelightHelpButton from './RelightHelpButton';
 import RelightHelpDialog from './RelightHelpDialog';
 import RelightLayersMenu from './RelightLayersMenu';
 import RelightDownloadCurrentLayerButton from './RelightDownloadCurrentLayerButton';
-import OpenSeadragon from 'openseadragon';
 import RelightDraggableLightButton from './RelightDraggableLightButton';
 
 /**
@@ -565,47 +564,58 @@ class Relight extends React.Component {
 
   onDraggableLightButtonDragHandler(event) {
     this.mouseMoving = true;
+    this.threeCanvasProps.mouseMoving = this.mouseMoving;
     const rotationModulus = this.rotation % 360;
-    this.mouseX = event.clientX - this.osdCanvasBoundingClientRect.left;
-    this.mouseY = event.clientY - this.osdCanvasBoundingClientRect.top;
-    this.lightX =
-      (this.mouseX / this.osdCanvasBoundingClientRect.width) * 2 - 1; // need to calculate based on bounding box...
-    this.lightY =
-      (this.mouseY / this.osdCanvasBoundingClientRect.height) * 2 - 1;
-    this.lightX = this.flipped ? -this.lightX : this.lightX;
 
-    // switch (rotationModulus) {
-    //   case 0:
-    //     this.mouseX = event.clientX;
-    //     this.mouseY = event.clientY;
-    //     this.lightX = this.mouseX * 2 - 1;
-    //     this.lightY = this.mouseY * 2 - 1;
-    //     this.lightX = this.flipped ? -this.lightX : this.lightX;
-    //     break;
-    //   case -270:
-    //   case 90:
-    //     this.mouseX = event.clientY;
-    //     this.mouseY = event.clientX;
-    //     this.lightX = this.mouseX * 2 - 1;
-    //     this.lightY = -(this.mouseY * 2 - 1);
-    //     this.lightY = this.flipped ? -this.lightY : this.lightY;
-    //     break;
-    //   case -180:
-    //   case 180:
-    //     this.mouseX = event.clientX;
-    //     this.mouseY = event.clientY;
-    //     this.lightX = -(this.mouseX * 2 - 1);
-    //     this.lightY = -(this.mouseY * 2 - 1);
-    //     this.lightX = this.flipped ? -this.lightX : this.lightX;
-    //     break;
-    //   case -90:
-    //   case 270:
-    //     this.mouseX = event.clientY;
-    //     this.mouseY = event.clientX;
-    //     this.lightX = -(this.mouseX * 2 - 1);
-    //     this.lightY = this.mouseY * 2 - 1;
-    //     this.lightY = this.flipped ? -this.lightY : this.lightY;
-    // }
+    switch (rotationModulus) {
+      case 0:
+        this.mouseX = event.clientX - this.osdCanvasBoundingClientRect.left;
+        this.mouseY = event.clientY - this.osdCanvasBoundingClientRect.top;
+        this.lightX =
+          (this.mouseX / this.osdCanvasBoundingClientRect.width) * 2 - 1;
+        this.lightY =
+          (this.mouseY / this.osdCanvasBoundingClientRect.height) * 2 - 1;
+        this.lightX = this.flipped ? -this.lightX : this.lightX;
+        break;
+      case -270:
+      case 90:
+        this.mouseX = event.clientY - this.osdCanvasBoundingClientRect.top;
+        this.mouseY = event.clientX - this.osdCanvasBoundingClientRect.left;
+        this.lightX =
+          (this.mouseX / this.osdCanvasBoundingClientRect.height) * 2 - 1;
+        this.lightY = -(
+          (this.mouseY / this.osdCanvasBoundingClientRect.width) * 2 -
+          1
+        );
+        this.lightY = this.flipped ? -this.lightY : this.lightY;
+        break;
+      case -180:
+      case 180:
+        this.mouseX = event.clientX - this.osdCanvasBoundingClientRect.left;
+        this.mouseY = event.clientY - this.osdCanvasBoundingClientRect.top;
+        this.lightX = -(
+          (this.mouseX / this.osdCanvasBoundingClientRect.width) * 2 -
+          1
+        );
+        this.lightY = -(
+          (this.mouseY / this.osdCanvasBoundingClientRect.height) * 2 -
+          1
+        );
+        this.lightX = this.flipped ? -this.lightX : this.lightX;
+        break;
+      case -90:
+      case 270:
+        this.mouseX = event.clientY - this.osdCanvasBoundingClientRect.top;
+        this.mouseY = event.clientX - this.osdCanvasBoundingClientRect.left;
+        this.lightX = -(
+          (this.mouseX / this.osdCanvasBoundingClientRect.height) * 2 -
+          1
+        );
+        this.lightY =
+          (this.mouseY / this.osdCanvasBoundingClientRect.width) * 2 - 1;
+        this.lightY = this.flipped ? -this.lightY : this.lightY;
+    }
+
     this.threeCanvasProps.lightX = this.lightX;
     this.threeCanvasProps.lightY = this.lightY;
     this.setState({
@@ -614,16 +624,16 @@ class Relight extends React.Component {
     this.setState({ isDragging: true });
   }
 
-  onDraggableLightButtonStopHandler(event) {
+  onDraggableLightButtonStopHandler() {
     this.mouseMoving = false;
     this.setState({ isDragging: false });
   }
 
-  onDraggableLightButtonMouseOverHandler(event) {
+  onDraggableLightButtonMouseOverHandler() {
     this.setState({ isOver: true });
   }
 
-  onDraggableLightButtonMouseLeaveHandler(event) {
+  onDraggableLightButtonMouseLeaveHandler() {
     this.setState({ isOver: false });
   }
 
@@ -637,7 +647,7 @@ class Relight extends React.Component {
    **/
   //  track of values stored in state and if they change if runs
   // eslint-disable-next-line no-unused-vars
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps, _prevState, _snapshot) {
     this.state.active
       ? ReactDOM.render(
           <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
@@ -870,13 +880,9 @@ class Relight extends React.Component {
           <RelightDraggableLightButton
             threeCanvasId={this.threeCanvas.id}
             onDrag={(event) => this.onDraggableLightButtonDragHandler(event)}
-            onStop={(event) => this.onDraggableLightButtonStopHandler(event)}
-            onMouseOver={(event) =>
-              this.onDraggableLightButtonMouseOverHandler(event)
-            }
-            onMouseLeave={(event) =>
-              this.onDraggableLightButtonMouseLeaveHandler(event)
-            }
+            onStop={() => this.onDraggableLightButtonStopHandler()}
+            onMouseOver={() => this.onDraggableLightButtonMouseOverHandler()}
+            onMouseLeave={() => this.onDraggableLightButtonMouseLeaveHandler()}
             isDragging={this.state.isDragging}
             isOver={this.state.isOver}
           />
