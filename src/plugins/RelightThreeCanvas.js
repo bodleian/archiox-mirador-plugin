@@ -24,6 +24,8 @@ class RelightThreeCanvas extends React.Component {
       contentHeight: this.props.contentHeight,
       x: this.props.intersection.x,
       y: this.props.intersection.y,
+      isDragging: false,
+      controlLocation: new THREE.Vector3(0, 0, 999),
     };
     this.id = this.props.id;
     this.threeResources = {};
@@ -82,6 +84,7 @@ class RelightThreeCanvas extends React.Component {
       100,
       '#1967d2'
     );
+
     this.directionalLight.castShadow = true;
     this.scene.add(this.target);
     this.scene.add(this.directionalLightHelper);
@@ -340,19 +343,21 @@ class RelightThreeCanvas extends React.Component {
    * The moveLight method updates the direction the directionalLight is pointing.
    */
   moveLight() {
-    let vector = new THREE.Vector3(this.props.lightX, -this.props.lightY, 0);
-    let dir = vector.sub(this.camera.position).normalize();
-    let distance = -this.camera.position.z / dir.z;
-    let pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
-    this.directionalLight.position.set(
-      this.target.position.x + pos.x * this.props.intersection.width,
-      this.target.position.y + pos.y * this.props.intersection.height,
-      999
-    );
-    this.directionalLight.updateMatrixWorld();
-    this.target.updateMatrixWorld();
-    this.directionalLightHelper.updateMatrixWorld();
-    this.directionalLightHelper.update();
+    if (this.props.mouseMoving && !this.state.isDragging) {
+      let vector = new THREE.Vector3(this.props.lightX, -this.props.lightY, 0);
+      let dir = vector.sub(this.camera.position).normalize();
+      let distance = -this.camera.position.z / dir.z;
+      let pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
+      this.directionalLight.position.set(
+        this.target.position.x + pos.x * this.props.intersection.width,
+        this.target.position.y + pos.y * this.props.intersection.height,
+        999
+      );
+      this.directionalLight.updateMatrixWorld();
+      this.target.updateMatrixWorld();
+      this.directionalLightHelper.updateMatrixWorld();
+      this.directionalLightHelper.update();
+    }
   }
 
   /** *
@@ -401,6 +406,15 @@ class RelightThreeCanvas extends React.Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.directionalLightHelper.visible = this.props.helperOn;
     this.target.visible = this.props.helperOn;
+
+    if (prevState.controlLocation !== this.state.controlLocation) {
+      this.moveLight();
+      this.rerender();
+      this.camera.updateProjectionMatrix();
+      this.directionalLight.updateMatrixWorld();
+      this.directionalLightHelper.updateMatrixWorld();
+      this.directionalLightHelper.update();
+    }
 
     if (prevProps.renderMode !== this.props.renderMode) {
       this.generateTiles();
@@ -511,6 +525,8 @@ RelightThreeCanvas.propTypes = {
   helperOn: PropTypes.bool.isRequired,
   /** The renderMode prop is a boolean value telling the ThreeCanvas to swap between PBR and Phong materials **/
   renderMode: PropTypes.bool.isRequired,
+  /** The mouseMoving prop is a booplean value telling the ThreeCanvas when the mouse is moving either on drag or over the sphere tool **/
+  mouseMoving: PropTypes.bool.isRequired,
 };
 
 export default RelightThreeCanvas;

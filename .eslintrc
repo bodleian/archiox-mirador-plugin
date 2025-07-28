@@ -31,6 +31,7 @@
   "rules": {
     "linebreak-style": ["error", "unix"],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }] // protects against false positive unused params that are needed
   }
 }

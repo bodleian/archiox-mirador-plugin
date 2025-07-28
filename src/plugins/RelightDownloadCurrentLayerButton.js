@@ -76,8 +76,6 @@ RelightDownloadCurrentLayerButton.propTypes = {
   id: PropTypes.string.isRequired,
   /** The choices prop are the canvas.iiifImageResources object from the current instance of the window in Mirador **/
   choices: PropTypes.object.isRequired,
-  /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
-  onClick: PropTypes.func.isRequired,
   /** The windowId prop is the Mirador window ID of the current instance of Mirador **/
   windowId: PropTypes.string,
   /** The canvasId prop is the Mirador canvas ID of the current instance of the window in Mirador **/
