@@ -12,19 +12,7 @@ class RelightLightButtons extends React.Component {
   render() {
     // children is used so that parent props can be passed to the children components inside its tags
     const { children } = this.props;
-    return (
-      <div
-        style={{
-          display: 'flex',
-          borderTop: '1px solid rgba(0, 0, 0, 0.2)',
-          borderImageSlice: 1,
-          borderImageSource:
-            'linear-gradient(to left, rgba(0, 0, 0, 0) 5%, rgba(0, 0, 0, 0.2) 5% 95%, rgba(0, 0, 0, 0) 95% )',
-        }}
-      >
-        {children}
-      </div>
-    );
+    return <div className="relightLightButtons">{children}</div>;
   }
 }
 

@@ -1,0 +1,110 @@
+.relightMenuButtons {
+    display: flex;
+    grid-row: 1;
+    grid-column: 1/5;
+}
+.relightMenuButton {
+    border-left: 1px solid rgba(0,0,0,0.2);
+    border-image-slice: 1;
+    border-image-source: linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.2) 20% 80%, rgba(0, 0, 0, 0) 80% );
+}
+.relightLabel {
+    grid-row: 1;
+    width: 49px;
+    height: 48px;
+    line-height: 48px;
+    text-align: center;
+    border-left: 1px solid rgba(0,0,0,0.2);
+    border-image-slice: 1;
+    border-image-source: linear-gradient(to bottom, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.2) 20% 80%, rgba(0, 0, 0, 0) 80% );
+}
+.relightLightButtons {
+    grid-row: 2;
+    grid-column: 4;
+}
+.relightHelpDialog {
+    position: absolute;
+    right: 0;
+}
+.relightExpandSlidersButton {
+    display: none;
+}
+.relightLightDirectionContainer {
+    display: inline-flex;
+    flex-direction: row;
+    grid-row: 2;
+    grid-column: 1/4;
+}
+.relightLightDirection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.relightLightSliders {
+    text-align: center;
+}
+.relightLayersMenu {
+    display: grid;
+    grid-column: 1/5;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+    margin: 10px;
+    justify-items: center;
+}
+.relightLayerThumbnail {
+    height: auto;
+    width: 50px;
+    max-height: 68px;
+}
+.relightLayerButton {
+    display: flex;
+    cursor: pointer;
+    border: 0;
+    margin: 0;
+    padding: 3px;
+    align-items: center;
+    background: rgb(0,0,0,0);
+}
+.relightLayersMenuHelp {
+    grid-column: 1/5;
+    text-align: center;
+}
+@media (max-width: 768px) {
+    .relightLightButtons {
+        display: inline-flex;
+        grid-row: 3;
+        grid-column: 1;
+    }
+    .relightLightDirectionContainer {
+        flex-direction: column;
+    }
+    .relightExpandSlidersButton {
+        display: flex;
+    }
+}
+.MiradorImageTools2 .MuiPaper-root.MuiPaper-elevation4 {
+    z-index: 998 !important;
+}
+
+.draggable-torch-button {
+    padding: 12px;
+    height: 1.5rem;
+    width: 1.5rem;
+    box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12);
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    z-index: 1000;
+    display: block;
+}
+
+.draggable-container {
+    position: fixed;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    border: none;
+    pointer-events: none;
+}

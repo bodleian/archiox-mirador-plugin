@@ -1,8 +1,6 @@
 import React from 'react';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
 import PropTypes from 'prop-types';
@@ -16,30 +14,23 @@ class RelightExpandSlidersButton extends React.Component {
     super(props);
   }
   render() {
-    const { drawerOpen, aspect, onClick } = this.props;
-
-    let icon = drawerOpen ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />;
-
-    if (aspect === 'landscape') {
-      icon = drawerOpen ? <ArrowBackIcon /> : <ArrowForwardIcon />;
-    }
+    const { drawerOpen, onClick } = this.props;
 
     return (
-      <MiradorMenuButton
-        style={{
-          clear: 'both',
-        }}
-        aria-label={
-          drawerOpen
-            ? 'Collapse relighting shader control sliders'
-            : 'Expand shader control sliders to take control of the light levels and shading parameters. ' +
-              'You can control light intensity, metalness, roughness, and normal depth here; there is a ' +
-              'description of what each one does on the relevant slider, just hover over it and see.'
-        }
-        onClick={onClick}
-      >
-        {icon}
-      </MiradorMenuButton>
+      <div className="relightExpandSlidersButton">
+        <MiradorMenuButton
+          aria-label={
+            drawerOpen
+              ? 'Collapse relighting shader control sliders'
+              : 'Expand shader control sliders to take control of the light levels and shading parameters. ' +
+                'You can control light intensity, metalness, roughness, and normal depth here; there is a ' +
+                'description of what each one does on the relevant slider, just hover over it and see.'
+          }
+          onClick={onClick}
+        >
+          {drawerOpen ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+        </MiradorMenuButton>
+      </div>
     );
   }
 }

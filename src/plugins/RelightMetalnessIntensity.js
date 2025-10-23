@@ -1,6 +1,7 @@
 import React from 'react';
 import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
+import FlareOutlined from '@material-ui/icons/FlareOutlined';
 import PropTypes from 'prop-types';
 
 /**
@@ -27,24 +28,33 @@ class RelightMetalnessIntensity extends React.Component {
     } = this.props;
     return (
       <Tooltip title={tooltipTitle}>
-        <Slider
-          id={id}
+        <div
           style={{
-            marginTop: '20px',
-            marginBottom: '20px',
-            height: '87px',
-            padding: '0px 15px',
+            display: 'inline-block',
+            textAlign: 'center',
           }}
-          size={size}
-          orientation={orientation}
-          marks
-          defaultValue={defaultIntensity}
-          value={intensity}
-          step={step}
-          min={min}
-          max={max}
-          onChange={onChange}
-        />
+        >
+          <Slider
+            id={id}
+            style={{
+              display: 'block',
+              marginTop: '20px',
+              marginBottom: '20px',
+              height: '87px',
+              padding: '0px 15px',
+            }}
+            size={size}
+            orientation={orientation}
+            marks
+            defaultValue={defaultIntensity}
+            value={intensity}
+            step={step}
+            min={min}
+            max={max}
+            onChange={onChange}
+          />
+          <FlareOutlined />
+        </div>
       </Tooltip>
     );
   }
@@ -76,7 +86,7 @@ RelightMetalnessIntensity.propTypes = {
 RelightMetalnessIntensity.defaultProps = {
   intensity: 0.0,
   defaultIntensity: 0.0,
-  step: 0.1,
+  step: 1,
   min: 0.0,
   max: 1.0,
   orientation: 'vertical',

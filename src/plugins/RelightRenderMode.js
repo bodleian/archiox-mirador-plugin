@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
 /**
- * The RelightRenderMode component is a plug-in button that will toggle the render mode between PBR and specular
- * enhancement when it is clicked.
- */
+ * The RelightRenderMode component is a plug-in button that will toggle the three.js overlay shader between PBR and
+ * Phong when it is clicked, which map to our PBR and specular enhancement modes.
+ **/
 class RelightRenderMode extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +24,7 @@ class RelightRenderMode extends React.Component {
         }
         style={{
           clear: 'both',
+          display: 'block',
         }}
         onClick={onClick}
       >

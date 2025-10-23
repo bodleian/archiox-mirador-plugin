@@ -1,6 +1,5 @@
 import React from 'react';
-import Help from '@material-ui/icons/Help';
-import HelpOutline from '@material-ui/icons/HelpOutline';
+import AssistantOutlined from '@material-ui/icons/AssistantOutlined';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
@@ -23,11 +22,13 @@ class RelightLightHelper extends React.Component {
             : 'Turn on a light direction helper to help you to visualise light position'
         }
         style={{
+          backgroundColor: helperOn ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0)',
           clear: 'both',
+          display: 'block',
         }}
         onClick={onClick}
       >
-        {helperOn ? <Help /> : <HelpOutline />}
+        {<AssistantOutlined />}
       </MiradorMenuButton>
     );
   }

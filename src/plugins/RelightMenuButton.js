@@ -1,5 +1,5 @@
 import React from 'react';
-import HighlightIcon from '@material-ui/icons/Highlight';
+import BuildOutlined from '@material-ui/icons/BuildOutlined';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 import PropTypes from 'prop-types';
@@ -27,7 +27,7 @@ class RelightMenuButton extends React.Component {
         }}
         onClick={onClick}
       >
-        {open ? <CloseSharpIcon /> : <HighlightIcon />}
+        {open ? <CloseSharpIcon /> : <BuildOutlined />}
       </MiradorMenuButton>
     );
   }

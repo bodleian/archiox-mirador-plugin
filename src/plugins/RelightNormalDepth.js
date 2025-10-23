@@ -1,12 +1,13 @@
 import React from 'react';
 import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
+import Height from '@material-ui/icons/Height';
 import PropTypes from 'prop-types';
 
 /**
- * The RelightNormalDepth component is a component that is used to render a slider component to change the
- * normalmap depth of the Three canvas scene.
- */
+ * The RelightNormalDepth component is a plug-in slider that allows the user to change the
+ * normalmap depth property of the Three canvas scene shader.
+ **/
 class RelightNormalDepth extends React.Component {
   constructor(props) {
     super(props);
@@ -27,24 +28,33 @@ class RelightNormalDepth extends React.Component {
     } = this.props;
     return (
       <Tooltip title={tooltipTitle}>
-        <Slider
-          id={id}
+        <div
           style={{
-            marginTop: '20px',
-            marginBottom: '20px',
-            height: '87px',
-            padding: '0px 15px',
+            display: 'inline-block',
+            textAlign: 'center',
           }}
-          size={size}
-          orientation={orientation}
-          marks
-          defaultValue={defaultNormalDepth}
-          value={normalDepth}
-          step={step}
-          min={min}
-          max={max}
-          onChange={onChange}
-        />
+        >
+          <Slider
+            id={id}
+            style={{
+              display: 'block',
+              marginTop: '20px',
+              marginBottom: '20px',
+              height: '87px',
+              padding: '0px 15px',
+            }}
+            size={size}
+            orientation={orientation}
+            marks
+            defaultValue={defaultNormalDepth}
+            value={normalDepth}
+            step={step}
+            min={min}
+            max={max}
+            onChange={onChange}
+          />
+          <Height />
+        </div>
       </Tooltip>
     );
   }

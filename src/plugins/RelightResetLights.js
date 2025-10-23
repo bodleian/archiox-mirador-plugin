@@ -19,6 +19,7 @@ class RelightResetLights extends React.Component {
         aria-label={'Reset all lighting settings to the default values'}
         style={{
           clear: 'both',
+          display: 'block',
         }}
         onClick={onClick}
       >
