@@ -29,6 +29,7 @@ import RelightMenuButton from './RelightMenuButton';
 import RelightMenuButtons from './RelightMenuButtons';
 import RelightLightHelper from './RelightLightHelper';
 import RelightRenderMode from './RelightRenderMode';
+import RelightOrbitToggle from './RelightOrbitToggle';
 import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
@@ -68,6 +69,7 @@ class Relight extends React.Component {
     this.tileLevels = {};
     this.helperOn = false;
     this.renderMode = true;
+    this.orbitEnabled = false;
     this.albedoInfo = {};
     this.loaded = false;
     this.visible = false;
@@ -311,6 +313,15 @@ class Relight extends React.Component {
   }
 
   /**
+   * The orbitHandler method when called toggles the boolean value this.orbitEnabled and then triggers an OSD overlay
+   * update to enable/disable OrbitControls for 3D camera rotation (experimental).
+   * **/
+  orbitHandler() {
+    this.orbitEnabled = !this.orbitEnabled;
+    this.updateOverlay();
+  }
+
+  /**
    * The initialiseThreeCanvasProps method sets the threeCanvasProps object with the current lighting positions,
    * zoom level, tile levels, image intersection dimensions, and maps so that the Three canvas overlay has everything
    * is need to start rendering.  It will capture the current values of the light positions and intensities even if the
@@ -353,6 +364,7 @@ class Relight extends React.Component {
     this.threeCanvasProps.contentHeight = this.tileSets[1].albedoTiles.height;
     this.threeCanvasProps.images = this.images;
     this.threeCanvasProps.tileSets = this.tileSets;
+    this.threeCanvasProps.orbitEnabled = this.orbitEnabled;
   }
 
   /**
@@ -391,7 +403,7 @@ class Relight extends React.Component {
    */
   updateThreeCanvasProps() {
     this.threeCanvasProps.renderMode = this.renderMode;
-
+    this.threeCanvasProps.orbitEnabled = this.orbitEnabled;
     this.threeCanvasProps.helperOn = this.helperOn;
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
@@ -732,6 +744,10 @@ class Relight extends React.Component {
           <RelightLightHelper
             helperOn={this.helperOn}
             onClick={() => this.helperHandler()}
+          />
+          <RelightOrbitToggle
+            orbitEnabled={this.orbitEnabled}
+            onClick={() => this.orbitHandler()}
           />
           <RelightRenderMode
             mode={this.renderMode}

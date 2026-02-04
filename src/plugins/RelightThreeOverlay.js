@@ -33,6 +33,7 @@ class RelightThreeOverlay extends React.Component {
       tileLevels,
       helperOn,
       renderMode,
+      orbitEnabled,
     } = this.props.threeCanvasProps;
     return (
       <RelightThreeCanvas
@@ -56,6 +57,7 @@ class RelightThreeOverlay extends React.Component {
         tileLevels={tileLevels}
         helperOn={helperOn}
         renderMode={renderMode}
+        orbitEnabled={orbitEnabled}
       />
     );
   }
@@ -84,6 +86,7 @@ RelightThreeOverlay.propTypes = {
     tileLevels: PropTypes.object.isRequired,
     helperOn: PropTypes.bool.isRequired,
     renderMode: PropTypes.bool.isRequired,
+    orbitEnabled: PropTypes.bool,
   }),
 };
 export default RelightThreeOverlay;

@@ -51,6 +51,9 @@ class RelightThreeCanvas extends React.Component {
     );
     this.camera.position.set(0, 0, 1200);
 
+    // Tilt angle for 3D view (experimental)
+    this.tiltAngle = -0.6; // ~34 degrees tilt (increased for visibility)
+
     // only show a part of the orthographic camera that matches the zoom and intersection of OpenSeaDragon
     this._cameraOffset(this.camera, this.props);
 
@@ -80,6 +83,16 @@ class RelightThreeCanvas extends React.Component {
       '#1967d2'
     );
     this.directionalLight.castShadow = true;
+
+    // Debug helpers (visible when orbitEnabled)
+    this.axesHelper = new THREE.AxesHelper(500);
+    this.axesHelper.visible = false;
+    this.gridHelper = new THREE.GridHelper(2000, 20);
+    this.gridHelper.rotation.x = Math.PI / 2; // Align with XY plane
+    this.gridHelper.visible = false;
+    this.scene.add(this.axesHelper);
+    this.scene.add(this.gridHelper);
+
     this.scene.add(this.target);
     this.scene.add(this.directionalLightHelper);
     this.directionalLight.target = this.target;
@@ -399,6 +412,35 @@ class RelightThreeCanvas extends React.Component {
     this.directionalLightHelper.visible = this.props.helperOn;
     this.target.visible = this.props.helperOn;
 
+    // Apply tilt when 3D mode is enabled
+    if (prevProps.orbitEnabled !== this.props.orbitEnabled) {
+      // Show/hide debug helpers
+      this.axesHelper.visible = this.props.orbitEnabled;
+      this.gridHelper.visible = this.props.orbitEnabled;
+
+      if (this.props.orbitEnabled) {
+        this.camera.rotation.x = this.tiltAngle;
+        // Hide all groups except current tileLevel to avoid z-fighting
+        for (let i = 0; i < this.props.maxTileLevel + 1; i++) {
+          this.groups[i].visible = (i === this.props.tileLevel);
+        }
+        // Log debug info
+        console.log('[3D Debug] Mode enabled');
+        console.log('[3D Debug] Camera position:', this.camera.position);
+        console.log('[3D Debug] Camera rotation:', this.camera.rotation);
+        console.log('[3D Debug] Tile level:', this.props.tileLevel);
+        console.log('[3D Debug] Max tile level:', this.props.maxTileLevel);
+        console.log('[3D Debug] Content size:', this.props.contentWidth, 'x', this.props.contentHeight);
+        console.log('[3D Debug] Visible group:', this.props.tileLevel, 'with', Object.keys(this.threeResources[this.props.tileLevel]['meshes']).length, 'tiles');
+        console.log('[3D Debug] Intersection:', this.props.intersection);
+        console.log('[3D Debug] Zoom:', this.props.zoom);
+      } else {
+        this.camera.rotation.x = 0;
+        console.log('[3D Debug] Mode disabled');
+      }
+      this.camera.updateProjectionMatrix();
+    }
+
     if (prevProps.renderMode !== this.props.renderMode) {
       this.generateTiles();
     }
@@ -508,6 +550,12 @@ RelightThreeCanvas.propTypes = {
   helperOn: PropTypes.bool.isRequired,
   /** The renderMode prop is a boolean value telling the ThreeCanvas to swap between PBR and Phong materials **/
   renderMode: PropTypes.bool.isRequired,
+  /** The orbitEnabled prop enables/disables OrbitControls for 3D camera rotation (experimental) **/
+  orbitEnabled: PropTypes.bool,
+};
+
+RelightThreeCanvas.defaultProps = {
+  orbitEnabled: false,
 };
 
 export default RelightThreeCanvas;
