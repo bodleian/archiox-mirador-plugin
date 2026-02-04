@@ -345,6 +345,22 @@ To serve a preview of your Mirador build locally on the localhost, run the follo
 npm run preview
 ```
 
+# Local Development (Standalone)
+
+You can run the plugin standalone for development without setting up a separate Mirador build:
+
+```bash
+npm install
+npm start
+```
+
+This starts a development server at `http://localhost:3000` with hot reload, loading a demo manifest from the Bodleian Library. Look for the torch button in the viewer toolbar to activate the plugin.
+
+Available scripts:
+- `npm start` - Start development server with hot reload
+- `npm run build` - Build the plugin for production
+- `npm run build:demo` - Build the demo application
+
 # Development  Rules
 All new features should be placed in feature branches and not pushed direct to the `qa` or `master` branches as per our 
 other repos.  That way we can test new features without breaking anything.
@@ -403,9 +419,23 @@ npm run test
 ```
 
 ## Gotchas
-If you are serving images to your Mirador instance from another host you may not be able to load them depending on your
-CORS policy.  You can get around this for local dev by changing a setting of OpenSeaDragon installed in your
-`node_modules` folder.  Find the openseadragon.js file in `node_modules/openseadragon/build/openseadragon/` and change
-the value of `crossOriginPolicy` from false to `Anonymous` in the `DEFAULT_SETTINGS` object and rebuild your Mirador
-using `npm run webpack`.  Be warned that running `npm ci` will wipe out this change and you will need to reimplement it
-every time you do a clean installation.
+
+### CORS Policy for Cross-Origin Images
+If you are serving images to your Mirador instance from another host, Three.js will fail to use them as WebGL textures due to CORS restrictions. You'll see errors like:
+```
+THREE.WebGLState: SecurityError: Failed to execute 'texSubImage2D' on 'WebGL2RenderingContext': The image element contains cross-origin data
+```
+
+**Solution:** Add `crossOriginPolicy: "Anonymous"` to your Mirador `osdConfig`:
+
+```javascript
+const config = {
+  id: 'viewer',
+  // ... other config
+  osdConfig: {
+    crossOriginPolicy: "Anonymous",
+  },
+};
+```
+
+This tells OpenSeadragon to load images with the `crossOrigin="anonymous"` attribute, allowing Three.js to use them as textures (provided the image server sends proper CORS headers like `Access-Control-Allow-Origin: *`).
