@@ -403,9 +403,23 @@ npm run test
 ```
 
 ## Gotchas
-If you are serving images to your Mirador instance from another host you may not be able to load them depending on your
-CORS policy.  You can get around this for local dev by changing a setting of OpenSeaDragon installed in your
-`node_modules` folder.  Find the openseadragon.js file in `node_modules/openseadragon/build/openseadragon/` and change
-the value of `crossOriginPolicy` from false to `Anonymous` in the `DEFAULT_SETTINGS` object and rebuild your Mirador
-using `npm run webpack`.  Be warned that running `npm ci` will wipe out this change and you will need to reimplement it
-every time you do a clean installation.
+
+### CORS Policy for Cross-Origin Images
+If you are serving images to your Mirador instance from another host, Three.js will fail to use them as WebGL textures due to CORS restrictions. You'll see errors like:
+```
+THREE.WebGLState: SecurityError: Failed to execute 'texSubImage2D' on 'WebGL2RenderingContext': The image element contains cross-origin data
+```
+
+**Solution:** Add `crossOriginPolicy: "Anonymous"` to your Mirador `osdConfig`:
+
+```javascript
+const config = {
+  id: 'viewer',
+  // ... other config
+  osdConfig: {
+    crossOriginPolicy: "Anonymous",
+  },
+};
+```
+
+This tells OpenSeadragon to load images with the `crossOrigin="anonymous"` attribute, allowing Three.js to use them as textures (provided the image server sends proper CORS headers like `Access-Control-Allow-Origin: *`).
