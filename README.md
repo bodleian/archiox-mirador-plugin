@@ -410,16 +410,12 @@ If you are serving images to your Mirador instance from another host, Three.js w
 THREE.WebGLState: SecurityError: Failed to execute 'texSubImage2D' on 'WebGL2RenderingContext': The image element contains cross-origin data
 ```
 
-**Solution:** Add `crossOriginPolicy: "Anonymous"` to your Mirador `osdConfig`:
+**Solution:** The dev environment already includes the fix. If you're building your own Mirador instance, add `crossOriginPolicy: "Anonymous"` to your `osdConfig`:
 
 ```javascript
-const config = {
-  id: 'viewer',
-  // ... other config
-  osdConfig: {
+osdConfig: {
     crossOriginPolicy: "Anonymous",
-  },
-};
+},
 ```
 
 This tells OpenSeadragon to load images with the `crossOrigin="anonymous"` attribute, allowing Three.js to use them as textures (provided the image server sends proper CORS headers like `Access-Control-Allow-Origin: *`).
