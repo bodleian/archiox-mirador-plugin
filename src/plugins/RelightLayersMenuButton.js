@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
 /**
- * The RelightRenderMode component is a plug-in button that will toggle the render mode between PBR and specular
- * enhancement when it is clicked.
- */
-class RelightCycleDefaultLayer extends React.Component {
+ * The RelightLayersMenuButton component is a plug-in button that will toggle the state of layersOpen which determines
+ * if the layer selection menu is rendered open or closed.
+ **/
+class RelightLayersMenuButton extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -17,9 +17,7 @@ class RelightCycleDefaultLayer extends React.Component {
     return (
       <MiradorMenuButton
         id={id}
-        aria-label={
-          'Click here to cycle through the layers for this object in Mirador; layers can tell you extra information about this object.'
-        }
+        aria-label={'Open the layer selection menu'}
         style={{
           clear: 'both',
         }}
@@ -32,7 +30,7 @@ class RelightCycleDefaultLayer extends React.Component {
   }
 }
 
-RelightCycleDefaultLayer.propTypes = {
+RelightLayersMenuButton.propTypes = {
   /** The id prop is used to populate the html id property so that we can keep track of the controls state **/
   id: PropTypes.string.isRequired,
   /** The onClick prop is a function used to manage component behaviour when the component is clicked **/
@@ -41,4 +39,4 @@ RelightCycleDefaultLayer.propTypes = {
   active: PropTypes.bool.isRequired,
 };
 
-export default RelightCycleDefaultLayer;
+export default RelightLayersMenuButton;

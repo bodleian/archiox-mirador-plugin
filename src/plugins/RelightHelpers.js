@@ -333,3 +333,17 @@ export function getAspect() {
   }
   return aspect;
 }
+
+/**
+ * Gets the canvas labels from the iiif image resources and returns an array of key value pairs containing the labels
+ * @param {array} iiifImageResouces an array of objects containing the canvas image choices.
+ * @returns {array} an array of key value pairs where the key is the image id and the value is the IIIF canvas label.
+ * **/
+export function getLabels(iiifImageResouces) {
+  return iiifImageResouces.reduce((accumulator, item) => {
+    const key = item.__jsonld.id;
+    const value = item.__jsonld.label.en[0];
+    accumulator[key] = value;
+    return accumulator;
+  }, {});
+}

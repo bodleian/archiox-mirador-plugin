@@ -4,20 +4,15 @@ import ReactDOM from 'react-dom';
 import * as THREE from 'three';
 import {
   updateLayer,
-  setLayers,
   getMaps,
-  getImages,
   getMap,
   getRendererInstructions,
   getTileSets,
-  reduceLayers,
-  getAspect,
 } from './RelightHelpers';
 import RelightNormalDepth from './RelightNormalDepth';
 import RelightAmbientLightIntensity from './RelightAmbientLightIntensity';
 import RelightDirectionalLightIntensity from './RelightDirectionalLightIntensity';
 import RelightLightDirection from './RelightLightDirection';
-import RelightLightControls from './RelightLightControls';
 import RelightToolMenu from './RelightToolMenu';
 import RelightResetLights from './RelightResetLights';
 import RelightLightButtons from './RelightLightButtons';
@@ -25,15 +20,20 @@ import RelightTorchButton from './RelightTorchButton';
 import RelightExpandSlidersButton from './RelightExpandSlidersButton';
 import RelightThreeOverlay from './RelightThreeOverlay';
 import RelightMenuButton from './RelightMenuButton';
-//import RelightAnnotationButton from './RelightAnnotations';  // disabled until we can get annotation data
 import RelightMenuButtons from './RelightMenuButtons';
 import RelightLightHelper from './RelightLightHelper';
 import RelightRenderMode from './RelightRenderMode';
-import RelightCycleDefaultLayer from './RelightCycleDefaultLayer';
+import RelightLayersMenuButton from './RelightLayersMenuButton';
 import RelightShininessIntensity from './RelightShininessIntensity';
 import RelightMetalnessIntensity from './RelightMetalnessIntensity';
 import RelightRoughnessIntensity from './RelightRoughnessIntensity';
-import { getLayers } from './state/selectors';
+import RelightSnapshotButton from './RelightSnapshotButton';
+import './public/styles.css';
+import RelightHelpButton from './RelightHelpButton';
+import RelightHelpDialog from './RelightHelpDialog';
+import RelightLayersMenu from './RelightLayersMenu';
+import RelightDownloadCurrentLayerButton from './RelightDownloadCurrentLayerButton';
+import RelightDraggableLightButton from './RelightDraggableLightButton';
 
 /**
  * The Relight component is the parent group of the plug-in that is inserted into the Mirador viewer as a tool menu.
@@ -46,9 +46,13 @@ class Relight extends React.Component {
       active: false,
       flipped: false,
       open: this.props.window.archioxPluginOpen || false,
-      drawerOpen: false,
+      drawerOpen: true,
       loadHandlerAdded: false,
       threeCanvasProps: {},
+      helpOn: false,
+      layersOpen: false,
+      isOver: false,
+      isDragging: false,
     };
     this.threeCanvasProps = {};
     this.mouseDown = false;
@@ -67,10 +71,14 @@ class Relight extends React.Component {
     this.tileSets = {};
     this.tileLevels = {};
     this.helperOn = false;
+    this.helpOn = false;
     this.renderMode = true;
     this.albedoInfo = {};
     this.loaded = false;
     this.visible = false;
+    this.mouseMoving = false;
+    this.draggableWidth = null;
+    this.draggableHeight = null;
 
     if (!this.renderMode) {
       this.normalDepth = 10.0;
@@ -93,13 +101,20 @@ class Relight extends React.Component {
     const boundingBox = lightDirectionControl.getBoundingClientRect();
 
     if (event.type === 'mousemove' && this.mouseDown) {
+      this.mouseMoving = true;
+      this.threeCanvasProps.mouseMoving = this.mouseMoving;
       event.preventDefault();
       this.moveX = event.clientX - boundingBox.left;
       this.moveY = event.clientY - boundingBox.top;
     } else if (event.type === 'touchmove') {
       this.mouseDown = true;
+      this.mouseMoving = true;
+      this.threeCanvasProps.mouseMoving = this.mouseMoving;
       this.moveX = event.touches[0].clientX - boundingBox.left;
       this.moveY = event.touches[0].clientY - boundingBox.top;
+    } else {
+      this.mouseMoving = false;
+      this.threeCanvasProps.mouseMoving = this.mouseMoving;
     }
 
     // rotation is the total degrees the canvas has rotated, i.e. it stacks, we need to get this back
@@ -141,7 +156,6 @@ class Relight extends React.Component {
       }
       this.threeCanvasProps.lightX = this.lightX;
       this.threeCanvasProps.lightY = this.lightY;
-
       this.setState({
         threeCanvasProps: this.threeCanvasProps,
       });
@@ -319,6 +333,9 @@ class Relight extends React.Component {
   initialiseThreeCanvasProps() {
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps = {};
+    this.threeCanvasProps.rotation = this.rotation;
+    this.threeCanvasProps.mouseMoving = this.mouseMoving;
+    this.threeCanvasProps.viewer = this.props.viewer;
     this.threeCanvasProps.helperOn = this.helperOn;
     this.threeCanvasProps.renderMode = this.renderMode;
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
@@ -374,24 +391,13 @@ class Relight extends React.Component {
   }
 
   /**
-   *
-   **/
-  generateMapData() {
-    this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
-    this.normalMap = getMap(this.props.canvas.iiifImageResources, 'normal');
-    this.map_ids = [
-      this.albedoMap.split('/').pop(),
-      this.normalMap.split('/').pop(),
-    ];
-  }
-
-  /**
    * The updateThreeCanvasProps method is used by the viewport-change event handler to keep the overlay dimensions and
    * Three camera view in sync with OpenSeaDragon and make sure the updated Three textures are sent to Three canvas.
    */
   updateThreeCanvasProps() {
     this.threeCanvasProps.renderMode = this.renderMode;
-
+    this.threeCanvasProps.rotation = this.rotation;
+    this.threeCanvasProps.mouseMoving = this.mouseMoving;
     this.threeCanvasProps.helperOn = this.helperOn;
     const zoom_level = this.props.viewer.viewport.getZoom(true);
     this.threeCanvasProps.rendererInstructions = getRendererInstructions(
@@ -444,7 +450,6 @@ class Relight extends React.Component {
       // this tells the overlay where to begin in terms of x, y coordinates
       this.props.viewer.addOverlay(this.threeCanvas);
       this.overlay = this.props.viewer.getOverlayById(this.threeCanvas);
-
       this.overlay.update(
         this.threeCanvasProps.rendererInstructions.intersectionTopLeft
       );
@@ -494,48 +499,7 @@ class Relight extends React.Component {
    * the order of the choices layers, and this function will preserve that order when shuffling.
    **/
   defaultLayerHandler() {
-    // make all the layers visible...
-    const excluded_maps = [
-      'composite',
-      'albedo',
-      'normal',
-      'shaded',
-      'depth',
-      'none',
-    ];
-    const layersInState = getLayers(this.props.state)[this.props.windowId][
-      this.canvasId
-    ];
-    let items;
-    let imagesFromState;
-
-    if (layersInState) {
-      // get the current state and extract the current index values and visibilities into a sorted array
-      items = Object.entries(layersInState)
-        .map(([url, { index, visibility }]) => ({ url, index, visibility }))
-        .sort((a, b) => a.index - b.index); // sort items based on the index property
-
-      // transform the sorted items into the desired output format for use as a payload body for Mirador
-      imagesFromState = items.map(({ url }) => ({ id: url }));
-    }
-
-    const maps = getMaps(this.props.canvas.iiifImageResources);
-
-    if (this.layers === undefined && !layersInState) {
-      this.layers = getImages(this.props.canvas.iiifImageResources);
-    } else {
-      this.layers = imagesFromState;
-    }
-
-    this.layers.push(this.layers.shift());
-    const payload = reduceLayers(this.layers, maps, excluded_maps);
-
-    setLayers(
-      this.props.windowId,
-      this.canvasId,
-      this.props.updateLayers,
-      payload
-    ).next();
+    this.setState((prevState) => ({ layersOpen: !prevState.layersOpen }));
   }
 
   /**
@@ -545,6 +509,10 @@ class Relight extends React.Component {
     this.setState((prevState) => ({ drawerOpen: !prevState.drawerOpen }));
   }
 
+  /**
+   * The disposeTextures method when called will empty the loaded images from memory.
+   * @param {object} images the image tiles currently loaded as threejs textures in memory.
+   * **/
   disposeTextures(images) {
     for (const key in images) {
       if (images[key] instanceof THREE.Texture) {
@@ -555,16 +523,131 @@ class Relight extends React.Component {
   }
 
   /**
+   * The snapshotButtonHandler method is called when the RelightSnapshotButton is pressed, it grabs the Threejs canvas
+   * and downloads the render that is currently on screen.
+   * @param {string} manifestTitle the title of the current manifest loaded in the Mirador window instance.
+   * **/
+  snapshotButtonHandler(manifestTitle) {
+    const canvas = document.querySelector('#container div canvas');
+    const dataURL = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataURL;
+    // todo: put in more meaningful file name here...
+    link.download =
+      manifestTitle.replace(/\s+/g, '-') + '_live_render_region.jpg';
+    link.click();
+  }
+
+  /**
+   * The helpOpenHandler method sets the helpOn value in state to true.
+   * **/
+  helpOpenHandler() {
+    this.setState({ helpOn: true });
+  }
+
+  /**
+   * The helpCloseHandler method sets the helpOn value in state to false.
+   * **/
+  helpCloseHandler() {
+    this.setState({ helpOn: false });
+  }
+
+  /**
+   * The resizeHandler method sets the state of drawerOpen to true if the window innerWidth is greater than 768px.
+   * **/
+  resizeHandler() {
+    const isNowWide = window.innerWidth > 768;
+    if (isNowWide) {
+      this.setState({ drawerOpen: true });
+    }
+  }
+
+  onDraggableLightButtonDragHandler(event) {
+    this.mouseMoving = true;
+    this.threeCanvasProps.mouseMoving = this.mouseMoving;
+    const rotationModulus = this.rotation % 360;
+
+    switch (rotationModulus) {
+      case 0:
+        this.mouseX = event.clientX - this.osdCanvasBoundingClientRect.left;
+        this.mouseY = event.clientY - this.osdCanvasBoundingClientRect.top;
+        this.lightX =
+          (this.mouseX / this.osdCanvasBoundingClientRect.width) * 2 - 1;
+        this.lightY =
+          (this.mouseY / this.osdCanvasBoundingClientRect.height) * 2 - 1;
+        this.lightX = this.flipped ? -this.lightX : this.lightX;
+        break;
+      case -270:
+      case 90:
+        this.mouseX = event.clientY - this.osdCanvasBoundingClientRect.top;
+        this.mouseY = event.clientX - this.osdCanvasBoundingClientRect.left;
+        this.lightX =
+          (this.mouseX / this.osdCanvasBoundingClientRect.height) * 2 - 1;
+        this.lightY = -(
+          (this.mouseY / this.osdCanvasBoundingClientRect.width) * 2 -
+          1
+        );
+        this.lightY = this.flipped ? -this.lightY : this.lightY;
+        break;
+      case -180:
+      case 180:
+        this.mouseX = event.clientX - this.osdCanvasBoundingClientRect.left;
+        this.mouseY = event.clientY - this.osdCanvasBoundingClientRect.top;
+        this.lightX = -(
+          (this.mouseX / this.osdCanvasBoundingClientRect.width) * 2 -
+          1
+        );
+        this.lightY = -(
+          (this.mouseY / this.osdCanvasBoundingClientRect.height) * 2 -
+          1
+        );
+        this.lightX = this.flipped ? -this.lightX : this.lightX;
+        break;
+      case -90:
+      case 270:
+        this.mouseX = event.clientY - this.osdCanvasBoundingClientRect.top;
+        this.mouseY = event.clientX - this.osdCanvasBoundingClientRect.left;
+        this.lightX = -(
+          (this.mouseX / this.osdCanvasBoundingClientRect.height) * 2 -
+          1
+        );
+        this.lightY =
+          (this.mouseY / this.osdCanvasBoundingClientRect.width) * 2 - 1;
+        this.lightY = this.flipped ? -this.lightY : this.lightY;
+    }
+
+    this.threeCanvasProps.lightX = this.lightX;
+    this.threeCanvasProps.lightY = this.lightY;
+    this.setState({
+      threeCanvasProps: this.threeCanvasProps,
+    });
+    this.setState({ isDragging: true });
+  }
+
+  onDraggableLightButtonStopHandler() {
+    this.mouseMoving = false;
+    this.setState({ isDragging: false });
+  }
+
+  onDraggableLightButtonMouseOverHandler() {
+    this.setState({ isOver: true });
+  }
+
+  onDraggableLightButtonMouseLeaveHandler() {
+    this.setState({ isOver: false });
+  }
+
+  /**
    * The componentDidUpdate method is a standard React class method that is used to run other methods whenever state or
    * props are updated.  Here we used it to re-render the overlay if there is a change in state detected.
    * @param prevProps the previous props sent to the Relight component
    * @param prevState the previous state set in the Relight component
    * @param snapshot a snapshot of the component before the next render cycle, you can use the React class method
    * getSnapShotBeforeUpdate to create this
-   */
+   **/
   //  track of values stored in state and if they change if runs
   // eslint-disable-next-line no-unused-vars
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps, _prevState, _snapshot) {
     this.state.active
       ? ReactDOM.render(
           <RelightThreeOverlay threeCanvasProps={this.threeCanvasProps} />,
@@ -574,11 +657,20 @@ class Relight extends React.Component {
   }
 
   /**
+   * The componentDidMount method is a standard React class method that is used to run other methods whenever the
+   * component has mounted. Here we use it to add an event listener for window resizing.
+   **/
+  componentDidMount() {
+    window.addEventListener('resize', () => this.resizeHandler());
+  }
+
+  /**
    * The componentWillUnmount method is a standard React class method that is used to run other methods whenever the
    * component is about to be unmounted.  Here we use it to dispose of the textures so the memory they occupy can be
-   * re-used.
+   * re-used and remove an event listner for window resizing.
    */
   componentWillUnmount() {
+    window.removeEventListener('resize', () => this.resizeHandler());
     this.disposeTextures(this.images);
   }
 
@@ -588,7 +680,6 @@ class Relight extends React.Component {
    * @returns {JSX.Element}
    */
   render() {
-    this.aspect = getAspect();
     // if the canvas object is available then grab define the albedo and normal maps and set them to state
     if (typeof this.props.canvas !== 'undefined' && !this.visible) {
       this.albedoMap = getMap(this.props.canvas.iiifImageResources, 'albedo');
@@ -606,7 +697,6 @@ class Relight extends React.Component {
           this.normalMap.split('/').pop(),
         ];
       }
-
       this.viewer = this.props.viewer;
       this.threeCanvas = document.createElement('div');
       this.threeCanvas.id = 'three-canvas-' + this.props.relightThreeCanvasID; // this needs to be unique
@@ -637,9 +727,16 @@ class Relight extends React.Component {
           this.canvasId
         );
 
+        // disable click to zoom
+        //this.props.viewer.zoomPerClick = 1;
+        // disable mouseNav
+
+        //this.props.viewer.set;
+
         // add a rotate event handler
         this.props.viewer.addHandler('rotate', (event) => {
           this.rotation = event.degrees;
+          this.threeCanvasProps.rotation = this.rotation;
         });
 
         // add a flip event handler
@@ -659,7 +756,6 @@ class Relight extends React.Component {
             excluded_maps,
             this.canvasId
           );
-          this.generateMapData();
           this.visible = false;
           this.setState({ active: false });
           // remove all handlers so viewport-change isn't activated!
@@ -698,12 +794,25 @@ class Relight extends React.Component {
         });
       }
     }
+    const osdCanvasBounds = document.querySelector('.openseadragon-canvas'); //.getBoundingClientRect()
+
+    if (osdCanvasBounds) {
+      this.osdCanvasBoundingClientRect =
+        osdCanvasBounds.getBoundingClientRect();
+      // draggableWidth bound will change depending on if the sidebar is open...
+      this.draggableWidth = this.props.state.windows[this.props.windowId]
+        .sideBarOpen
+        ? this.osdCanvasBoundingClientRect.width - 45 // 48 + 24
+        : this.osdCanvasBoundingClientRect.width - 16;
+      this.draggableHeight = this.osdCanvasBoundingClientRect.height - 142; // might need to figure out how to exactly calculate these offsets
+    }
 
     let toolMenu = null;
     let toolMenuLightControls = null;
     let toolMenuLightButtons = null;
     let toolMenuMaterialControls = null;
     let toolMenuSliders = null;
+    let toolMenuLayersMenu = null;
     let toolMenuLightControlsAmbientIntensity;
 
     if (this.renderMode) {
@@ -719,6 +828,24 @@ class Relight extends React.Component {
       );
     } else {
       toolMenuLightControlsAmbientIntensity = null;
+    }
+
+    if (this.state.layersOpen) {
+      toolMenuLayersMenu = (
+        <>
+          <RelightLayersMenu
+            id={this.props.relightLayersMenuID}
+            choices={this.props.canvas.iiifImageResources}
+            windowId={this.props.windowId}
+            canvasId={this.canvasId}
+            updateLayers={this.props.updateLayers}
+            state={this.props.state}
+            canvas={this.props.canvas}
+          />
+        </>
+      );
+    } else {
+      toolMenuLayersMenu = null;
     }
 
     if (this.state.active) {
@@ -737,10 +864,27 @@ class Relight extends React.Component {
             mode={this.renderMode}
             onClick={() => this.renderHandler()}
           />
+          <RelightHelpButton
+            id={this.props.relightHelpButtonID}
+            onClick={() => this.helpOpenHandler()}
+          />
+          <RelightHelpDialog
+            id={this.props.relightHelpDialogID}
+            helpOn={this.state.helpOn}
+            onClose={() => this.helpCloseHandler()}
+          />
           <RelightExpandSlidersButton
             drawerOpen={this.state.drawerOpen}
-            aspect={this.aspect}
             onClick={() => this.drawerHandler()}
+          />
+          <RelightDraggableLightButton
+            threeCanvasId={this.threeCanvas.id}
+            onDrag={(event) => this.onDraggableLightButtonDragHandler(event)}
+            onStop={() => this.onDraggableLightButtonStopHandler()}
+            onMouseOver={() => this.onDraggableLightButtonMouseOverHandler()}
+            onMouseLeave={() => this.onDraggableLightButtonMouseLeaveHandler()}
+            isDragging={this.state.isDragging}
+            isOver={this.state.isOver}
           />
         </RelightLightButtons>
       );
@@ -781,19 +925,8 @@ class Relight extends React.Component {
         );
       }
       if (this.state.drawerOpen) {
-        let sliderStyle = {
-          textAlign: 'center',
-        };
-
-        if (this.aspect === 'landscape') {
-          sliderStyle = {
-            textAlign: 'center',
-            marginRight: '13px',
-          };
-        }
-
         toolMenuSliders = (
-          <div style={sliderStyle}>
+          <div className="relightLightSliders">
             <RelightDirectionalLightIntensity
               id={this.props.relightDirectionalLightIntensityID}
               tooltipTitle={
@@ -823,46 +956,65 @@ class Relight extends React.Component {
       }
 
       toolMenuLightControls = (
-        <RelightLightControls aspect={this.aspect}>
-          <div
-            style={{
-              maxWidth: 'fit-content',
-              marginInline: 'auto',
-            }}
+        <>
+          <RelightLightDirection
+            id={this.props.relightLightDirectionID}
+            tooltipTitle={
+              'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
+            }
+            moveX={this.moveX}
+            moveY={this.moveY}
+            mouseX={this.mouseX} // mouseX isn't a part of this.state.threeCanvasProps...
+            mouseY={this.mouseY} // mouseY isn't a part of this.state.threeCanvasProps...
+            flipped={this.state.flipped}
+            onMouseMove={(event) =>
+              this.onMouseMove(
+                event,
+                this.props.relightLightDirectionID,
+                this.rotation
+              )
+            }
+            onMouseDown={(event) => this.onMouseDown(event)}
+            onMouseUp={(event) => this.onMouseUp(event)}
+            onMouseLeave={(event) => this.onMouseLeave(event)}
+            onTouchMove={(event) =>
+              this.onMouseMove(
+                event,
+                this.props.relightLightDirectionID,
+                this.rotation
+              )
+            }
+            rotation={this.rotation}
           >
-            <RelightLightDirection
-              id={this.props.relightLightDirectionID}
-              aspect={this.aspect}
-              tooltipTitle={
-                'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
-              }
-              moveX={this.moveX}
-              moveY={this.moveY}
-              mouseX={this.mouseX} // mouseX isn't a part of this.state.threeCanvasProps...
-              mouseY={this.mouseY} // mouseY isn't a part of this.state.threeCanvasProps...
-              flipped={this.state.flipped}
-              onMouseMove={(event) =>
-                this.onMouseMove(
-                  event,
-                  this.props.relightLightDirectionID,
-                  this.rotation
-                )
-              }
-              onMouseDown={(event) => this.onMouseDown(event)}
-              onMouseUp={(event) => this.onMouseUp(event)}
-              onMouseLeave={(event) => this.onMouseLeave(event)}
-              onTouchMove={(event) =>
-                this.onMouseMove(
-                  event,
-                  this.props.relightLightDirectionID,
-                  this.rotation
-                )
-              }
-              rotation={this.rotation}
+            {toolMenuSliders}
+          </RelightLightDirection>
+          {toolMenuLightButtons}
+        </>
+      );
+    } else if (this.state.layersOpen) {
+      toolMenuLightControls = (
+        <>
+          {toolMenuLayersMenu}
+          <div className="relightLayersMenuHelp">
+            <RelightHelpButton
+              id={this.props.relightHelpButtonID}
+              onClick={() => this.helpOpenHandler()}
+            />
+            <RelightHelpDialog
+              id={this.props.relightHelpDialogID}
+              helpOn={this.state.helpOn}
+              onClose={() => this.helpCloseHandler()}
+            />
+            <RelightDownloadCurrentLayerButton
+              id={this.props.relightDownloadCurrentLayerButtonID}
+              choices={this.props.canvas.iiifImageResources}
+              manifestTitle={this.props.manifestTitle}
+              state={this.props.state}
+              windowId={this.props.windowId}
+              canvasId={this.canvasId}
             />
           </div>
-          {toolMenuSliders}
-        </RelightLightControls>
+        </>
       );
     }
 
@@ -873,7 +1025,10 @@ class Relight extends React.Component {
           visible={this.visible}
           sideBarOpen={this.props.window.sideBarOpen}
         >
-          <RelightMenuButtons id={this.props.relightMenuButtonsID}>
+          <RelightMenuButtons
+            id={this.props.relightMenuButtonsID}
+            active={this.state.active}
+          >
             <RelightMenuButton
               onClick={() => this.menuHandler()}
               open={this.state.open}
@@ -883,18 +1038,21 @@ class Relight extends React.Component {
               onClick={() => this.torchHandler()}
               active={this.state.active}
             />
-            {/*<RelightAnnotationButton*/}
-            {/*  id={this.props.relightAnnotationButtonID}*/}
-            {/*  onClick={() => this.annotationsHandler()}*/}
-            {/*  active={this.annotationsOn}*/}
-            {/*/>*/}
-            <RelightCycleDefaultLayer
-              id={this.props.relightCycleDefaultLayerID}
+            <RelightLayersMenuButton
+              id={this.props.relightLayersMenuButtonID}
               onClick={() => this.defaultLayerHandler()}
               active={this.state.active}
+              layersOpen={this.state.layersOpen}
             />
+            <RelightSnapshotButton
+              id={this.props.relightSnapshotButtonID}
+              onClick={() =>
+                this.snapshotButtonHandler(this.props.manifestTitle)
+              }
+              active={this.state.active}
+            />
+            <div className="relightLabel">2.5D</div>
           </RelightMenuButtons>
-          {toolMenuLightButtons}
           {toolMenuLightControls}
         </RelightToolMenu>
       );
@@ -914,8 +1072,18 @@ class Relight extends React.Component {
     } else if (!this.visible) {
       toolMenu = null;
     }
-
-    return <>{toolMenu}</>;
+    return (
+      <>
+        {toolMenu}
+        <div
+          className="draggable-container"
+          style={{
+            height: this.draggableHeight ? this.draggableHeight + 'px' : 0,
+            width: this.draggableWidth ? this.draggableWidth + 'px' : 0,
+          }}
+        ></div>
+      </>
+    );
   }
 }
 
@@ -954,14 +1122,26 @@ Relight.propTypes = {
   relightNormalDepthID: PropTypes.string,
   /** The relightToolMenuID prop is the ID for the control **/
   relightToolMenuID: PropTypes.string,
-  /** The relightMenuButtonID prop is the ID for the control **/
+  /** The relightMenuButtonsID prop is the ID for the control **/
   relightMenuButtonsID: PropTypes.string,
   /** The relightTorchButtonID prop is the ID for the control **/
   relightTorchButtonID: PropTypes.string,
   /** The relightAnnotationButtonID prop is the ID for the control **/
   relightAnnotationButtonID: PropTypes.string,
-  /** The relightCycleDefaultLayerID prop is the ID for the control **/
-  relightCycleDefaultLayerID: PropTypes.string,
+  /** The relightLayersMenuID prop is the ID for the control **/
+  relightLayersMenuID: PropTypes.string,
+  /** The relightLayersMenuButtonID prop is the ID for the control **/
+  relightLayersMenuButtonID: PropTypes.string,
+  /** The relightSnapshotButtonID prop is the ID for the control **/
+  relightSnapshotButtonID: PropTypes.string,
+  /** The relightHelpButtonID prop is the ID for the control **/
+  relightHelpButtonID: PropTypes.string,
+  /** The relightHelpDialogID prop is the ID for the control **/
+  relightHelpDialogID: PropTypes.string,
+  /** The relightDownloadCurrentLayerButtonID prop is the ID for the control **/
+  relightDownloadCurrentLayerButtonID: PropTypes.string,
+  /** The manifestTitle prop is the title of the manifest loaded into the current Mirador window instance **/
+  manifestTitle: PropTypes.string,
 };
 
 export default Relight;

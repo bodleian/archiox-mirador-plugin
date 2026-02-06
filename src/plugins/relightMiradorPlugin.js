@@ -1,5 +1,8 @@
 import Relight from './Relight';
-import { getCurrentCanvas } from 'mirador/dist/es/src/state/selectors';
+import {
+  getCurrentCanvas,
+  getManifestTitle,
+} from 'mirador/dist/es/src/state/selectors';
 import { getWindow } from 'mirador/dist/es/src/state/selectors';
 import * as actions from 'mirador/dist/es/src/state/actions';
 import { rootSaga } from './state/sagas';
@@ -24,10 +27,16 @@ export default [
         relightNormalDepthID: uuidv4(),
         relightToolMenuID: uuidv4(),
         relightMenuButtonsID: uuidv4(),
+        relightSnapShotButtonID: uuidv4(),
         relightTorchButtonID: uuidv4(),
+        relightHelpButtonID: uuidv4(),
         relightAnnotationButtonID: uuidv4(),
-        relightCycleDefaultLayerID: uuidv4(),
+        relightLayersMenuID: uuidv4(),
+        relightLayersMenuButtonID: uuidv4(),
+        relightHelpDialogId: uuidv4(),
+        relightDownloadCurrentLayerButtonId: uuidv4(),
         canvas: getCurrentCanvas(state, { windowId }),
+        manifestTitle: getManifestTitle(state, { windowId }),
         window: getWindow(state, _ref),
         state: state,
       };
