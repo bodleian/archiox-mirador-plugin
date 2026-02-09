@@ -53,6 +53,8 @@ class Relight extends React.Component {
       layersOpen: false,
       isOver: false,
       isDragging: false,
+      showRelightDraggableLightButton:
+        this.props.window.showRelightDraggableLightButton || false,
     };
     this.threeCanvasProps = {};
     this.mouseDown = false;
@@ -885,6 +887,7 @@ class Relight extends React.Component {
             onMouseLeave={() => this.onDraggableLightButtonMouseLeaveHandler()}
             isDragging={this.state.isDragging}
             isOver={this.state.isOver}
+            isVisible={this.state.showRelightDraggableLightButton}
           />
         </RelightLightButtons>
       );
@@ -1142,6 +1145,8 @@ Relight.propTypes = {
   relightDownloadCurrentLayerButtonID: PropTypes.string,
   /** The manifestTitle prop is the title of the manifest loaded into the current Mirador window instance **/
   manifestTitle: PropTypes.string,
+  /** The showRelightDraggableLightButton prop controls if RelightDraggableLightButton is visible or not **/
+  showRelightDraggableLightButton: PropTypes.bool,
 };
 
 export default Relight;
