@@ -28,6 +28,12 @@
                     archioxPluginOpen: true,
                     showRelightDraggableLightButton: true,
                     manifestId: 'https://iiif.bodleian.ox.ac.uk/iiif/manifest/e18c7f45-8b8c-4ec2-9330-f96f6f1b500c.json'
+                    views:  [
+                        { key: 'single', behaviors: ['individuals', 'paged'] },
+                        { key: 'book', behaviors: ['individuals', 'paged'] },
+                        { key: 'scroll', behaviors: ['continuous'] },
+                        { key: 'gallery' },
+                     ],
                 }],
                 requests: {
                     // Manipulate IIIF HTTP requests (info.json, IIIF presentation manifests, annotations, etc) to add an Accept header so we use our v3 manifests
