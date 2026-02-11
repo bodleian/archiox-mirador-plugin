@@ -260,7 +260,13 @@ export function getRendererInstructions(props) {
     rendererInstructions.intersection = intersection;
     return rendererInstructions;
   }
-  rendererInstructions.intersection = { "x": 0, "y": 0, "width": 0, "height": 0, "degress": 0 }
+  rendererInstructions.intersection = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    degress: 0,
+  };
   return rendererInstructions;
 }
 
