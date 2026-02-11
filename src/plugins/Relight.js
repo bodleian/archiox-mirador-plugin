@@ -490,7 +490,6 @@ class Relight extends React.Component {
    **/
   renderHandler() {
     this.renderMode = !this.renderMode;
-    this.resetHandler(this.props.relightLightDirectionID);
     this.updateOverlay();
   }
 
