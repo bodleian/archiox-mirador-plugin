@@ -32,7 +32,7 @@ class RelightDraggableLightButton extends Component {
           >
             <Tooltip
               open={isDragging || !isOver ? false : true}
-              title={'Drag this button to move the directional light around'}
+              title={'Move directional light torch'}
             >
               <div className="draggable-torch-button">
                 <HighLightOutlined />

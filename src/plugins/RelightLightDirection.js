@@ -151,7 +151,7 @@ class RelightLightDirection extends React.Component {
                   borderRadius: '50px',
                   background: this.state.calculatedBackgroundStyle,
                 }}
-                aria-label="Change light direction"
+                aria-label="Move directional light trackball"
                 aria-expanded="False"
                 onMouseMove={onMouseMove}
                 onMouseDown={onMouseDown}

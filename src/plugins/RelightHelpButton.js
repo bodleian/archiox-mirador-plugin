@@ -17,7 +17,7 @@ class RelightHelpButton extends React.Component {
       <MiradorMenuButton
         id={id}
         aria-label={
-          'Click here to open up a dialog box providing in-detail guidance on using this tool'
+          'Help'
         }
         onClick={onClick}
       >

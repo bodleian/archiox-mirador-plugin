@@ -21,10 +21,8 @@ class RelightExpandSlidersButton extends React.Component {
         <MiradorMenuButton
           aria-label={
             drawerOpen
-              ? 'Collapse relighting shader control sliders'
-              : 'Expand shader control sliders to take control of the light levels and shading parameters. ' +
-                'You can control light intensity, metalness, roughness, and normal depth here; there is a ' +
-                'description of what each one does on the relevant slider, just hover over it and see.'
+              ? 'Collapse relighting sliders'
+              : 'Expand relighting sliders'
           }
           onClick={onClick}
         >

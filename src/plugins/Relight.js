@@ -821,7 +821,7 @@ class Relight extends React.Component {
         <RelightAmbientLightIntensity
           id={this.props.relightAmbientLightIntensityID}
           tooltipTitle={
-            'Change the ambient light intensity (the incidental light): increasing this can help you to see the colours of the object more clearly'
+            'Change ambient light intensity'
           }
           intensity={this.state.threeCanvasProps.ambientIntensity}
           onChange={(event, value) => this.onAmbientLightChange(event, value)}
@@ -897,7 +897,7 @@ class Relight extends React.Component {
             <RelightRoughnessIntensity
               id={this.props.relightRoughnessIntensityID}
               tooltipTitle={
-                'Change material roughness: change the roughness to model how polished the material is, glass is highly polished (low roughness) and a corroded piece of metal is not (high roughness).'
+                'Change object roughness'
               }
               intensity={this.state.threeCanvasProps.roughness}
               onChange={(event, value) => this.onRoughnessChange(event, value)}
@@ -905,7 +905,7 @@ class Relight extends React.Component {
             <RelightMetalnessIntensity
               id={this.props.relightMetalnessIntensityID}
               tooltipTitle={
-                'Change material metalness: change the metalness to model how metalic the material is, generally a metal has a metalness of 1, however I highly corroded metal and a none metal would have a metalness of 0.'
+                'Change object metalness'
               }
               intensity={this.state.threeCanvasProps.metalness}
               onChange={(event, value) => this.onMetalnessChange(event, value)}
@@ -918,7 +918,7 @@ class Relight extends React.Component {
             <RelightShininessIntensity
               id={this.props.relightShininessIntensityID}
               tooltipTitle={
-                'Change the shininess of the object: increasing this can enhance the reflective highlights to bring out more features'
+                'Change object shininess'
               }
               intensity={this.state.threeCanvasProps.shininess}
               onChange={(event, value) => this.onShininessChange(event, value)}
@@ -932,7 +932,7 @@ class Relight extends React.Component {
             <RelightDirectionalLightIntensity
               id={this.props.relightDirectionalLightIntensityID}
               tooltipTitle={
-                'Change the directional light intensity (the torch): decreasing this can help you to see more features if the light is over saturated'
+                'Change directional light intensity'
               }
               intensity={this.state.threeCanvasProps.directionalIntensity}
               onChange={(event, value) =>
@@ -943,7 +943,7 @@ class Relight extends React.Component {
             <RelightNormalDepth
               id={this.props.relightNormalDepthID}
               tooltipTitle={
-                'Change normal map depth: increasing this exagerates the depth of the details helping to bring out more features'
+                'Change normal depth'
               }
               normalDepth={this.state.threeCanvasProps.normalDepth}
               onChange={(event, value) =>
@@ -962,7 +962,7 @@ class Relight extends React.Component {
           <RelightLightDirection
             id={this.props.relightLightDirectionID}
             tooltipTitle={
-              'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
+              'Move directional light trackball'
             }
             moveX={this.moveX}
             moveY={this.moveY}

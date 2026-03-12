@@ -1,6 +1,6 @@
 import React from 'react';
 import LocalMoviesIcon from '@material-ui/icons/LocalMovies';
-import FlareIcon from '@material-ui/icons/Flare';
+import BrightnessHigh from '@material-ui/icons/BrightnessHigh';
 import PropTypes from 'prop-types';
 import { MiradorMenuButton } from 'mirador/dist/es/src/components/MiradorMenuButton';
 
@@ -19,8 +19,8 @@ class RelightRenderMode extends React.Component {
       <MiradorMenuButton
         aria-label={
           mode
-            ? 'Render using specular enhancement to make the highlights really pop out'
-            : 'Render using physically based renderer (PBR) for a realistic digital fascimile'
+            ? 'Specular enhancement mode'
+            : 'Physically based rendering mode'
         }
         style={{
           clear: 'both',
@@ -28,7 +28,7 @@ class RelightRenderMode extends React.Component {
         }}
         onClick={onClick}
       >
-        {mode ? <FlareIcon /> : <LocalMoviesIcon />}
+        {mode ? <BrightnessHigh /> : <LocalMoviesIcon />}
       </MiradorMenuButton>
     );
   }

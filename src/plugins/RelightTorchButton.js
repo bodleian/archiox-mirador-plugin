@@ -21,8 +21,8 @@ class RelightTorchButton extends React.Component {
           id={id}
           aria-label={
             active
-              ? 'Turn off the 3D overlay to return to the default Mirador view'
-              : 'Turn on the 3D overlay to relight this object virtually'
+              ? 'Deactivate 3D overlay'
+              : 'Activate 3D overlay'
           }
           style={{
             backgroundColor: active ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0)',
