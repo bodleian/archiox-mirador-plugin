@@ -16,7 +16,7 @@ to artificially exaggerate shadows and highlights and even take screenshots of w
 to share with collegues in active research of objects after scanning.
 
 # Table of Contents
-- [Installation Instructions](#installation-instructions)
+- [Installation Instructions](#installation)
 - [Usage](#usage)
 - [Key Features](#key-features)
 - [Contributing](#contributing)
