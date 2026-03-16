@@ -376,26 +376,36 @@ This tells OpenSeadragon to load images with the `crossOrigin="anonymous"` attri
 You can play around with our current implementation [here](https://iiif.bodleian.ox.ac.uk/iiif/mirador/?iiif-content=https://iiif.bodleian.ox.ac.uk/iiif/manifest/1fc3f35d-bbb5-4524-8fbe-a5bcb5468be2.json)
 
 1.  When Mirador first opens you'll see our plug-in user interface open by default on the top left of the OpenSeadragon viewport. The following options are available in this initial state, capture render snapshot is disabled until the 3D overlay is activated:
-    - <img src="./public/icons/close_sharp.svg" width="24" style="vertical-align: middle;" alt="Close Sharp Icon" />|<img src="./public/icons/build_outline.svg" width="24" style="vertical-align: middle;" alt="Build outline icon"/> Collapse/Expand rendering toolbar
-      - This button simply expands or collapses the main plugin toolbar.
-    - <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" alt="Highlight outline icon"/>|<img src="./public/icons/highlight_baseline.svg" width="24" style="vertical-align: middle;" alt="Highlight baseline icon"/> Activate 3D overlay/Deactivate 3D overlay
-      - This button activates or deactivates a WebGL 3D renderer overlay positioned over the object in the OpenSeadragon viewport that relights the object using normal and albedo map data.
-    - <img src="./public/icons/collections_outline.svg" width="24" style="vertical-align: middle;" /> Select active layer
-      - This button opens up a submenu allowing the user to choose which layer in the IIIF choices stack is currently active. 
- 
+    - <img src="./public/icons/close_sharp.svg" width="24" style="vertical-align: middle;" alt="Close Sharp svg Icon" />|<img src="./public/icons/build_outline.svg" width="24" style="vertical-align: middle;" alt="Build outline svg icon"/> Collapse/Expand rendering toolbar
+      >This button simply expands or collapses the main plugin toolbar.
+    - <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" alt="Highlight outline svg icon"/>|<img src="./public/icons/highlight_baseline.svg" width="24" style="vertical-align: middle;" alt="Highlight baseline icon"/> Activate 3D overlay/Deactivate 3D overlay
+      >This button activates or deactivates a WebGL 3D renderer overlay positioned over the object in the OpenSeadragon viewport that relights the object using normal and albedo map data.
+    - <img src="./public/icons/collections_outline.svg" width="24" style="vertical-align: middle;" alt="Collections outline svg icon"/> Select active layer
+      >This button opens up a submenu allowing the user to choose which layer in the IIIF choices stack is currently active via image thumbnail buttons. 
     
-2.  To start rendering the Mirador object in three dimensions, press the <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" /> `Activate 3D overlay` button. A 3D overlay will be superimposed over the object in the OpenSeadragon viewport and the toolbar will expand downwards with the following extra options:
-    - <img src="./public/icons/control_camera_baseline.svg" width="24" style="vertical-align: middle;" /> Move directional light trackball
-    - <img src="./public/icons/highlight_baseline.svg" width="24" style="vertical-align: middle;" /> Move directional light torch
-    - <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" /> Change directional light intensity
-    - <img src="./public/icons/wb_incandescent_outline.svg" width="24" style="vertical-align: middle;" /> Change ambient light intensity
-    - <img src="./public/icons/height_baseline.svg" width="24" style="vertical-align: middle;" /> Change normal depth
-    - <img src="./public/icons/waves_baseline.svg" width="24" style="vertical-align: middle;" /> Change object roughness 
-    - <img src="./public/icons/flare_baseline.svg" width="24" style="vertical-align: middle;" /> Change object metalness
-    - <img src="./public/icons/replay_sharp.svg" width="24" style="vertical-align: middle;" /> Reset all light settings 
-    - <img src="./public/icons/assistant_outline.svg" width="24" style="vertical-align: middle;" /> Turn on directional light helper
-    - <img src="./public/icons/brightness_full_baseline.svg" width="24" style="vertical-align: middle;" />|<img src="./public/icons/localmovies_baseline.svg" width="24" style="vertical-align: middle;" /> Render using specular enhancement/Render using physically based rendering 
-    - <img src="./public/icons/help_outline.svg" width="24" style="vertical-align: middle;" /> Click here to get help
+2.  When the 3D overlay is active, after pressing the <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" /> `Activate 3D overlay` button. A 3D overlay will be superimposed over the object in the OpenSeadragon viewport and the toolbar will expand downwards with the following extra options:
+    - <img src="./public/icons/control_camera_baseline.svg" width="24" style="vertical-align: middle;" alt="Control camera baseline svg icon"/> Move directional light trackball
+      >This icon appears below a circular polar angle control that will move the directional lighting in the 3D overlay when the user clicks and drags the mouse cursor over it.  The coordinates in this control map to a hemisphere in the 3D overlay, i.e. if one moves the light direction to the centre, the light will be at the "zenith" (altitude of 90 deg directly above the object) and moving it to the far right in the middle it will be at an altitude of 0 deg at an azimuth of 90 deg.
+    - <img src="./public/icons/highlight_baseline.svg" width="24" style="vertical-align: middle;" alt="Highlight baseline svg icon"/> Move directional light torch
+      >This draggable button is an alternative to the circular polar angle control allowing the user to map the directional light movement to the confines of the OpenSeadragon view port instead of the smaller control, this might be easier for certain people to use than the other method, and it works in a similar way.
+    - <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" alt="Highlight outline svg icon" /> Change directional light intensity
+      >This icon appears below a slider control that allows the user to increase or decrease the intensity of the directional light sourc; this can be helpful in exaggerating or attenuating shadows and highlights.
+    - <img src="./public/icons/wb_incandescent_outline.svg" width="24" style="vertical-align: middle;" alt="Wb incandescent outline svg icon" /> Change ambient light intensity
+      >This icon appear below a slider control that allows the user to increase or decrease the incidental light source of the scene i.e. the light coming from the "environment" and not the torch.
+    - <img src="./public/icons/height_baseline.svg" width="24" style="vertical-align: middle;" alt="Height baseline svg icon" /> Change normal depth
+      >This icon appears below a slider control that allows the user to increase or decrease the normal depth of the object; what this means is that the depth of the surface details can be artificially increased or flattened to the baseline data, this is especially useful for objects with very shallow details such as paper block prints.
+    - <img src="./public/icons/waves_baseline.svg" width="24" style="vertical-align: middle;" alt="Waves baseline svg icon" /> Change object roughness 
+      >This icon appears below a slider control that allows the user to increase or decrease the roughness value of the default physically based rendering (PBR) shader we use to blend our textures into a realistic rendering of the object in the 3D overlay. Paper and matte objects have medium to high roughness values, i.e. the higher the roughness the less light will be reflected by the object, conversely a polished object will have a low roughness value.  This control allows the user to adjust this value to optimise their viewing experience depending on the materials the object is composed of.
+    - <img src="./public/icons/flare_baseline.svg" width="24" style="vertical-align: middle;" alt="Flare baseline svg icon" /> Change object metalness
+      >This icon appears below a slider control that allows the user to increase or dcrease the metalness value of the default physically based rendering (PBR) shader we use to blend our textures into a realistic rendering of the object in the 3D overlay.  Metal materials have a metalness value of 1 and non-metal materials (dielectric) have a metalness value of 0.  If the object is meant to be metallic, set the metalness value to 1, otherwise set it to 0. 
+    - <img src="./public/icons/replay_sharp.svg" width="24" style="vertical-align: middle;" alt="Replay sharp svg icon" /> Reset all light settings 
+      >This button will reset all changed lighting settings, including light direction to the default values for the shader selected.
+    - <img src="./public/icons/assistant_outline.svg" width="24" style="vertical-align: middle;" alt="Assistant outline svg icon" /> Turn on directional light helper
+      >This button will add a visual helper to the directional light so that you can see where the directional light is currently pointing to.  The white dot is the focal point of the light, and the blue square the direction the light is coming from.
+    - <img src="./public/icons/brightness_full_baseline.svg" width="24" style="vertical-align: middle;" alt="Brightness full baseline svg icon" />|<img src="./public/icons/localmovies_baseline.svg" width="24" style="vertical-align: middle;" alt="Local movies baseline svg icon" /> Render using specular enhancement/Render using physically based rendering 
+      >This button will toggle between two different shaders, physically based rendering and specular enhancement. The first will try to render a lifelike digital facsimile of the object as it would appear in real life and specular enhancement is a monochrome representation designed to exaggerate highlights and shadows allowing the user to see potentially hidden details better.
+    - <img src="./public/icons/help_outline.svg" width="24" style="vertical-align: middle;" alt="Help outline svg icon" /> Click here to get help
+      >This button will toggle the appearance of a dialogue box containing a version of the helptext above.
     
 # Key Features
 
