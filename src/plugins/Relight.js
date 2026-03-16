@@ -490,6 +490,13 @@ class Relight extends React.Component {
    **/
   renderHandler() {
     this.renderMode = !this.renderMode;
+
+    if (!this.renderMode) {
+      this.normalDepth = 10.0;
+    } else {
+      this.normalDepth = 1.0;
+    }
+
     this.updateOverlay();
   }
 
