@@ -388,7 +388,7 @@ You can play around with our current implementation [here](https://iiif.bodleian
     - <img src="./public/icons/highlight_baseline.svg" width="24" style="vertical-align: middle;" alt="Highlight baseline svg icon"/> Move directional light torch
       >This draggable button is an alternative to the circular polar angle control allowing the user to map the directional light movement to the confines of the OpenSeadragon view port instead of the smaller control, this might be easier for certain people to use than the other method, and it works in a similar way.
     - <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" alt="Highlight outline svg icon" /> Change directional light intensity
-      >This icon appears below a slider control that allows the user to increase or decrease the intensity of the directional light sourc; this can be helpful in exaggerating or attenuating shadows and highlights.
+      >This icon appears below a slider control that allows the user to increase or decrease the intensity of the directional light source; this can be helpful in exaggerating or attenuating shadows and highlights.
     - <img src="./public/icons/wb_incandescent_outline.svg" width="24" style="vertical-align: middle;" alt="Wb incandescent outline svg icon" /> Change ambient light intensity
       >This icon appear below a slider control that allows the user to increase or decrease the incidental light source of the scene i.e. the light coming from the "environment" and not the torch.
     - <img src="./public/icons/height_baseline.svg" width="24" style="vertical-align: middle;" alt="Height baseline svg icon" /> Change normal depth
