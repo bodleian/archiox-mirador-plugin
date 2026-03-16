@@ -16,13 +16,13 @@ to artificially exaggerate shadows and highlights and even take screenshots of w
 to share with collegues in active research of objects after scanning.
 
 # Table of Contents
-[Installation Instructions](#installation-instructions)
-[Usage](#usage)
-[Key Features](#key-features)
-[Contributing](#contributing)
-[License](#license)
-[Contact Information](#contact-information)
-[Acknowledgements](#acknoledgements)
+- [Installation Instructions](#installation-instructions)
+- [Usage](#usage)
+- [Key Features](#key-features)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact Information](#contact-information)
+- [Acknowledgements](#acknoledgements)
 
 # Installation
 
