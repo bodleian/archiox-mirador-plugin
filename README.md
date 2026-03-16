@@ -151,8 +151,7 @@ responses, like as follows, you may also need to set extra formats:
 
 ## Building Mirador with the plug-in
 
-To build and minify your own copy of Mirador with the plug-in installed, start a new project and install at least `node.js` version 22.  
-You can copy the .nvmrc config from this repo into the new project.
+To build and minify your own copy of Mirador with the plug-in installed, start a new project and install at least `node.js` version 22. You can copy the .nvmrc config from this repo into the new project.
 
 Then first install the plug-in by running the following command:
 
