@@ -18,9 +18,7 @@ class RelightRenderMode extends React.Component {
     return (
       <MiradorMenuButton
         aria-label={
-          mode
-            ? 'Specular enhancement mode'
-            : 'Physically based rendering mode'
+          mode ? 'Specular enhancement mode' : 'Physically based rendering mode'
         }
         style={{
           clear: 'both',

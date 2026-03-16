@@ -484,8 +484,7 @@ class Relight extends React.Component {
   }
 
   /**
-   * The renderHandler method when called will toggle the boolean value of this.renderMode, trigger the resetHandler
-   * method causing the UI settings to reset and cause an update of the OSD overlay.  The renderMode boolean value
+   * The renderHandler method when called will toggle the boolean value of this.renderMode. The renderMode boolean value
    * controls what material the three.js canvas overlay is currently using.
    **/
   renderHandler() {
@@ -827,9 +826,7 @@ class Relight extends React.Component {
       toolMenuLightControlsAmbientIntensity = (
         <RelightAmbientLightIntensity
           id={this.props.relightAmbientLightIntensityID}
-          tooltipTitle={
-            'Change ambient light intensity'
-          }
+          tooltipTitle={'Change ambient light intensity'}
           intensity={this.state.threeCanvasProps.ambientIntensity}
           onChange={(event, value) => this.onAmbientLightChange(event, value)}
         />
@@ -903,17 +900,13 @@ class Relight extends React.Component {
           <>
             <RelightRoughnessIntensity
               id={this.props.relightRoughnessIntensityID}
-              tooltipTitle={
-                'Change object roughness'
-              }
+              tooltipTitle={'Change object roughness'}
               intensity={this.state.threeCanvasProps.roughness}
               onChange={(event, value) => this.onRoughnessChange(event, value)}
             />
             <RelightMetalnessIntensity
               id={this.props.relightMetalnessIntensityID}
-              tooltipTitle={
-                'Change object metalness'
-              }
+              tooltipTitle={'Change object metalness'}
               intensity={this.state.threeCanvasProps.metalness}
               onChange={(event, value) => this.onMetalnessChange(event, value)}
             />
@@ -924,9 +917,7 @@ class Relight extends React.Component {
           <>
             <RelightShininessIntensity
               id={this.props.relightShininessIntensityID}
-              tooltipTitle={
-                'Change object shininess'
-              }
+              tooltipTitle={'Change object shininess'}
               intensity={this.state.threeCanvasProps.shininess}
               onChange={(event, value) => this.onShininessChange(event, value)}
             />
@@ -938,9 +929,7 @@ class Relight extends React.Component {
           <div className="relightLightSliders">
             <RelightDirectionalLightIntensity
               id={this.props.relightDirectionalLightIntensityID}
-              tooltipTitle={
-                'Change directional light intensity'
-              }
+              tooltipTitle={'Change directional light intensity'}
               intensity={this.state.threeCanvasProps.directionalIntensity}
               onChange={(event, value) =>
                 this.onDirectionalLightChange(event, value)
@@ -949,10 +938,8 @@ class Relight extends React.Component {
             {toolMenuLightControlsAmbientIntensity}
             <RelightNormalDepth
               id={this.props.relightNormalDepthID}
-              tooltipTitle={
-                'Change normal depth'
-              }
-              normalDepth={this.state.threeCanvasProps.normalDepth}
+              tooltipTitle={'Change normal depth'}
+              normalDepth={this.normalDepth}
               onChange={(event, value) =>
                 this.onNormalDepthChange(event, value)
               }
@@ -968,9 +955,7 @@ class Relight extends React.Component {
         <>
           <RelightLightDirection
             id={this.props.relightLightDirectionID}
-            tooltipTitle={
-              'Move directional light trackball'
-            }
+            tooltipTitle={'Move directional light trackball'}
             moveX={this.moveX}
             moveY={this.moveY}
             mouseX={this.mouseX} // mouseX isn't a part of this.state.threeCanvasProps...

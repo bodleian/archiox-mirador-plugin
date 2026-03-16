@@ -19,11 +19,7 @@ class RelightTorchButton extends React.Component {
       <div className="relightMenuButton">
         <MiradorMenuButton
           id={id}
-          aria-label={
-            active
-              ? 'Deactivate 3D overlay'
-              : 'Activate 3D overlay'
-          }
+          aria-label={active ? 'Deactivate 3D overlay' : 'Activate 3D overlay'}
           style={{
             backgroundColor: active ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0)',
             clear: 'both',
