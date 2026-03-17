@@ -403,7 +403,7 @@ You can play around with our current implementation [here](https://iiif.bodleian
       >This button will add a visual helper to the directional light so that you can see where the directional light is currently pointing to.  The white dot is the focal point of the light, and the blue square the direction the light is coming from.
     - <img src="./public/icons/brightness_full_baseline.svg" width="24" style="vertical-align: middle;" alt="Brightness full baseline svg icon" />|<img src="./public/icons/localmovies_baseline.svg" width="24" style="vertical-align: middle;" alt="Local movies baseline svg icon" /> Render using specular enhancement/Render using physically based rendering 
       >This button will toggle between two different shaders, physically based rendering and specular enhancement. The first will try to render a lifelike digital facsimile of the object as it would appear in real life and specular enhancement is a monochrome representation designed to exaggerate highlights and shadows allowing the user to see potentially hidden details better.
-    - <img src="./public/icons/help_outline.svg" width="24" style="vertical-align: middle;" alt="Help outline svg icon" /> Click here to get help
+    - <img src="./public/icons/help_outline.svg" width="24" style="vertical-align: middle;" alt="Help outline svg icon" /> Help
       >This button will toggle the appearance of a dialogue box containing a version of the helptext above.
     
 # Key Features
