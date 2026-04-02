@@ -24,5 +24,15 @@ export default defineConfig(({ command }) => {
     },
     build: undefined,
     base: './',
+    test: {
+      root: './',
+      environment: 'jsdom',
+      globals: true,
+      css: false,
+      coverage: {
+        reporters: ['html'],
+        include: ['src/**/**/*.js'],
+      },
+    },
   };
 });
