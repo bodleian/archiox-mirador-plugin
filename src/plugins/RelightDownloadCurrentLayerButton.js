@@ -60,7 +60,7 @@ class RelightDownloadCurrentLayerButton extends React.Component {
     return (
       <MiradorMenuButton
         id={id}
-        aria-label={'Download current selected layer'}
+        aria-label={'Download selected layer'}
         onClick={() =>
           this.onClick(state, windowId, canvasId, choices, manifestTitle)
         }

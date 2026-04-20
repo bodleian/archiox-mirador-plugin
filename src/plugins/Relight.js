@@ -484,12 +484,18 @@ class Relight extends React.Component {
   }
 
   /**
-   * The renderHandler method when called will toggle the boolean value of this.renderMode, trigger the resetHandler
-   * method causing the UI settings to reset and cause an update of the OSD overlay.  The renderMode boolean value
+   * The renderHandler method when called will toggle the boolean value of this.renderMode. The renderMode boolean value
    * controls what material the three.js canvas overlay is currently using.
    **/
   renderHandler() {
     this.renderMode = !this.renderMode;
+
+    if (!this.renderMode) {
+      this.normalDepth = 10.0;
+    } else {
+      this.normalDepth = 1.0;
+    }
+
     this.updateOverlay();
   }
 
@@ -820,9 +826,7 @@ class Relight extends React.Component {
       toolMenuLightControlsAmbientIntensity = (
         <RelightAmbientLightIntensity
           id={this.props.relightAmbientLightIntensityID}
-          tooltipTitle={
-            'Change the ambient light intensity (the incidental light): increasing this can help you to see the colours of the object more clearly'
-          }
+          tooltipTitle={'Change ambient light intensity'}
           intensity={this.state.threeCanvasProps.ambientIntensity}
           onChange={(event, value) => this.onAmbientLightChange(event, value)}
         />
@@ -896,17 +900,13 @@ class Relight extends React.Component {
           <>
             <RelightRoughnessIntensity
               id={this.props.relightRoughnessIntensityID}
-              tooltipTitle={
-                'Change material roughness: change the roughness to model how polished the material is, glass is highly polished (low roughness) and a corroded piece of metal is not (high roughness).'
-              }
+              tooltipTitle={'Change object roughness'}
               intensity={this.state.threeCanvasProps.roughness}
               onChange={(event, value) => this.onRoughnessChange(event, value)}
             />
             <RelightMetalnessIntensity
               id={this.props.relightMetalnessIntensityID}
-              tooltipTitle={
-                'Change material metalness: change the metalness to model how metalic the material is, generally a metal has a metalness of 1, however I highly corroded metal and a none metal would have a metalness of 0.'
-              }
+              tooltipTitle={'Change object metalness'}
               intensity={this.state.threeCanvasProps.metalness}
               onChange={(event, value) => this.onMetalnessChange(event, value)}
             />
@@ -917,9 +917,7 @@ class Relight extends React.Component {
           <>
             <RelightShininessIntensity
               id={this.props.relightShininessIntensityID}
-              tooltipTitle={
-                'Change the shininess of the object: increasing this can enhance the reflective highlights to bring out more features'
-              }
+              tooltipTitle={'Change object shininess'}
               intensity={this.state.threeCanvasProps.shininess}
               onChange={(event, value) => this.onShininessChange(event, value)}
             />
@@ -931,9 +929,7 @@ class Relight extends React.Component {
           <div className="relightLightSliders">
             <RelightDirectionalLightIntensity
               id={this.props.relightDirectionalLightIntensityID}
-              tooltipTitle={
-                'Change the directional light intensity (the torch): decreasing this can help you to see more features if the light is over saturated'
-              }
+              tooltipTitle={'Change directional light intensity'}
               intensity={this.state.threeCanvasProps.directionalIntensity}
               onChange={(event, value) =>
                 this.onDirectionalLightChange(event, value)
@@ -942,10 +938,8 @@ class Relight extends React.Component {
             {toolMenuLightControlsAmbientIntensity}
             <RelightNormalDepth
               id={this.props.relightNormalDepthID}
-              tooltipTitle={
-                'Change normal map depth: increasing this exagerates the depth of the details helping to bring out more features'
-              }
-              normalDepth={this.state.threeCanvasProps.normalDepth}
+              tooltipTitle={'Change normal depth'}
+              normalDepth={this.normalDepth}
               onChange={(event, value) =>
                 this.onNormalDepthChange(event, value)
               }
@@ -961,9 +955,7 @@ class Relight extends React.Component {
         <>
           <RelightLightDirection
             id={this.props.relightLightDirectionID}
-            tooltipTitle={
-              'Change the directional light direction by dragging your mouse over this control: more raking light can help to reveal hidden details'
-            }
+            tooltipTitle={'Move directional light trackball'}
             moveX={this.moveX}
             moveY={this.moveY}
             mouseX={this.mouseX} // mouseX isn't a part of this.state.threeCanvasProps...

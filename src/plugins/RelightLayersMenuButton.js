@@ -17,7 +17,7 @@ class RelightLayersMenuButton extends React.Component {
     return (
       <MiradorMenuButton
         id={id}
-        aria-label={'Open the layer selection menu'}
+        aria-label={'Select active layer'}
         style={{
           clear: 'both',
         }}
