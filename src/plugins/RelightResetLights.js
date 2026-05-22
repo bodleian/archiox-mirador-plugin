@@ -16,7 +16,7 @@ class RelightResetLights extends React.Component {
     const { onClick } = this.props;
     return (
       <MiradorMenuButton
-        aria-label={'Reset all lighting settings to the default values'}
+        aria-label={'Reset all lighting settings'}
         style={{
           clear: 'both',
           display: 'block',

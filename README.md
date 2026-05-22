@@ -1,185 +1,162 @@
-# archiox-mirador-plugin
-This is the ARCHiOx Mirador Viewer plug-in, it is designed to be installed as a Mirador viewer plug-in and is not
-a standalone application.
+# Project Title and Description
 
-# Demo
-You can play around with our implementation [here](https://iiif.bodleian.ox.ac.uk/iiif/mirador/?iiif-content=https://iiif.bodleian.ox.ac.uk/iiif/manifest/1fc3f35d-bbb5-4524-8fbe-a5bcb5468be2.json)
+## Title: ARCHiOx Mirador Viewer Plug-in
 
-Look for the torch button in the top left of the viewer window, pressing this will open up our plug-in menu that allows 
-you to render the normal map data alongside the albedo map in realtime in your browser giving the object the illusion of
-3D depth (2.5D) and allowing you to re-light and change the light direction by dragging your mouse cursor over the 
-"sphere" control.  You can also play around with metalness and roughness in `physically based rendering` (PBR) mode, or 
-shininess in `specular enhancement` mode.  The intensity of both directional and ambient light, and the normal depths
-can also be changed using the slider controls to allow you to explore all the details recorded in these special objects.
+## Description:
 
-# Image Formats
+ARCHiOx is a multi year collaborative project between the Bodleian Libraries and Factum Arte, funded by
+the Helen Hamlyn Trust.  Seeking to "see the unseen"; Factum, the Imaging Studio and Digital Collections Discovery team
+have worked together to surface the digital recordings captured using the Selene photometric stereo scanner.
+
+Here we share the code for the IIIF viewer Mirador plug-in that allows users to relight and render these scans in realtime
+in your web browser, allowing users to share interoperable collections of "2.5D" dimensional interactive images.
+
+Being able to relight these images in an interactive way is more than just an engagement exercise, as users are able
+to artificially exaggerate shadows and highlights and even take screenshots of what they are seeing on the digital canvas
+to share with collegues in active research of objects after scanning.
+
+# Table of Contents
+- [Installation](#installation)
+- [Usage](#usage)
+- [Key Features](#key-features)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact Information](#contact-information)
+- [Acknowledgements](#acknoledgements)
+
+# Installation
+
+## Dependencies
+You need at least `node.js` version 22 and a version of `npm` that supports this installed as a minimum.  
+Use of a node version manager such as `nvm` can help you manage this if you need to support multiple node versions
+on your local machine.  The inclusion of a .nvmrc config file in this project means that npm will automatically use
+this node.js version for the project if it is installed.
+
+## IIIF Presentation and Image API Support
+The plug-in depends upon IIIF Presentation version 3 and IIIF Image API version 3 and makes use of a currently unregistered presentation API extension
+that we wrote called LightingMap.
+
+Include the LightingMap context in your IIIF manifest as follows:
+
+```json
+"@context": [
+    "http://iiif.io/api/presentation/3/context.json",
+    "https://iiif.bodleian.ox.ac.uk/contexts/lightingmap/context.json"
+]
+```
+
+As a minimum provide a normal map and a albedo map via IIIF choices as follows, referencing the mapTypes in the LightingMap extension:
+
+```json
+"items": [
+	{
+	  "id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/annotationpage/98adb17b-2b42-4e93-8701-f2ebc10e1018.json",
+	  "type": "AnnotationPage",
+	  "items": [
+		{
+		  "id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/annotation/98adb17b-2b42-4e93-8701-f2ebc10e1018.json",
+		  "type": "Annotation",
+		  "target": "https://iiif-qa.bodleian.ox.ac.uk/iiif/canvas/98adb17b-2b42-4e93-8701-f2ebc10e1018.json",
+		  "body": {
+			"type": "Choice",
+			"items": [
+			  {
+				"id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/image/84487473-e54a-4866-a9d2-ea64b6e3f5ac/full/max/0/default.jpg",
+				"type": "Image",
+				"format": "image/jpeg",
+				"label": {
+				  "en": [
+					"Obverse [albedo]"
+				  ]
+				},
+				"width": 2958,
+				"height": 4056,
+				"service": [
+				  {
+					"@id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/image/84487473-e54a-4866-a9d2-ea64b6e3f5ac",
+					"@type": "ImageService2",
+					"profile": "http://iiif.io/api/image/2/level1.json"
+				  },
+				  {
+					"id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/image/84487473-e54a-4866-a9d2-ea64b6e3f5ac",
+					"type": "ImageService3",
+					"profile": "level1"
+				  },
+				  {
+					"id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/image/lightingmap/84487473-e54a-4866-a9d2-ea64b6e3f5ac.json",
+					"type": "LightingMapExtension",
+					"profile": "http://iiif.io/api/extension/lightingmap",
+					"mapType": "albedo"
+				  }
+				]
+			  },
+			  {
+				"id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/image/5a0630b3-2b08-4ce5-86fa-a465d472c167/full/max/0/default.jpg",
+				"type": "Image",
+				"format": "image/jpeg",
+				"label": {
+				  "en": [
+					"Obverse [normal map]"
+				  ]
+				},
+				"width": 2958,
+				"height": 4056,
+				"service": [
+				  {
+					"@id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/image/5a0630b3-2b08-4ce5-86fa-a465d472c167",
+					"@type": "ImageService2",
+					"profile": "http://iiif.io/api/image/2/level1.json"
+				  },
+				  {
+					"id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/image/5a0630b3-2b08-4ce5-86fa-a465d472c167",
+					"type": "ImageService3",
+					"profile": "level1"
+				  },
+				  {
+					"id": "https://iiif-qa.bodleian.ox.ac.uk/iiif/image/lightingmap/5a0630b3-2b08-4ce5-86fa-a465d472c167.json",
+					"type": "LightingMapExtension",
+					"profile": "http://iiif.io/api/extension/lightingmap",
+					"mapType": "normal"
+				  }
+				]
+			  }
+			]
+		  },
+		  "motivation": "painting"
+		}
+	  ]
+	}
+]
+
+```
+
+## Image formats
+
 The plug-in makes use of normal map data generated from photometric techniques of objects and renders a "2.5D"
 interactive experience using a three.js canvas overlay.  Because of this, we recommend that you use a lossless image
-format such as PNG or WebP for your albedo and normal map layers. WebP, however, is not currently supported as of 
-version 4.10 of OpenSeadragon, it is, however, planned for inclusion in version 5.0.  In order to work around this for 
-now, you can build your own version of OpenSeadragon with the following modification, where we have added WebP to the 
-list of formats supported.
+format such as PNG or WebP for your albedo and normal map layers.
 
-```javascript
-var FILEFORMATS = {
-            bmp:  false,
-            jpeg: true,
-            jpg:  true,
-            png:  true,
-            tif:  false,
-            wdp:  false,
-            webp: true
-}
-```
-
-Host your build on GitHub or GitLabs and override the version used by Mirador by adding something like the following
-to your package.json file, where the `org/repository` points to your own.
+To make sure that OpenSeadragon uses this format you need to set it as the prefered format in your IIIF image info.json
+responses, like as follows, you may also need to set extra formats:
 
 ```json
-"overrides": {
-    "openseadragon": "github:org/repository"
-  }
+ "preferredFormats": [
+    "webp"
+],
+"extraFormats": [
+    "webp"
+],
+
 ```
 
-# IIIF Presentation and Image API Support
-The plug-in is intended to be used with version 3 of the IIIF presentation and image APIs to make use of the
-`preferredFormat` property, so that you can use WebP format.  However, you can technically get choices working
-in version 2.  For the plug-in to work at all you will need to extend IIIF presentation API for choices in the 
-following way, where we add in type `lightingMapExtension` and `mapType`:
+## Building Mirador with the plug-in
 
-```json
-{
-            "id": "http://0.0.0.0:8000/iiif/canvas/object_id.json",
-            "type": "Canvas",
-            "label": {
-                "en": [
-                    "front end"
-                ]
-            },
-            "width": 1508,
-            "height": 5300,
-            "items": [
-                {
-                    "id": "http://0.0.0.0:8000/iiif/annotationpage/object_id.json",
-                    "type": "AnnotationPage",
-                    "items": [
-                        {
-                            "id": "http://0.0.0.0:8000/iiif/annotation/object_id.json",
-                            "type": "Annotation",
-                            "target": "http://0.0.0.0:8000/iiif/canvas/object_id.json",
-                            "body": {
-                                "type": "Choice",
-                                "items": [
-                                    {
-                                        "id": "http://0.0.0.0:8000/iiif/image/image_id/full/max/0/default.png",
-                                        "type": "Image",
-                                        "format": "image/png",
-                                        "label": {
-                                            "en": [
-                                                "front end"
-                                            ]
-                                        },
-                                        "width": 1508,
-                                        "height": 5300,
-                                        "service": [
-                                            {
-                                                "@id": "http://0.0.0.0:8000/iiif/image/image_id",
-                                                "@type": "ImageService2",
-                                                "profile": "http://iiif.io/api/image/2/level1.json"
-                                            },
-                                            {
-                                                "id": "http://0.0.0.0:8000/iiif/image/image_id",
-                                                "type": "ImageService3",
-                                                "profile": "level1"
-                                            },
-                                            {
-                                                "id": "http://0.0.0.0:8000/iiif/image/lightingmap/image_id.json",
-                                                "type": "LightingMapExtension",
-                                                "profile": "http://iiif.io/api/extension/lightingmap",
-                                                "mapType": "albedo"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "id": "http://0.0.0.0:8000/iiif/image/image_id/full/max/0/default.png",
-                                        "type": "Image",
-                                        "format": "image/png",
-                                        "label": {
-                                            "en": [
-                                                "front end"
-                                            ]
-                                        },
-                                        "width": 1508,
-                                        "height": 5300,
-                                        "service": [
-                                            {
-                                                "@id": "http://0.0.0.0:8000/iiif/image/image_id",
-                                                "@type": "ImageService2",
-                                                "profile": "http://iiif.io/api/image/2/level1.json"
-                                            },
-                                            {
-                                                "id": "http://0.0.0.0:8000/iiif/image/image_id",
-                                                "type": "ImageService3",
-                                                "profile": "level1"
-                                            },
-                                            {
-                                                "id": "http://0.0.0.0:8000/iiif/image/lightingmap/image_id.json",
-                                                "type": "LightingMapExtension",
-                                                "profile": "http://iiif.io/api/extension/lightingmap",
-                                                "mapType": "normal"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        }
-                    ],
-                    "motivation": "painting"
-                }
-            ]
-        }
-```
+To build and minify your own copy of Mirador with the plug-in installed, start a new project and install at least `node.js` version 22. You can copy the .nvmrc config from this repo into the new project.
 
-# IIIF Choices and Mirador Viewer Config
-This Mirador plug-in makes use of IIIF Choices and is developed for single page view only; because of this we take control of Mirador via the plug-in and set
-the config for the default viewing experience whenever a Choices body type is detected at canvas level.  
-
-You are still free to manually change to book view in the Mirador menu, however, the plug-in won't work as intended.
-
-The view config we inject is identical to the exerpt below:
-
-```json
-    views: [
-    { key: 'single', behaviors: ['individuals', 'paged'] },
-    { key: 'book', behaviors: ['individuals', 'paged'] },
-    { key: 'scroll', behaviors: ['continuous'] },
-    { key: 'gallery' },
-    ]
-```
-
-# Installation and build
-Make sure you have node.js and npm installed.  It might also be good to install nvm to allow you to switch versions of
-node.js more easily.
-
-Change the default version of node, node version 22+ is compatible.
+Then first install the plug-in by running the following command:
 
 ```bash
-nvm install 20.19.0
-```
-
-Make nvm use whatever version is compatible.
-
-```bash
-nvm use 20
-```
-
-To build Mirador bundled with our plug-in, run the following commands from the root directory of your 
-Mirador build repository:
-
-Install the dependencies.
-
-```bash
-npm install mirador@3.4.2  
+npm install github:bodleian/archiox-mirador-plugin.git
 ```
 
 Then add the following dependencies verbatim to the dependencies dictionary of the package.json file so that it looks
@@ -187,20 +164,25 @@ like the example below:
 
 ```json
 "dependencies": {
-    "mirador": "3.4.3",
+    "@blueprintjs/core": "^5.18.0",
+    "@blueprintjs/icons": "^5.21.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@rollup/plugin-replace": "^6.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
     "archiox-mirador-plugin": "github:bodleian/archiox-mirador-plugin.git",
+    "mirador": "3.4.3",
     "mirador-image-tools": "0.11",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
     "react-i18next": "^15.4.1",
     "url-loader": "^4.1.1",
     "vite": "^6.2.3",
-    "@vitejs/plugin-react": "^4.3.4",
     "vite-plugin-svgr": "^4.3.0"
-}
+  },
+
 ```
+
 Then delete the package-lock.json file and re-run the install command as follows:
 
 ```bash
@@ -208,8 +190,8 @@ npm install
 ```
 
 Create a `/src` folder with a new `index.js` in it, copy-paste the following into it (edit for your needs):
-**NB: ** This example is configured for the Bodleian Library set up of using content negotiation to serve 
-either v2/v3 IIIF image and or presentation API requests.  Replace `your_iiif_manifest.json` with the uri to the 
+**NB: ** This example is configured for the Bodleian Library set up of using content negotiation to serve
+either v2/v3 IIIF image and or presentation API requests.  Replace `your_iiif_manifest.json` with the uri to the
 manifest you wish to serve Mirador viewer.
 
 ```javascript
@@ -345,62 +327,30 @@ To serve a preview of your Mirador build locally on the localhost, run the follo
 npm run preview
 ```
 
-# Development  Rules
-All new features should be placed in feature branches and not pushed direct to the `qa` or `master` branches as per our 
-other repos.  That way we can test new features without breaking anything.
+## Local development
 
-# Developing locally
-To develop the application locally you can work on and edit the code in your Mirador build folders `node_modules`
-directory under `node_modules/archiox-mirador-plugin/src/plugins` and rebuild the application using `npm run build`.
-
-Any changes you get working in this way can be then added to commits as a feature branch of the `archiox-mirador-plugin`
-repository.
-
-To pull in changes from a feature branch you can specify the branch and commit in your `package.json` and 
-`package-lock.sjon` files in your Mirador build folder.  Update all instances of `archiox-mirador-plugin` to something
-like the following (this is only an example of the kind of thing to look for):
-
-```json
-"packages": {
-    "": {
-"archiox-mirador-plugin": "github:bodleian/archiox-mirador-plugin#example-feature-branch",
-},
-"node_modules/archiox-mirador-plugin": {
-"version": "0.0.1",
-"resolved": "https://github.com/bodleian/archiox-mirador-plugin.git#example-commit-hash",
-"license": "N/A",
-"dependencies": {
-"react-loader-spinner": "^5.3.4",
-"three": "^0.146.0"
-},
-"peerDependencies": {
-"mirador": "^3.0.0-rc.4",
-"react": "16.x",
-"react-dom": "16.x"
-}
-}
-```
-
-Then run the following command (warning this will wipe out any local changes, because it does a clean install):
+To make code changes and immediately see the changes to the plug-in locally, from the location where you cloned this repository, run the following script:
 
 ```bash
-npm ci
+npm run dev
 ```
 
-## es-lint and Prettier
-To lint and autoformat your code locally, run the following script from this repositories root directory, 
+### es-lint and Prettier
+To lint and autoformat your code locally, run the following script from this repositories root directory,
 not your Mirador build, after installing the relevant dependencies in the normal way:
 
 ```bash
 npm run lint
 ```
 
-## Unit testing
+### Unit testing
 To run the unit tests locally, run the following command:
 
 ```bash
 npm run test
 ```
+
+Make changes to the plug-in code and the changes will hot reload in your browser (just refresh the page).
 
 ## Gotchas
 
@@ -419,3 +369,73 @@ osdConfig: {
 ```
 
 This tells OpenSeadragon to load images with the `crossOrigin="anonymous"` attribute, allowing Three.js to use them as textures (provided the image server sends proper CORS headers like `Access-Control-Allow-Origin: *`).
+
+# Usage
+
+You can play around with our current implementation [here](https://iiif.bodleian.ox.ac.uk/iiif/mirador/?iiif-content=https://iiif.bodleian.ox.ac.uk/iiif/manifest/1fc3f35d-bbb5-4524-8fbe-a5bcb5468be2.json)
+
+1.  When Mirador first opens you'll see our plug-in user interface open by default on the top left of the OpenSeadragon viewport. The following options are available in this initial state, capture render snapshot is disabled until the 3D overlay is activated:
+    - <img src="./public/icons/close_sharp.svg" width="24" style="vertical-align: middle;" alt="Close Sharp svg Icon" />|<img src="./public/icons/build_outline.svg" width="24" style="vertical-align: middle;" alt="Build outline svg icon"/> Collapse/Expand rendering toolbar
+      >This button simply expands or collapses the main plugin toolbar.
+    - <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" alt="Highlight outline svg icon"/>|<img src="./public/icons/highlight_baseline.svg" width="24" style="vertical-align: middle;" alt="Highlight baseline icon"/> Activate 3D overlay/Deactivate 3D overlay
+      >This button activates or deactivates a WebGL 3D renderer overlay positioned over the object in the OpenSeadragon viewport that relights the object using normal and albedo map data.
+    - <img src="./public/icons/collections_outline.svg" width="24" style="vertical-align: middle;" alt="Collections outline svg icon"/> Select active layer
+      >This button opens up a submenu allowing the user to choose which layer in the IIIF choices stack is currently active via image thumbnail buttons. 
+    
+2.  When the 3D overlay is active, after pressing the <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" /> `Activate 3D overlay` button. A 3D overlay will be superimposed over the object in the OpenSeadragon viewport and the toolbar will expand downwards with the following extra options:
+    - <img src="./public/icons/control_camera_baseline.svg" width="24" style="vertical-align: middle;" alt="Control camera baseline svg icon"/> Move directional light trackball
+      >This icon appears below a circular polar angle control that will move the directional lighting in the 3D overlay when the user clicks and drags the mouse cursor over it.  The coordinates in this control map to a hemisphere in the 3D overlay, i.e. if one moves the light direction to the centre, the light will be at the "zenith" (altitude of 90 deg directly above the object) and moving it to the far right in the middle it will be at an altitude of 0 deg at an azimuth of 90 deg.
+    - <img src="./public/icons/highlight_baseline.svg" width="24" style="vertical-align: middle;" alt="Highlight baseline svg icon"/> Move directional light torch
+      >This draggable button is an alternative to the circular polar angle control allowing the user to map the directional light movement to the confines of the OpenSeadragon view port instead of the smaller control, this might be easier for certain people to use than the other method, and it works in a similar way.
+    - <img src="./public/icons/highlight_outline.svg" width="24" style="vertical-align: middle;" alt="Highlight outline svg icon" /> Change directional light intensity
+      >This icon appears below a slider control that allows the user to increase or decrease the intensity of the directional light source; this can be helpful in exaggerating or attenuating shadows and highlights.
+    - <img src="./public/icons/wb_incandescent_outline.svg" width="24" style="vertical-align: middle;" alt="Wb incandescent outline svg icon" /> Change ambient light intensity
+      >This icon appear below a slider control that allows the user to increase or decrease the incidental light source of the scene i.e. the light coming from the "environment" and not the torch.
+    - <img src="./public/icons/height_baseline.svg" width="24" style="vertical-align: middle;" alt="Height baseline svg icon" /> Change normal depth
+      >This icon appears below a slider control that allows the user to increase or decrease the normal depth of the object; what this means is that the depth of the surface details can be artificially increased or flattened to the baseline data, this is especially useful for objects with very shallow details such as paper block prints.
+    - <img src="./public/icons/waves_baseline.svg" width="24" style="vertical-align: middle;" alt="Waves baseline svg icon" /> Change object roughness 
+      >This icon appears below a slider control that allows the user to increase or decrease the roughness value of the default physically based rendering (PBR) shader we use to blend our textures into a realistic rendering of the object in the 3D overlay. Paper and matte objects have medium to high roughness values, i.e. the higher the roughness the less light will be reflected by the object, conversely a polished object will have a low roughness value.  This control allows the user to adjust this value to optimise their viewing experience depending on the materials the object is composed of.
+    - <img src="./public/icons/flare_baseline.svg" width="24" style="vertical-align: middle;" alt="Flare baseline svg icon" /> Change object metalness
+      >This icon appears below a slider control that allows the user to increase or dcrease the metalness value of the default physically based rendering (PBR) shader we use to blend our textures into a realistic rendering of the object in the 3D overlay.  Metal materials have a metalness value of 1 and non-metal materials (dielectric) have a metalness value of 0.  If the object is meant to be metallic, set the metalness value to 1, otherwise set it to 0. 
+    - <img src="./public/icons/replay_sharp.svg" width="24" style="vertical-align: middle;" alt="Replay sharp svg icon" /> Reset all light settings 
+      >This button will reset all changed lighting settings, including light direction to the default values for the shader selected.
+    - <img src="./public/icons/assistant_outline.svg" width="24" style="vertical-align: middle;" alt="Assistant outline svg icon" /> Turn on directional light helper
+      >This button will add a visual helper to the directional light so that you can see where the directional light is currently pointing to.  The white dot is the focal point of the light, and the blue square the direction the light is coming from.
+    - <img src="./public/icons/brightness_full_baseline.svg" width="24" style="vertical-align: middle;" alt="Brightness full baseline svg icon" />|<img src="./public/icons/localmovies_baseline.svg" width="24" style="vertical-align: middle;" alt="Local movies baseline svg icon" /> Specular enhancement mode/Physically based rendering mode
+      >This button will toggle between two different shaders, physically based rendering and specular enhancement. The first will try to render a lifelike digital facsimile of the object as it would appear in real life and specular enhancement is a monochrome representation designed to exaggerate highlights and shadows allowing the user to see potentially hidden details better.
+    - <img src="./public/icons/help_outline.svg" width="24" style="vertical-align: middle;" alt="Help outline svg icon" /> Help
+      >This button will toggle the appearance of a dialogue box containing a version of the helptext above.
+    
+# Key Features
+
+1. Realtime user controlled relighting and rendering of 2.5D scenes using just a 2D diffuse colour map and normal map
+2. User controllable directional and ambient virtual light sources
+3. Diffuse colour map and normal map ambivalence: it doesn't matter if your scanning data comes from photometric stereo, photogrammetry, or RTI
+4. IIIF choices layer selection menu
+5. Render capture button to capture and share the current render on the screen
+6. PBR or Phong shading modes for photorealism or exaggerating shadows and highlights
+7. Downloadable IIIF choices images; which you can import into your own tools
+
+# Contributing
+
+We welcome contributions to improving this public repository.  Please be aware that in order to submit a change you may need
+to fork the project first.  Please base all development branches off of the QA branch first, any pull requests to master will
+be rebased onto QA by our reviewers.
+
+Please see the [installation instructions](#installation-instructions) for how to set up a local development environment to
+further improve this tool.
+
+# License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+# Contact Information
+
+For all issues related to the code and behaviour of this repo please raise an issue here.  For all other queries related to
+ARCHiOx please contact digital-bodleian@bodleian.ox.ac.uk
+
+# Acknowledgements
+
+This project was made possible through the generous support of **The Helen Hamlyn Trust**, whose funding enabled its development.
+
+We also gratefully acknowledge **Factum Arte** for providing the Selene scanning technology, and ongoing technical support that made this work possible.

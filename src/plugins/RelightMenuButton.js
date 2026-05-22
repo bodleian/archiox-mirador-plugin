@@ -17,9 +17,7 @@ class RelightMenuButton extends React.Component {
     return (
       <MiradorMenuButton
         aria-label={
-          open
-            ? 'Collapse relighting tools'
-            : 'Expand relighting tools to access controls that allow 3D rendering of this object in your browser'
+          open ? 'Collapse relighting toolbar' : 'Expand relighting toolbar'
         }
         style={{
           float: 'left',

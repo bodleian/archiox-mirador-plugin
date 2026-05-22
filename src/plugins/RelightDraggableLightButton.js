@@ -10,29 +10,40 @@ class RelightDraggableLightButton extends Component {
   }
 
   render() {
-    const { onDrag, onStop, onMouseOver, onMouseLeave, isDragging, isOver } =
-      this.props;
-    return (
-      <Draggable
-        onDrag={(event) => onDrag(event)}
-        onStop={(event) => onStop(event)}
-        bounds=".draggable-container"
-      >
-        <div
-          onMouseOver={(event) => onMouseOver(event)}
-          onMouseLeave={(event) => onMouseLeave(event)}
+    const {
+      onDrag,
+      onStop,
+      onMouseOver,
+      onMouseLeave,
+      isDragging,
+      isOver,
+      isVisible,
+    } = this.props;
+    if (isVisible) {
+      return (
+        <Draggable
+          onDrag={(event) => onDrag(event)}
+          onStop={(event) => onStop(event)}
+          bounds=".draggable-container"
         >
-          <Tooltip
-            open={isDragging || !isOver ? false : true}
-            title={'Drag this button to move the directional light around'}
+          <div
+            onMouseOver={(event) => onMouseOver(event)}
+            onMouseLeave={(event) => onMouseLeave(event)}
           >
-            <div className="draggable-torch-button">
-              <HighLightOutlined />
-            </div>
-          </Tooltip>
-        </div>
-      </Draggable>
-    );
+            <Tooltip
+              open={isDragging || !isOver ? false : true}
+              title={'Move directional light torch'}
+            >
+              <div className="draggable-torch-button">
+                <HighLightOutlined />
+              </div>
+            </Tooltip>
+          </div>
+        </Draggable>
+      );
+    } else {
+      return null;
+    }
   }
 }
 
@@ -49,6 +60,8 @@ RelightDraggableLightButton.propTypes = {
   isDragging: PropTypes.bool.isRequired,
   /** The isOver prop is a boolean value telling the component if the mouse is over it or not **/
   isOver: PropTypes.bool.isRequired,
+  /** The isVisible prop is a boolean value telling the button to render or not**/
+  isVisible: PropTypes.bool.isRequired,
 };
 
 export default RelightDraggableLightButton;

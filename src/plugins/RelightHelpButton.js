@@ -14,13 +14,7 @@ class RelightHelpButton extends React.Component {
   render() {
     const { id, onClick } = this.props;
     return (
-      <MiradorMenuButton
-        id={id}
-        aria-label={
-          'Click here to open up a dialog box providing in-detail guidance on using this tool'
-        }
-        onClick={onClick}
-      >
+      <MiradorMenuButton id={id} aria-label={'Help'} onClick={onClick}>
         <HelpOultined />
       </MiradorMenuButton>
     );

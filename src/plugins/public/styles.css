@@ -108,3 +108,29 @@
     border: none;
     pointer-events: none;
 }
+
+.icon {
+    width: 24px;
+    vertical-align: middle;
+    margin: 2px;
+}
+
+.relightHelpDialogTextParagraph {
+    text-align: justify;
+}
+
+.MuiDialogTitle-root.relightHelpDialogHeader {
+    padding: 5px 24px;
+    background: lightgray;
+}
+
+.relightHelpDialogHeadingOne {
+    margin-block-start: 0.4em;
+    margin-block-end: 0.2em;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+}
+
+.relightHelpDialogContainer {
+  max-width: 650px;
+}

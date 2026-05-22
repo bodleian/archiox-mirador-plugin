@@ -19,7 +19,7 @@ class RelightSnapshotButton extends React.Component {
       <div className="relightMenuButton">
         <MiradorMenuButton
           id={id}
-          aria-label="Take a screenshot of the current rendered view"
+          aria-label="Capture render snapshot"
           onClick={onClick}
           disabled={!active}
         >
