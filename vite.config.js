@@ -10,18 +10,6 @@ export default defineConfig(({ command }) => {
     },
     plugins: [react(), svgr()],
     root: isBuild ? '.' : './dev',
-    esbuild: {
-      loader: 'jsx',
-      include: /.*\.jsx?$/,
-      exclude: [],
-    },
-    optimizeDeps: {
-      esbuildOptions: {
-        loader: {
-          '.js': 'jsx',
-        },
-      },
-    },
     build: undefined,
     base: './',
     test: {
