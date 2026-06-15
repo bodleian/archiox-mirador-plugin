@@ -1,7 +1,8 @@
 {
   "name": "archiox-mirador-plugin",
-  "version": "1.3.0",
+  "version": "1.4.1",
   "engines": {
+    "node": "22.14.0",
     "npm": ">=11.10.0"
   },
   "description": "An experimental plugin to display depth information captured with Lucida or Selene scanners from FactumARTE. However, the plug-in can present any normal map/albedo map combination produced from any technique.\n\nTopics\n",
@@ -38,11 +39,10 @@
     "prop-types": "15.8.1",
     "react-draggable": "4.5.0",
     "three": "0.178.0",
-    "uuid": "9.0.1"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.27.0",
-    "@vitejs/plugin-react": "4.6.0",
+    "@vitejs/plugin-react": "6.0.2",
     "eslint": "8.57.1",
     "eslint-config-prettier": "8.10.0",
     "eslint-plugin-prettier": "4.2.1",
@@ -54,15 +54,16 @@
     "prettier": "2.8.8",
     "react": "16.14.0",
     "react-dom": "16.14.0",
-    "vite": "7.3.1",
-    "vite-plugin-svgr": "4.3.0",
-    "vitest": "3.2.4"
+    "vite": "8.0.16",
+    "vite-plugin-svgr": "5.2.0",
+    "vitest": "4.1.8"
   },
   "overrides": {
     "tap-out": "github:scottcorgan/tap-out.git",
     "mirador": {
-      "dompurify": "3.3.3"
+      "dompurify": "3.4.0",
+      "lodash": "4.18.1"
     },
-    "brace-expansion": "5.0.5"
+    "brace-expansion": "5.0.6"
   }
 }
