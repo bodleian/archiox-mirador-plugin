@@ -1,6 +1,6 @@
 {
   "name": "archiox-mirador-plugin",
-  "version": "1.3.0",
+  "version": "1.4.1",
   "engines": {
     "node": "22.14.0",
     "npm": ">=11.10.0"
