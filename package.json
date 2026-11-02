@@ -49,23 +49,33 @@
     "eslint-plugin-react": "7.37.4",
     "eslint-plugin-react-hooks": "4.6.2",
     "expect.js": "0.3.1",
-    "jsdom": "30.1.1",
+    "jsdom": "30.1.3",
     "mirador-image-tools": "0.11.0",
     "prettier": "2.8.8",
     "react": "16.14.0",
     "react-dom": "16.14.0",
-    "vite": "8.0.16",
+    "vite": "8.1.6",
     "vite-plugin-svgr": "5.2.0",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   },
   "overrides": {
     "tap-out": "github:scottcorgan/tap-out.git",
     "mirador": {
-      "dompurify": "3.4.16",
+      "dompurify": "3.4.17",
       "lodash": "4.18.1"
     },
     "minimatch": {
       "brace-expansion": "5.0.12"
+    },
+    "jsdom": {
+      "css-tree": {
+        "source-map-js": "1.2.2"
+      }
+    },
+    "vite": {
+      "postcss": {
+        "source-map-js": "1.2.2"
+      }
     }
   }
 }
